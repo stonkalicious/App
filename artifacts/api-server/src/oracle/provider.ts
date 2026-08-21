@@ -1,4 +1,4 @@
-import type { AllowlistedAsset, ContractSnapshot, PortfolioObservation } from "./types";
+import type { AllowlistedAsset, AssetKind, ContractSnapshot, PortfolioObservation } from "./types";
 
 type ProviderResponse = {
   wallet?: unknown;
@@ -56,19 +56,27 @@ export class PublicAssetProvider {
     if (!isWallet(candidate.wallet) || candidate.wallet.toLowerCase() !== wallet.toLowerCase()) throw new Error("Public asset provider wallet mismatch");
 
     const assets = Array.isArray(candidate.assets) ? candidate.assets : [];
-    const allowlistedSymbols = new Set(this.allowlist.map((asset) => asset.symbol));
     const normalizedAssets = assets.map((asset) => {
       if (!asset || typeof asset !== "object") throw new Error("Public asset provider returned an invalid asset");
       const item = asset as Record<string, unknown>;
       const symbol = typeof item.symbol === "string" ? item.symbol.toUpperCase() : "";
       const valueUsd = numberValue(item.valueUsd, `${symbol || "asset"}.valueUsd`);
-      const included = allowlistedSymbols.has(symbol);
+      const kind = item.kind;
+      const contractAddress = typeof item.contractAddress === "string" ? item.contractAddress.toLowerCase() : "";
+      const configured = this.allowlist.find((entry) =>
+        entry.symbol === symbol &&
+        entry.contractAddress.toLowerCase() === contractAddress &&
+        entry.kind === kind,
+      );
+      const capped = configured?.maxContributionUsd !== undefined && valueUsd > configured.maxContributionUsd;
+      const included = Boolean(configured) && !capped;
+      const normalizedKind: AssetKind = kind === "stock" || kind === "etf" || kind === "coin" ? kind : "coin";
       return {
         symbol: symbol || "UNKNOWN",
-        kind: (typeof item.kind === "string" ? item.kind : "unknown") as "stock" | "etf" | "coin",
+        kind: normalizedKind,
         valueUsd,
         included,
-        ...(included ? {} : { exclusionReason: "not allowlisted" }),
+        ...(!included ? { exclusionReason: capped ? "contribution cap exceeded" : "not allowlisted" } : {}),
       };
     });
 

@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: warriors
+    description: Live warrior metadata
 paths:
   /healthz:
     get:
@@ -24,6 +26,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /warriors/{tokenId}:
+    get:
+      operationId: getWarriorMetadata
+      tags: [warriors]
+      summary: Get live metadata for a warrior
+      description: Returns current metadata derived from the owner's qualifying public portfolio data. Stale data is explicitly marked.
+      parameters:
+        - name: tokenId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[1-9][0-9]*$"
+      responses:
+        "200":
+          description: Warrior metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WarriorMetadata"
+        "400":
+          description: Invalid token ID
+        "503":
+          description: Data source is unavailable or not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +63,51 @@ components:
           type: string
       required:
         - status
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    WarriorAttribute:
+      type: object
+      properties:
+        trait_type:
+          type: string
+        value:
+          oneOf:
+            - type: string
+            - type: number
+      required: [trait_type, value]
+    WarriorMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+          format: uri
+        external_url:
+          type: string
+          format: uri
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/WarriorAttribute"
+        properties:
+          type: object
+          properties:
+            wallet:
+              type: string
+            epoch:
+              type: string
+            observedAt:
+              type: string
+              format: date-time
+            stale:
+              type: boolean
+          required: [wallet, epoch, observedAt, stale]
+      required: [name, description, image, external_url, attributes, properties]
 

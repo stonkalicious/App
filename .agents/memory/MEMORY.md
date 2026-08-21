@@ -1,1 +1,2 @@
 - [Launch safety boundary](launch-safety.md) — mint authorization, identity uniqueness, and non-custodial contract policies must stay enforced before deployment.
+- [Oracle data boundary](oracle-data-boundary.md) — live metadata must use configured, allowlisted public data and never fabricate unavailable wallet performance.

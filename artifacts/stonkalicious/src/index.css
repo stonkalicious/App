@@ -506,6 +506,51 @@ body {
   animation: float 5s ease-in-out infinite;
 }
 
+.warrior-art {
+  position: relative;
+  width: min(100%, 520px);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid rgba(238, 233, 221, .22);
+  background: #131722;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .28);
+}
+
+.warrior-art img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(.92) contrast(1.04);
+  transition: opacity .35s ease, transform .55s cubic-bezier(.22, 1, .36, 1);
+}
+
+.warrior-art:hover img {
+  transform: scale(1.035);
+}
+
+.artwork-glow {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(118, 102, 201, .2), transparent 40%, rgba(236, 100, 47, .16));
+  mix-blend-mode: screen;
+}
+
+.level-liquidated .artwork-glow,
+.level-wrecked .artwork-glow {
+  background: linear-gradient(135deg, rgba(74, 18, 32, .36), transparent 46%, rgba(236, 100, 47, .12));
+}
+
+.level-elite .artwork-glow,
+.level-plumber .artwork-glow {
+  background: linear-gradient(135deg, rgba(245, 191, 88, .18), transparent 46%, rgba(255, 113, 60, .2));
+}
+
 .reveal-up {
   animation: revealUp 0.8s cubic-bezier(.22, 1, .36, 1) both;
 }

@@ -260,7 +260,7 @@ function App() {
           {[
              ['8', 'market-tested levels'],
              ['1', 'warrior per wallet'],
-            ['0', 'random wallet noise'],
+             ['1:1', 'wallet / X identity'],
             ['∞', 'reasons to keep building'],
           ].map(([value, label], index) => (
             <div key={label} className={`px-5 py-7 md:px-10 ${index < 3 ? 'border-b border-[#eee9dd]/15 md:border-b-0 md:border-r' : ''}`}>
@@ -371,7 +371,8 @@ function App() {
           </div>
           <div className="grid gap-3">
             {[
-              [Shield, 'Allowlisted assets only', 'Official Robinhood tokenized stocks and ETFs, plus a short fixed list of large Robinhood Chain coins.'],
+              [Shield, 'One identity per warrior', 'One wallet gets one warrior. One verified X profile gets one active performance identity.'],
+              [WalletCards, 'Allowlisted assets only', 'Official Robinhood tokenized stocks and ETFs, plus a short fixed list of large Robinhood Chain coins.'],
               [Flame, 'Capped coin contribution', 'Allowlisted coins count, but a meme pump cannot instantly summon a Tier 4 warrior.'],
               [RotateCcw, 'Transfer means reset', 'When the NFT moves, its snapshot moves with it. The new owner starts fresh. The warrior can drop tiers.'],
             ].map(([Icon, title, copy], index) => {

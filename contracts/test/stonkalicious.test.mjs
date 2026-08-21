@@ -63,12 +63,12 @@ test("enforces one lifetime warrior per wallet and binds each X profile once", a
   const { server, contract, owner, alice, bob } = await fixture();
   try {
     await (await contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") })).wait();
-    await assert.rejects(contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") }));
+    await assert.rejects(async () => (await contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") })).wait());
     const profileHash = ethers.keccak256(ethers.toUtf8Bytes("x-account-123"));
     await (await contract.bindXProfile(1, profileHash)).wait();
     assert.equal(await contract.warriorByXProfile(profileHash), 1n);
     assert.equal(await contract.xProfileOf(1), profileHash);
-    await assert.rejects(contract.bindXProfile(1, ethers.keccak256(ethers.toUtf8Bytes("x-account-456"))));
+    await assert.rejects(async () => (await contract.bindXProfile(1, ethers.keccak256(ethers.toUtf8Bytes("x-account-456")))).wait());
     await assert.rejects(contract.connect(alice).bindXProfile(1, profileHash));
     await (await contract.connect(alice).transferFrom(await alice.getAddress(), await bob.getAddress(), 1)).wait();
     assert.equal(await contract.warriorByXProfile(profileHash), 0n);
@@ -84,7 +84,7 @@ test("enforces mint limits, exact payment, and supply cap", async () => {
     await assert.rejects(contract.connect(alice).mint(1, { value: 0 }));
     await assert.rejects(contract.connect(alice).mint(2, { value: ethers.parseEther("0.02") }));
     await (await contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") })).wait();
-    await assert.rejects(contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") }));
+    await assert.rejects(async () => (await contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") })).wait());
   } finally {
     await server.close();
   }

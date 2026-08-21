@@ -164,10 +164,8 @@ contract Stonkalicious {
         if (existingToken != 0 && existingToken != tokenId) revert XProfileAlreadyBound();
 
         bytes32 previousHash = xProfileOf[tokenId];
-        if (previousHash != bytes32(0) && previousHash != profileHash) {
-            delete warriorByXProfile[previousHash];
-            emit XProfileUnbound(tokenId, previousHash, tokenOwner);
-        }
+        if (previousHash != bytes32(0) && previousHash != profileHash) revert XProfileAlreadyBound();
+        if (previousHash == profileHash) return;
         warriorByXProfile[profileHash] = tokenId;
         xProfileOf[tokenId] = profileHash;
         emit XProfileBound(tokenId, profileHash, tokenOwner);

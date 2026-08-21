@@ -217,8 +217,8 @@ function App() {
           <div className="mono-face mb-7 flex items-center gap-3 text-[10px] text-[#ec642f]">
             <span className="h-px w-10 bg-[#ec642f]" /> dynamic nft / robinhood chain
           </div>
-          <h1 className="display-face max-w-[760px] text-[clamp(4rem,10vw,8.8rem)] font-extrabold leading-[.82]">
-             who’s<br /><span className="text-[#ec642f]">king</span> of the<br />Hood?
+           <h1 className="display-face max-w-[760px] text-[clamp(4rem,8vw,7.5rem)] font-extrabold leading-[.82]">
+             who’s <span className="text-[#ec642f]">king</span><br />of the<br />Hood?
           </h1>
           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
               Stonkalicious turns portfolio performance into a body. One warrior, eight levels of market trauma, and an on-chain mirror that cannot be faked. Your bag writes the answer.

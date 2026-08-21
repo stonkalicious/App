@@ -3,6 +3,10 @@
 This package contains the ERC-721 foundation for the Robinhood Chain testnet.
 The contract does not hold stocks, ETFs, or coins and does not try to read
 portfolio balances on-chain.
+The NFT and metadata service are strictly observational: they can read
+qualifying public on-chain balances and prices, but cannot move, trade,
+approve, or withdraw wallet assets. Never give the project a wallet seed phrase
+or private key.
 
 ## Architecture boundary
 

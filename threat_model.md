@@ -13,6 +13,7 @@
 5. Metadata cannot silently become malicious, disappear, or be rewritten without an observable record.
 6. A challenge ranking cannot be inflated by duplicate identities, fake progress, replayed claims, or unbounded API traffic.
 7. No private X OAuth data, credentials, or wallet-linked personal information is exposed unnecessarily.
+8. The NFT and its metadata/oracle services have read-only access to qualifying public wallet data and can never move, trade, approve, or withdraw user assets.
 
 ## Assets and trust boundaries
 
@@ -25,6 +26,22 @@
 | X account binding | X OAuth ↔ verifier ↔ contract | Account spoofing, OAuth CSRF, rebinding, privacy leaks |
 | Challenge rank | Wallet/oracle/API ↔ leaderboard | Sybil wallets, replay, rate abuse, fake cohort data |
 | Admin and deployment controls | Operators ↔ production | Hot-key compromise, accidental configuration, irreversible launch |
+
+## Non-custodial boundary
+
+The NFT is a read-only performance record, not a vault, broker, trading bot, or
+portfolio manager. The system must never request, accept, or store seed phrases,
+private keys, or wallet-draining approvals. Wallet connections should be used
+only to read public chain state and to request explicitly scoped signatures for
+identity or claim authorization. A wallet signature for a claim or identity
+must never be presented as permission to transfer user assets.
+
+The metadata/oracle service must use public RPC/indexer reads and separate
+server credentials for its own operations. It must not ask users to approve
+ERC-20 allowances, set operators, sign arbitrary transactions, or deposit
+assets into a contract. Any future contract change that adds custody,
+allowances, swaps, or withdrawals is outside this product's security boundary
+and requires a new review.
 
 ## Current high-priority findings
 

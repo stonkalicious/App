@@ -218,7 +218,7 @@ function App() {
             <span className="h-px w-10 bg-[#ec642f]" /> dynamic nft / robinhood chain
           </div>
           <h1 className="display-face max-w-[760px] text-[clamp(4rem,10vw,8.8rem)] font-extrabold leading-[.82]">
-            your bag<br /><span className="text-[#ec642f]">grows</span> your<br />warrior.
+             your bag<br /><span className="text-[#ec642f]">levels up</span><br />your avatar.
           </h1>
           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
              Stonkalicious turns portfolio performance into a body. One warrior, eight levels of market trauma, and an on-chain mirror that cannot be faked.
@@ -441,12 +441,24 @@ function App() {
         </div>
       </section>
 
+       <section id="risk" className="border-t-2 border-[#202534] bg-[#ec642f] px-5 py-14 text-[#202534] md:px-10 md:py-20" data-testid="section-risk">
+         <div className="mx-auto grid max-w-[1320px] gap-6 md:grid-cols-[auto_1fr] md:items-start md:gap-10">
+           <div className="mono-face border-2 border-[#202534] px-3 py-2 text-[10px] font-bold">high risk / read this</div>
+           <div className="max-w-[900px]">
+             <h2 className="display-face text-3xl font-bold leading-none md:text-5xl">Expect to lose everything.</h2>
+             <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and on-chain performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain assets and crypto assets are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
+             <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, market moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring a warrior. Do your own research and only participate with money you can afford to lose.</p>
+           </div>
+         </div>
+       </section>
+
       <footer className="bg-[#202534] px-5 py-8 text-[#aaa7a0] md:px-10">
         <div className="mx-auto flex max-w-[1320px] flex-col justify-between gap-5 md:flex-row md:items-center">
           <div className="flex items-center gap-3"><div className="grid h-8 w-8 place-items-center border border-[#f5bf58]"><span className="h-3 w-3 rounded-full bg-[#ec642f]" /></div><span className="display-face text-lg text-[#eee9dd]">stonkalicious</span></div>
-          <div className="mono-face text-[9px]">dynamic nft / robinhood chain / 2025</div>
-          <div className="flex gap-5 text-sm"><a href="#rules" data-testid="link-footer-rules" className="hover:text-[#f5bf58]">rules</a><a href="#mint" data-testid="link-footer-mint" className="hover:text-[#f5bf58]">mint</a><a href="#top" data-testid="link-footer-top" className="hover:text-[#f5bf58]">back to top ↑</a></div>
+           <div className="mono-face text-[9px]">dynamic nft / robinhood chain / 2026</div>
+           <div className="flex flex-wrap gap-5 text-sm"><a href="#rules" data-testid="link-footer-rules" className="hover:text-[#f5bf58]">rules</a><a href="#risk" data-testid="link-footer-risk" className="hover:text-[#f5bf58]">risk notice</a><a href="#mint" data-testid="link-footer-mint" className="hover:text-[#f5bf58]">mint</a><a href="#top" data-testid="link-footer-top" className="hover:text-[#f5bf58]">back to top ↑</a></div>
         </div>
+         <div className="mx-auto mt-6 max-w-[1320px] border-t border-[#eee9dd]/15 pt-5 text-[10px] leading-relaxed text-[#777985]">Digital collectibles are high risk. No guarantee of value, liquidity, uptime, or future performance. This notice is not a substitute for advice from a qualified lawyer or financial professional.</div>
       </footer>
     </main>
   );

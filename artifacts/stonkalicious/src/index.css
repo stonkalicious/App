@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @plugin "@tailwindcss/typography";
@@ -78,72 +79,72 @@
   --elevate-1: rgba(0, 0, 0, 0.03);
   --elevate-2: rgba(0, 0, 0, 0.08);
 
-  --background: red; /*replace with H S L */
+  --background: 40 34% 92%;
 
-  --foreground: red; /*replace with H S L */
+  --foreground: 228 25% 13%;
 
-  --border: red; /*replace with H S L */
+  --border: 228 18% 78%;
 
-  --card: red; /*replace with H S L */
+  --card: 40 40% 96%;
 
-  --card-foreground: red; /*replace with H S L */
+  --card-foreground: 228 25% 13%;
 
-  --card-border: red; /*replace with H S L */
+  --card-border: 228 18% 78%;
 
-  --sidebar: red; /*replace with H S L */
+  --sidebar: 40 34% 92%;
 
-  --sidebar-foreground: red; /*replace with H S L */
+  --sidebar-foreground: 228 25% 13%;
 
-  --sidebar-border: red; /*replace with H S L */
+  --sidebar-border: 228 18% 78%;
 
-  --sidebar-primary: red; /*replace with H S L */
+  --sidebar-primary: 17 87% 52%;
 
-  --sidebar-primary-foreground: red; /*replace with H S L */
+  --sidebar-primary-foreground: 40 40% 96%;
 
-  --sidebar-accent: red; /*replace with H S L */
+  --sidebar-accent: 38 86% 63%;
 
-  --sidebar-accent-foreground: red; /*replace with H S L */
+  --sidebar-accent-foreground: 228 25% 13%;
 
-  --sidebar-ring: red; /*replace with H S L */
+  --sidebar-ring: 17 87% 52%;
 
-  --popover: red; /*replace with H S L */
+  --popover: 40 40% 96%;
 
-  --popover-foreground: red; /*replace with H S L */
+  --popover-foreground: 228 25% 13%;
 
-  --popover-border: red; /*replace with H S L */
+  --popover-border: 228 18% 78%;
 
-  --primary: red; /*replace with H S L */
+  --primary: 17 87% 52%;
 
-  --primary-foreground: red; /*replace with H S L */
+  --primary-foreground: 40 40% 96%;
 
-  --secondary: red; /*replace with H S L */
+  --secondary: 228 25% 13%;
 
-  --secondary-foreground: red; /*replace with H S L */
+  --secondary-foreground: 40 40% 96%;
 
-  --muted: red; /*replace with H S L */
+  --muted: 38 30% 82%;
 
-  --muted-foreground: red; /*replace with H S L */
+  --muted-foreground: 228 12% 42%;
 
-  --accent: red; /*replace with H S L */
+  --accent: 38 86% 63%;
 
-  --accent-foreground: red; /*replace with H S L */
+  --accent-foreground: 228 25% 13%;
 
-  --destructive: red; /*replace with H S L */
+  --destructive: 4 74% 48%;
 
-  --destructive-foreground: red; /*replace with H S L */
+  --destructive-foreground: 40 40% 96%;
 
-  --input: red; /*replace with H S L */
-  --ring: red; /*replace with H S L */
-  --chart-1: red; /*replace with H S L */
-  --chart-2: red; /*replace with H S L */
-  --chart-3: red; /*replace with H S L */
-  --chart-4: red; /*replace with H S L */
-  --chart-5: red; /*replace with H S L */
+  --input: 228 18% 78%;
+  --ring: 17 87% 52%;
+  --chart-1: 17 87% 52%;
+  --chart-2: 38 86% 63%;
+  --chart-3: 145 38% 42%;
+  --chart-4: 228 25% 13%;
+  --chart-5: 264 28% 48%;
 
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: Georgia, serif;
-  --app-font-mono: Menlo, monospace;
-  --radius: 0.5rem; /* 8px */
+  --app-font-sans: 'Space Grotesk', sans-serif;
+  --app-font-serif: 'Syne', sans-serif;
+  --app-font-mono: 'DM Mono', monospace;
+  --radius: 0.85rem;
   --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0); /*replace with H S L */
   --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0); /*replace with H S L */
   --shadow-sm:
@@ -227,68 +228,68 @@
   --elevate-1: rgba(255, 255, 255, 0.04);
   --elevate-2: rgba(255, 255, 255, 0.09);
 
-  --background: red; /*replace with H S L */
+  --background: 228 25% 13%;
 
-  --foreground: red; /*replace with H S L */
+  --foreground: 40 34% 92%;
 
-  --border: red; /*replace with H S L */
+  --border: 228 14% 28%;
 
-  --card: red; /*replace with H S L */
+  --card: 228 22% 17%;
 
-  --card-foreground: red; /*replace with H S L */
+  --card-foreground: 40 34% 92%;
 
-  --card-border: red; /*replace with H S L */
+  --card-border: 228 14% 28%;
 
-  --sidebar: red; /*replace with H S L */
+  --sidebar: 228 25% 13%;
 
-  --sidebar-foreground: red; /*replace with H S L */
+  --sidebar-foreground: 40 34% 92%;
 
-  --sidebar-border: red; /*replace with H S L */
+  --sidebar-border: 228 14% 28%;
 
-  --sidebar-primary: red; /*replace with H S L */
+  --sidebar-primary: 38 86% 63%;
 
-  --sidebar-primary-foreground: red; /*replace with H S L */
+  --sidebar-primary-foreground: 228 25% 13%;
 
-  --sidebar-accent: red; /*replace with H S L */
+  --sidebar-accent: 17 87% 52%;
 
-  --sidebar-accent-foreground: red; /*replace with H S L */
+  --sidebar-accent-foreground: 40 34% 92%;
 
-  --sidebar-ring: red; /*replace with H S L */
+  --sidebar-ring: 38 86% 63%;
 
-  --popover: red; /*replace with H S L */
+  --popover: 228 22% 17%;
 
-  --popover-foreground: red; /*replace with H S L */
+  --popover-foreground: 40 34% 92%;
 
-  --popover-border: red; /*replace with H S L */
+  --popover-border: 228 14% 28%;
 
-  --primary: red; /*replace with H S L */
+  --primary: 38 86% 63%;
 
-  --primary-foreground: red; /*replace with H S L */
+  --primary-foreground: 228 25% 13%;
 
-  --secondary: red; /*replace with H S L */
+  --secondary: 228 14% 28%;
 
-  --secondary-foreground: red; /*replace with H S L */
+  --secondary-foreground: 40 34% 92%;
 
-  --muted: red; /*replace with H S L */
+  --muted: 228 18% 22%;
 
-  --muted-foreground: red; /*replace with H S L */
+  --muted-foreground: 40 15% 68%;
 
-  --accent: red; /*replace with H S L */
+  --accent: 17 87% 52%;
 
-  --accent-foreground: red; /*replace with H S L */
+  --accent-foreground: 40 34% 92%;
 
-  --destructive: red; /*replace with H S L */
+  --destructive: 4 74% 52%;
 
-  --destructive-foreground: red; /*replace with H S L */
+  --destructive-foreground: 40 34% 92%;
 
   /* Used as the border around inputs. Dark mode: Should be a border that is light enough to have high contrast when rendered on a --card background. More contrast than standard --border */
-  --input: red; /*replace with H S L */
-  --ring: red; /*replace with H S L */
-  --chart-1: red; /*replace with H S L */
-  --chart-2: red; /*replace with H S L */
-  --chart-3: red; /*replace with H S L */
-  --chart-4: red; /*replace with H S L */
-  --chart-5: red; /*replace with H S L */
+  --input: 228 14% 28%;
+  --ring: 38 86% 63%;
+  --chart-1: 38 86% 63%;
+  --chart-2: 17 87% 52%;
+  --chart-3: 145 38% 42%;
+  --chart-4: 40 34% 92%;
+  --chart-5: 264 28% 58%;
 
   --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
   --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
@@ -430,4 +431,340 @@
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
   }
+}
+
+:root {
+  --ink: #202534;
+  --paper: #eee9dd;
+  --paper-deep: #e2dccd;
+  --orange: #ec642f;
+  --amber: #f5bf58;
+  --purple: #7666c9;
+  --green: #4a8b68;
+  --line: rgba(32, 37, 52, 0.16);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--paper);
+}
+
+body {
+  min-width: 320px;
+  overflow-x: hidden;
+  background: var(--paper);
+}
+
+::selection {
+  color: var(--paper);
+  background: var(--orange);
+}
+
+.site-shell {
+  background:
+    radial-gradient(circle at 84% 12%, rgba(245, 191, 88, 0.22), transparent 22rem),
+    radial-gradient(circle at 11% 24%, rgba(118, 102, 201, 0.12), transparent 28rem),
+    var(--paper);
+}
+
+.display-face {
+  font-family: var(--app-font-serif);
+  letter-spacing: -0.06em;
+}
+
+.mono-face {
+  font-family: var(--app-font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.noise::after {
+  content: '';
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
+}
+
+.grid-paper {
+  background-image: linear-gradient(rgba(32, 37, 52, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(32, 37, 52, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.hero-orbit {
+  animation: orbit 18s linear infinite;
+}
+
+.orb-pulse {
+  animation: orbPulse 3s ease-in-out infinite;
+}
+
+.warrior-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.reveal-up {
+  animation: revealUp 0.8s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.delay-1 { animation-delay: 120ms; }
+.delay-2 { animation-delay: 220ms; }
+.delay-3 { animation-delay: 340ms; }
+
+.warrior-stage {
+  --stage-aura: var(--purple);
+  --stage-fire: #ab7de7;
+  position: relative;
+  width: min(100%, 440px);
+  aspect-ratio: 0.78;
+  isolation: isolate;
+}
+
+.warrior-stage.focused {
+  --stage-aura: #c1717c;
+  --stage-fire: var(--orange);
+}
+.warrior-stage.hardened {
+  --stage-aura: #df7e3c;
+  --stage-fire: #f59a3f;
+}
+.warrior-stage.elite {
+  --stage-aura: var(--amber);
+  --stage-fire: #ff713c;
+}
+
+.warrior-aura {
+  position: absolute;
+  inset: 14% 5% 9%;
+  border: 1px solid color-mix(in srgb, var(--stage-aura), transparent 45%);
+  border-radius: 48% 52% 42% 58%;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--stage-aura), transparent 77%), transparent 64%);
+  box-shadow: 0 0 70px color-mix(in srgb, var(--stage-aura), transparent 74%);
+  transform: rotate(-7deg);
+}
+
+.warrior-aura::before,
+.warrior-aura::after {
+  content: '';
+  position: absolute;
+  border: 1px solid color-mix(in srgb, var(--stage-aura), transparent 36%);
+  border-radius: 50%;
+  inset: 16%;
+  transform: rotate(37deg) scaleX(.63);
+}
+.warrior-aura::after {
+  inset: 25% 8%;
+  transform: rotate(-44deg) scaleY(.52);
+}
+
+.warrior-figure {
+  position: absolute;
+  inset: 12% 19% 7%;
+  filter: drop-shadow(0 28px 14px rgba(32, 37, 52, .22));
+}
+
+.warrior-head {
+  position: absolute;
+  z-index: 3;
+  top: 4%;
+  left: 28%;
+  width: 44%;
+  aspect-ratio: .87;
+  border: 5px solid var(--ink);
+  border-radius: 45% 49% 43% 46%;
+  background: #c98765;
+  transform: rotate(-4deg);
+}
+.warrior-head::before {
+  content: '';
+  position: absolute;
+  top: 34%;
+  left: 17%;
+  width: 13%;
+  height: 6%;
+  border-radius: 100%;
+  background: var(--ink);
+  box-shadow: 87px 0 0 var(--ink);
+}
+.warrior-head::after {
+  content: '';
+  position: absolute;
+  left: 39%;
+  bottom: 18%;
+  width: 22%;
+  height: 8%;
+  border-bottom: 4px solid var(--ink);
+  border-radius: 50%;
+}
+
+.warrior-stage.focused .warrior-head { transform: rotate(-3deg) scale(.98); }
+.warrior-stage.hardened .warrior-head,
+.warrior-stage.elite .warrior-head { background: #b9785d; }
+
+.helmet {
+  display: none;
+  position: absolute;
+  z-index: 5;
+  top: -7%;
+  left: 19%;
+  width: 62%;
+  height: 38%;
+  border: 5px solid var(--ink);
+  border-radius: 58% 54% 28% 24%;
+  background: #5d6879;
+  transform: rotate(-4deg);
+}
+.helmet::after {
+  content: '';
+  position: absolute;
+  right: -10%;
+  bottom: 5%;
+  width: 72%;
+  height: 25%;
+  border: 4px solid var(--ink);
+  border-left: 0;
+  border-radius: 0 14px 14px 0;
+  background: #818c9a;
+}
+.warrior-stage.hardened .helmet,
+.warrior-stage.elite .helmet { display: block; }
+.warrior-stage.elite .helmet { background: #b6a46d; }
+
+.warrior-torso {
+  position: absolute;
+  z-index: 2;
+  top: 29%;
+  left: 16%;
+  width: 68%;
+  height: 52%;
+  border: 5px solid var(--ink);
+  border-radius: 38% 42% 18% 18%;
+  background:
+    linear-gradient(90deg, transparent 45%, rgba(32, 37, 52, .18) 46%, transparent 49%),
+    linear-gradient(160deg, #7162a9, #4c426f);
+  clip-path: polygon(16% 0, 84% 0, 100% 25%, 87% 100%, 13% 100%, 0 25%);
+}
+.warrior-stage.focused .warrior-torso { background: linear-gradient(160deg, #a15b6a, #623f58); }
+.warrior-stage.hardened .warrior-torso { background: linear-gradient(160deg, #747f88, #414b5b); }
+.warrior-stage.elite .warrior-torso { background: linear-gradient(160deg, #9b8c66, #485468); }
+
+.armor-plate {
+  position: absolute;
+  z-index: 4;
+  top: 42%;
+  left: 27%;
+  width: 46%;
+  height: 22%;
+  border: 4px solid var(--ink);
+  border-radius: 8px 8px 20px 20px;
+  background: color-mix(in srgb, var(--stage-fire), white 17%);
+  clip-path: polygon(10% 0, 90% 0, 100% 70%, 82% 100%, 18% 100%, 0 70%);
+}
+.armor-plate::before {
+  content: '';
+  position: absolute;
+  inset: 22% 35%;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.warrior-arm {
+  position: absolute;
+  z-index: 1;
+  top: 34%;
+  width: 25%;
+  height: 52%;
+  border: 5px solid var(--ink);
+  background: #c98765;
+}
+.warrior-arm.left { left: 0; transform: rotate(17deg); border-radius: 40% 30% 50% 55%; }
+.warrior-arm.right { right: 0; transform: rotate(-16deg); border-radius: 30% 40% 55% 50%; }
+.warrior-stage.hardened .warrior-arm,
+.warrior-stage.elite .warrior-arm { background: #5e6875; }
+
+.warrior-leg {
+  position: absolute;
+  z-index: 0;
+  top: 76%;
+  width: 25%;
+  height: 23%;
+  border: 5px solid var(--ink);
+  background: #4a5068;
+}
+.warrior-leg.left { left: 22%; transform: rotate(7deg); border-radius: 10px 10px 40% 40%; }
+.warrior-leg.right { right: 22%; transform: rotate(-7deg); border-radius: 10px 10px 40% 40%; }
+
+.warrior-orb {
+  position: absolute;
+  z-index: 8;
+  top: 51%;
+  right: -2%;
+  width: 24%;
+  aspect-ratio: 1;
+  border: 5px solid var(--ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #fff5c7 0 7%, var(--stage-fire) 21%, var(--orange) 55%, #703e57 100%);
+  box-shadow: 0 0 0 8px rgba(245, 191, 88, .16), 0 0 42px color-mix(in srgb, var(--stage-fire), transparent 25%);
+}
+.warrior-orb::after {
+  content: '';
+  position: absolute;
+  inset: -22%;
+  border: 2px dashed var(--stage-fire);
+  border-radius: 50%;
+  transform: rotate(32deg);
+}
+
+.warrior-flame {
+  position: absolute;
+  z-index: 7;
+  right: 4%;
+  top: 35%;
+  width: 17%;
+  height: 27%;
+  border-radius: 70% 30% 70% 30%;
+  background: var(--stage-fire);
+  transform: rotate(29deg);
+  filter: blur(1px);
+}
+.warrior-stage.naive .warrior-flame { opacity: .32; }
+.warrior-stage.focused .warrior-flame { opacity: .58; }
+.warrior-stage.hardened .warrior-flame { opacity: .82; }
+.warrior-stage.elite .warrior-flame { opacity: 1; }
+
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+.scanline::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 0%, rgba(245, 191, 88, .14) 48%, transparent 52%);
+  transform: translateY(-100%);
+  animation: scan 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.section-rule {
+  border-top: 1px solid var(--line);
+}
+
+.button-cut {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes orbPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes scan { 0%, 35% { transform: translateY(-100%); } 70%, 100% { transform: translateY(100%); } }
+@keyframes revealUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 640px) {
+  .warrior-stage { width: min(100%, 330px); }
+  .warrior-figure { left: 15%; right: 15%; }
+  .warrior-head::before { box-shadow: 57px 0 0 var(--ink); }
 }

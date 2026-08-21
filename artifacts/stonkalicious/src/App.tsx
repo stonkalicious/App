@@ -43,6 +43,8 @@ type Warrior = {
   strength: number;
   growth: number;
   bag: string;
+  cohortRank: number;
+  cohortSize: number;
 };
 
 const stages: Stage[] = [
@@ -66,12 +68,12 @@ const stages: Stage[] = [
 }));
 
 const warriors: Warrior[] = [
-  { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, growth: 218.4, bag: '$482,190' },
-  { rank: 2, name: 'marauder.eth', wallet: '0xD2…4F10', stage: 'elite', strength: 88, growth: 167.9, bag: '$301,842' },
-  { rank: 3, name: 'cold_storage', wallet: '0xA8…BC33', stage: 'hardened', strength: 73, growth: 112.6, bag: '$188,460' },
-  { rank: 4, name: 'redline_rider', wallet: '0x3C…008E', stage: 'hardened', strength: 68, growth: 92.3, bag: '$124,707' },
-  { rank: 5, name: 'smallcap_samurai', wallet: '0x11…E2A9', stage: 'wrecked', strength: 46, growth: 71.8, bag: '$76,340' },
-  { rank: 6, name: 'index_apprentice', wallet: '0xBE…771C', stage: 'back', strength: 38, growth: 48.7, bag: '$44,920' },
+  { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, growth: 218.4, bag: '$482,190', cohortRank: 1, cohortSize: 247 },
+  { rank: 2, name: 'marauder.eth', wallet: '0xD2…4F10', stage: 'elite', strength: 88, growth: 167.9, bag: '$301,842', cohortRank: 2, cohortSize: 247 },
+  { rank: 3, name: 'cold_storage', wallet: '0xA8…BC33', stage: 'hardened', strength: 73, growth: 112.6, bag: '$188,460', cohortRank: 3, cohortSize: 247 },
+  { rank: 4, name: 'redline_rider', wallet: '0x3C…008E', stage: 'hardened', strength: 68, growth: 92.3, bag: '$124,707', cohortRank: 4, cohortSize: 247 },
+  { rank: 5, name: 'smallcap_samurai', wallet: '0x11…E2A9', stage: 'wrecked', strength: 46, growth: 71.8, bag: '$76,340', cohortRank: 5, cohortSize: 247 },
+  { rank: 6, name: 'index_apprentice', wallet: '0xBE…771C', stage: 'back', strength: 38, growth: 48.7, bag: '$44,920', cohortRank: 6, cohortSize: 247 },
 ];
 
 function setMeta(name: string, content: string, property?: string) {
@@ -115,7 +117,7 @@ function App() {
   const [activeStage, setActiveStage] = useState<StageKey>('plumber');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [leaderboardFilter, setLeaderboardFilter] = useState<'all' | StageKey>('all');
-  const [sortMode, setSortMode] = useState<'strength' | 'growth'>('strength');
+  const [sortMode, setSortMode] = useState<'rank' | 'growth'>('rank');
   const [notice, setNotice] = useState('');
   const [copied, setCopied] = useState(false);
   const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[7];
@@ -142,7 +144,7 @@ function App() {
     const filtered = leaderboardFilter === 'all'
       ? warriors
       : warriors.filter((warrior) => warrior.stage === leaderboardFilter);
-    return [...filtered].sort((a, b) => sortMode === 'strength' ? b.strength - a.strength : b.growth - a.growth);
+    return [...filtered].sort((a, b) => sortMode === 'rank' ? a.cohortRank - b.cohortRank : b.growth - a.growth);
   }, [leaderboardFilter, sortMode]);
 
   const handleAction = (message: string, target?: string) => {
@@ -390,7 +392,7 @@ function App() {
               <div className="mono-face mb-5 text-[10px] text-[#f5bf58]">04 / public signal</div>
               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Who is<br /><span className="text-[#ec642f]">still climbing?</span></h2>
             </div>
-            <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">The FOMO loop, made collectible. Rank by total strength, ROI, or time spent surviving the market.</p>
+            <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">No fake global ranking. Every warrior competes inside a challenge cohort, like a $1K → $100K run.</p>
           </div>
           <div className="mt-12 flex flex-col justify-between gap-4 border-y border-[#eee9dd]/15 py-4 md:flex-row md:items-center">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter leaderboard by stage">
@@ -398,19 +400,19 @@ function App() {
                 <button type="button" key={filter} onClick={() => setLeaderboardFilter(filter)} data-testid={`button-filter-${filter}`} className={`mono-face border px-3 py-2 text-[9px] transition-colors ${leaderboardFilter === filter ? 'border-[#f5bf58] bg-[#f5bf58] text-[#202534]' : 'border-[#eee9dd]/20 text-[#aaa7a0] hover:border-[#f5bf58] hover:text-[#f5bf58]'}`}>{filter === 'all' ? 'all warriors' : filter}</button>
               ))}
             </div>
-            <button type="button" onClick={() => setSortMode(sortMode === 'strength' ? 'growth' : 'strength')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'strength' ? 'total value' : 'ROI'} <ChevronDown className="h-3.5 w-3.5" /></button>
+             <button type="button" onClick={() => setSortMode(sortMode === 'rank' ? 'growth' : 'rank')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'rank' ? 'challenge rank' : 'ROI'} <ChevronDown className="h-3.5 w-3.5" /></button>
           </div>
           <div className="mt-4 overflow-x-auto">
             <div className="min-w-[700px]">
-              <div className="grid grid-cols-[60px_1.6fr_1fr_1fr_1fr] gap-4 px-4 py-3 mono-face text-[9px] text-[#777985]"><span>#</span><span>warrior / wallet</span><span>level</span><span>total value</span><span>ROI since snapshot</span></div>
+              <div className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] gap-4 px-4 py-3 mono-face text-[9px] text-[#777985]"><span>rank / cohort</span><span>warrior / wallet</span><span>level</span><span>current value</span><span>ROI in challenge</span></div>
               {visibleWarriors.map((warrior, index) => {
                 const stage = stages.find((item) => item.key === warrior.stage) ?? stages[0];
-                return <div key={warrior.name} data-testid={`row-leaderboard-${warrior.name}`} className="grid grid-cols-[60px_1.6fr_1fr_1fr_1fr] items-center gap-4 border-t border-[#eee9dd]/15 px-4 py-5 transition-colors hover:bg-[#2b3042]"><span className={`font-mono text-sm ${index === 0 ? 'text-[#f5bf58]' : 'text-[#777985]'}`}>{String(index + 1).padStart(2, '0')}</span><div><div className="font-bold">{warrior.name}</div><div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet} / {warrior.bag}</div></div><span className="flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</span><span className="font-mono text-[#f5bf58]">{warrior.bag}</span><span className="font-mono text-[#4a8b68]">+{warrior.growth}%</span></div>;
+                return <div key={warrior.name} data-testid={`row-leaderboard-${warrior.name}`} className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] items-center gap-4 border-t border-[#eee9dd]/15 px-4 py-5 transition-colors hover:bg-[#2b3042]"><span className={`font-mono text-sm ${index === 0 ? 'text-[#f5bf58]' : 'text-[#777985]'}`}>{String(warrior.cohortRank).padStart(2, '0')}<span className="text-[10px] text-[#777985]"> / {warrior.cohortSize}</span></span><div><div className="font-bold">{warrior.name}</div><div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div></div><span className="flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</span><span className="font-mono text-[#f5bf58]">{warrior.bag}</span><span className="font-mono text-[#4a8b68]">+{warrior.growth}%</span></div>;
               })}
               {visibleWarriors.length === 0 && <div className="border-t border-[#eee9dd]/15 py-14 text-center text-[#aaa7a0]" data-testid="empty-leaderboard">No warriors at this stage yet. The arena is still open.</div>}
             </div>
           </div>
-          <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Preview data for the showcase. Public ranking arrives with the live metadata layer.</div>
+          <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Preview cohort: $1K → $100K / 247 participants. Live challenge rankings arrive with the metadata layer.</div>
         </div>
       </section>
 

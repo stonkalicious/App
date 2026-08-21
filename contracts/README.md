@@ -12,7 +12,9 @@ or private key.
 
 - The contract owns token identity, ownership, minting, URI configuration, and
   transfer lifecycle.
-- The launch policy is one lifetime warrior per wallet. `maxPerWallet` must be
+- The launch policy is one lifetime warrior per wallet. Public minting requires
+  an EIP-712 authorization from the configured `mintSigner`, bound to the
+  wallet, X profile hash, challenge, nonce, and expiry. `maxPerWallet` must be
   configured as `1`, and admin/free allocations count against the same wallet
   ledger.
 - An authorized identity verifier can bind one hashed X account identifier to
@@ -26,6 +28,14 @@ or private key.
   allowlisted portfolio data to choose the current warrior level and social
   performance card.
   `tokenURI` points marketplaces at that service.
+- Metadata stays mutable by design. Base URI changes emit ERC-4906-compatible
+  `BatchMetadataUpdate`; snapshot and identity changes emit `MetadataUpdate`.
+  There is no metadata-freeze switch.
+- Transfers are blocked for seven days after mint or transfer, then reset the
+  snapshot and clear the X binding. Ownership is two-step
+  (`transferOwnership`, then `acceptOwnership`), and the owner can pause minting,
+  transfers, oracle writes, and admin mints for emergencies.
+- `contractURI()` provides collection-level marketplace metadata.
 
 ## Local checks
 
@@ -61,6 +71,7 @@ The repeatable deployment command is:
 RPC_URL=... \
 DEPLOYER_PRIVATE_KEY=... \
 SNAPSHOT_ORACLE=0x... \
+MINT_SIGNER=0x... \
 BASE_TOKEN_URI=https://metadata.example/token/ \
 MAX_SUPPLY=10000 \
 MINT_PRICE_ETH=0.01 \

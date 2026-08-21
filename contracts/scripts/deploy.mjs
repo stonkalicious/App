@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { ethers } from "ethers";
 
-const required = ["RPC_URL", "DEPLOYER_PRIVATE_KEY", "SNAPSHOT_ORACLE"];
+const required = ["RPC_URL", "DEPLOYER_PRIVATE_KEY", "SNAPSHOT_ORACLE", "MINT_SIGNER"];
 for (const key of required) {
   if (!process.env[key]) {
     throw new Error(`${key} is required; provide it through the deployment environment's secret manager`);
@@ -16,7 +16,7 @@ const deployer = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
 
 const maxSupply = BigInt(process.env.MAX_SUPPLY ?? "10000");
 const mintPrice = ethers.parseEther(process.env.MINT_PRICE_ETH ?? "0.01");
-const maxPerWallet = BigInt(process.env.MAX_PER_WALLET ?? "3");
+const maxPerWallet = BigInt(process.env.MAX_PER_WALLET ?? "1");
 const baseTokenURI = process.env.BASE_TOKEN_URI;
 if (!baseTokenURI) throw new Error("BASE_TOKEN_URI is required");
 
@@ -27,6 +27,7 @@ const contract = await factory.deploy(
   maxPerWallet,
   baseTokenURI,
   process.env.SNAPSHOT_ORACLE,
+  process.env.MINT_SIGNER,
 );
 await contract.waitForDeployment();
 
@@ -39,4 +40,5 @@ console.log(JSON.stringify({
   maxPerWallet: maxPerWallet.toString(),
   baseTokenURI,
   snapshotOracle: process.env.SNAPSHOT_ORACLE,
+  mintSigner: process.env.MINT_SIGNER,
 }, null, 2));

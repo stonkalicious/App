@@ -1,0 +1,1 @@
+- [Launch safety boundary](launch-safety.md) — mint authorization, identity uniqueness, and non-custodial contract policies must stay enforced before deployment.

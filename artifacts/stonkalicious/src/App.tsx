@@ -280,7 +280,7 @@ function App() {
             <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT tracks<br /><span className="text-[#7666c9]">the bag.</span></h2>
           </div>
           <div className="max-w-[490px]">
-             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior has read-only access to qualifying on-chain holdings: it can observe performance, but never move, trade, approve, or withdraw your assets.</p>
+             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior has read-only access to qualifying on-chain holdings: it can observe performance, but never move, trade, approve, or withdraw your assets. This site will never ask for a seed phrase, private key, or token approval.</p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                  [WalletCards, 'read-only by design', 'It observes the wallet. It never controls the wallet.'],
@@ -449,7 +449,7 @@ function App() {
            <div className="max-w-[900px]">
              <h2 className="display-face text-3xl font-bold leading-none md:text-5xl">Expect to lose everything.</h2>
              <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and on-chain performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain assets and crypto assets are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
-             <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, market moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring a warrior. Do your own research and only participate with money you can afford to lose.</p>
+             <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, market moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring a warrior. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
            </div>
          </div>
        </section>

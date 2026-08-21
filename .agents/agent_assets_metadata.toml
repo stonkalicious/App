@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "GdXsUXDrqy6kTU7-VYJLT"
+uri = "file://attached_assets/generated_images/stonkalicious_x_banner.png"
+type = "image"
+title = "Stonkalicious X Profile Banner"
+description = "1500×500 PNG banner for X, featuring the armored warrior artwork and WHO'S KING OF THE HOOD? headline."
+logical_id = "939ed3ad-6239-4a58-97cf-94888bd76bad"
+content_hash = "sha256:d12c0310b0fc4c7e14a055a976e3ca37b518ea8223a8c16c44444909e286732a"
+size = 970194
+mtime_ms = 1787325711587
+storage_uri = "gcs://replit-rams-assets-kirk/rams/assets/repl:d02ff542-2bc0-448d-a728-30a17bd1db02/939ed3ad-6239-4a58-97cf-94888bd76bad/cbd8f898-b690-416d-93f4-c92827d77b4b"
+storage_version_token = "1787325721743527"
+content_type = "image/png"

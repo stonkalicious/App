@@ -218,10 +218,10 @@ function App() {
             <span className="h-px w-10 bg-[#ec642f]" /> dynamic nft / robinhood chain
           </div>
           <h1 className="display-face max-w-[760px] text-[clamp(4rem,10vw,8.8rem)] font-extrabold leading-[.82]">
-             your bag<br /><span className="text-[#ec642f]">levels up</span><br />your avatar.
+             who’s<br /><span className="text-[#ec642f]">king</span> of the<br />Hood?
           </h1>
           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
-             Stonkalicious turns portfolio performance into a body. One warrior, eight levels of market trauma, and an on-chain mirror that cannot be faked.
+              Stonkalicious turns portfolio performance into a body. One warrior, eight levels of market trauma, and an on-chain mirror that cannot be faked. Your bag writes the answer.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <button type="button" onClick={() => handleAction('Mint details are coming with the collection announcement. No wallet connection is requested yet.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">

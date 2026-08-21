@@ -107,7 +107,7 @@ function BrandMark() {
       </div>
       <div>
         <div className="display-face text-[18px] font-extrabold leading-none tracking-[-.08em]">stonkalicious</div>
-        <div className="mono-face mt-1 text-[9px] text-[#6e6b72]">on-chain status</div>
+        <div className="mono-face mt-1 text-[9px] text-[#6e6b72]">market status</div>
       </div>
     </div>
   );
@@ -126,7 +126,7 @@ function App() {
     document.title = 'Stonkalicious — Your bag grows your warrior';
     setMeta('description', 'A dynamic NFT on Robinhood Chain. Your bag grows your warrior from naive to elite.');
     setMeta('', 'Stonkalicious — Your bag grows your warrior', 'og:title');
-    setMeta('', 'A dynamic NFT status symbol powered by your allowlisted on-chain portfolio.', 'og:description');
+    setMeta('', 'A dynamic NFT status symbol powered by your allowlisted portfolio.', 'og:description');
     setMeta('', 'website', 'og:type');
     setMeta('', window.location.href, 'og:url');
     setMeta('twitter:card', 'summary_large_image');
@@ -223,7 +223,7 @@ function App() {
              who’s <span className="text-[#ec642f]">king</span><br />of the<br />Hood?
           </h1>
           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
-              Stonkalicious turns portfolio performance into a body. One warrior, eight levels of market trauma, and an on-chain mirror that cannot be faked. Your bag writes the answer.
+              Stonkalicious turns portfolio performance into a body. One warrior, eight levels of market trauma, and a public mirror that cannot be faked. Your bag writes the answer.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <button type="button" onClick={() => handleAction('Mint details are coming with the collection announcement. No wallet connection is requested yet.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
@@ -280,7 +280,7 @@ function App() {
             <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT tracks<br /><span className="text-[#7666c9]">the bag.</span></h2>
           </div>
           <div className="max-w-[490px]">
-             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior has read-only access to qualifying on-chain holdings: it can observe performance, but never move, trade, approve, or withdraw your assets. This site will never ask for a seed phrase, private key, or token approval.</p>
+             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior has read-only access to qualifying holdings: it can observe performance, but never move, trade, approve, or withdraw your assets. This site will never ask for a seed phrase, private key, or token approval.</p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                  [WalletCards, 'read-only by design', 'It observes the wallet. It never controls the wallet.'],
@@ -448,7 +448,7 @@ function App() {
            <div className="mono-face border-2 border-[#202534] px-3 py-2 text-[10px] font-bold">high risk / read this</div>
            <div className="max-w-[900px]">
              <h2 className="display-face text-3xl font-bold leading-none md:text-5xl">Expect to lose everything.</h2>
-             <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and on-chain performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain assets and crypto assets are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
+             <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain assets and crypto assets are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
              <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, market moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring a warrior. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
            </div>
          </div>

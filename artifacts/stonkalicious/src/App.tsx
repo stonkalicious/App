@@ -275,7 +275,7 @@ function App() {
         <div className="grid gap-14 md:grid-cols-[.8fr_1.2fr] md:items-end">
           <div>
             <div className="mono-face mb-5 text-[10px] text-[#ec642f]">01 / the mirror</div>
-            <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT does not hold the bag.<br /><span className="text-[#7666c9]">It holds up a mirror.</span></h2>
+            <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT tracks<br /><span className="text-[#7666c9]">the bag.</span></h2>
           </div>
           <div className="max-w-[490px]">
              <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior reads the current owner’s allowlisted holdings and turns the live high, low, and current position into a shareable status symbol.</p>

@@ -1,0 +1,77 @@
+Stonkalicious
+A dynamic NFT on Robinhood Chain. Each NFT is a warrior that starts naive and becomes a hardened elite as the owner’s bag performs.
+The flex is the visual. The warrior is a living status symbol for how well you are doing on-chain.
+
+What it is
+Every NFT is the same character at different stages of power:
+
+Naive — young, open face, light armor, soft purple energy
+Focused — tighter, more armor, still no helmet, energy turning toward fire
+Hardened — practical battle helmet, tougher look, real fire starting
+Elite — battle-worn warrior, bright flames, aura
+
+Style: clean Azuki / manga. Male ego fantasy. Starts a bit silly. Ends serious. Always holding a magical orb. No text on the image.
+
+What it reacts to
+The NFT does not hold assets. It reads the current owner’s wallet.
+Counts:
+
+Official Robinhood tokenized stocks and ETFs
+A small fixed list of large Robinhood Chain coins (only a few names, chosen by you)
+
+Does not count:
+
+Random memes
+Stablecoins
+Anything not on the allowlist
+
+Scoring:
+
+Current portfolio strength from allowlisted balances
+Growth since this owner acquired the NFT
+Allowlisted coins can count, but are capped so a meme pump cannot instantly create a Tier 4 warrior
+
+On transfer:
+Snapshot resets. New owner starts fresh. The warrior can drop tiers. That is the point.
+
+How it works
+
+Someone mints or buys the NFT.
+At that moment, record owner, time, and starting bag value.
+When the NFT is viewed, look up the current owner, read their allowlisted balances, compare to the snapshot, pick the tier, return the matching image and attributes.
+If it transfers, write a new snapshot for the new owner.
+
+A public leaderboard ranks warriors by current strength + growth.
+
+Why people would care
+Young men already battle at a screen. This gives that fight a body.
+
+Competition: visible hierarchy
+Creation / identity: this is my warrior
+Virality: Tier 1 vs Tier 4 is instantly shareable
+Fairness: you cannot buy a maxed warrior and keep the glow after selling it
+
+This is different from projects where the NFT is a vault that holds stocks. Here the NFT is a mirror of the owner.
+
+What v1 is not
+No AI agents.
+No extra token.
+No ERC-6551 stock vaults.
+No complex game world.
+No scoring the entire wallet.
+v1 is only: warrior visuals + allowlisted holdings + growth since acquisition + reset on transfer + simple leaderboard.
+
+How to build it (any tool)
+Work in stages. Do not dump the whole product into one prompt.
+Stage 1 — Rules
+Lock the stock list, the 3–5 extra coins, scoring, tier thresholds, transfer reset, leaderboard.
+Stage 2 — Art
+Lock the 4-tier character sheet and image prompts.
+Stage 3 — Architecture
+ERC-721 + off-chain metadata server + small database for snapshots + simple site (mint, my warrior, leaderboard).
+Stage 4 — Metadata
+JSON shape, attributes, caching, empty-wallet and transfer edge cases.
+Stage 5 — Build
+First make mint + live tier from balances. Then add snapshots and growth. Then leaderboard and polish.
+Stage 6 — Audience
+Show the transformation. One sentence: Your bag grows your warrior. Main surface is X.

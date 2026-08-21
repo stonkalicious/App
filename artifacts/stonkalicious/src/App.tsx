@@ -217,7 +217,7 @@ function App() {
           <div className="mono-face mb-7 flex items-center gap-3 text-[10px] text-[#ec642f]">
             <span className="h-px w-10 bg-[#ec642f]" /> dynamic nft / robinhood chain
           </div>
-           <h1 className="display-face max-w-[760px] text-[clamp(4rem,8vw,7.5rem)] font-extrabold leading-[.82]">
+           <h1 className="max-w-[760px] font-sans text-[clamp(3.75rem,7vw,6.8rem)] font-black leading-[.9] tracking-[-.07em]">
              who’s <span className="text-[#ec642f]">king</span><br />of the<br />Hood?
           </h1>
           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">

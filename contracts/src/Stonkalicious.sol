@@ -24,6 +24,8 @@ contract Stonkalicious {
     mapping(uint256 tokenId => address) private _tokenApprovals;
     mapping(address account => mapping(address operator => bool)) private _operatorApprovals;
     mapping(address account => uint256) public mintedByWallet;
+    mapping(bytes32 profileHash => uint256 tokenId) public warriorByXProfile;
+    mapping(uint256 tokenId => bytes32) public xProfileOf;
 
     struct Snapshot {
         address wallet;
@@ -44,6 +46,8 @@ contract Stonkalicious {
     error TransferToNonReceiver();
     error MetadataIsFrozen();
     error SnapshotNotAllowed();
+    error XProfileAlreadyBound();
+    error InvalidXProfile();
 
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
@@ -66,6 +70,8 @@ contract Stonkalicious {
     event MetadataBaseURIUpdated(string previousURI, string newURI);
     event MetadataFrozen();
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event XProfileBound(uint256 indexed tokenId, bytes32 indexed profileHash, address indexed wallet);
+    event XProfileUnbound(uint256 indexed tokenId, bytes32 indexed profileHash, address indexed wallet);
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
@@ -84,7 +90,7 @@ contract Stonkalicious {
         string memory baseTokenURI_,
         address snapshotOracle_
     ) {
-        if (maxSupply_ == 0 || maxPerWallet_ == 0 || maxPerWallet_ > maxSupply_) {
+        if (maxSupply_ == 0 || maxPerWallet_ != 1 || maxPerWallet_ > maxSupply_) {
             revert InvalidQuantity();
         }
         if (snapshotOracle_ == address(0)) revert InvalidAddress();
@@ -110,7 +116,10 @@ contract Stonkalicious {
 
     function adminMint(address to, uint256 quantity) external onlyOwner {
         if (to == address(0)) revert InvalidAddress();
-        if (quantity == 0 || totalSupply + quantity > maxSupply) revert InvalidQuantity();
+        if (quantity == 0 || quantity > maxPerWallet - mintedByWallet[to] || totalSupply + quantity > maxSupply) {
+            revert InvalidQuantity();
+        }
+        mintedByWallet[to] += quantity;
         _mintWarriors(to, quantity);
     }
 
@@ -143,6 +152,25 @@ contract Stonkalicious {
             snapshot.acquiredAt,
             snapshot.epoch
         );
+    }
+
+    /// @notice Binds a verified X account to the current owner's warrior.
+    /// @dev The off-chain verifier must authenticate X and pass a non-reversible
+    /// hash of the provider's stable account identifier, never the handle.
+    function bindXProfile(uint256 tokenId, bytes32 profileHash) external onlySnapshotOracle {
+        address tokenOwner = ownerOf(tokenId);
+        if (profileHash == bytes32(0)) revert InvalidXProfile();
+        uint256 existingToken = warriorByXProfile[profileHash];
+        if (existingToken != 0 && existingToken != tokenId) revert XProfileAlreadyBound();
+
+        bytes32 previousHash = xProfileOf[tokenId];
+        if (previousHash != bytes32(0) && previousHash != profileHash) {
+            delete warriorByXProfile[previousHash];
+            emit XProfileUnbound(tokenId, previousHash, tokenOwner);
+        }
+        warriorByXProfile[profileHash] = tokenId;
+        xProfileOf[tokenId] = profileHash;
+        emit XProfileBound(tokenId, profileHash, tokenOwner);
     }
 
     function setSnapshotOracle(address newOracle) external onlyOwner {
@@ -254,6 +282,12 @@ contract Stonkalicious {
         _balances[to]++;
         _owners[tokenId] = to;
         Snapshot storage snapshot = _snapshots[tokenId];
+        bytes32 profileHash = xProfileOf[tokenId];
+        if (profileHash != bytes32(0)) {
+            delete warriorByXProfile[profileHash];
+            delete xProfileOf[tokenId];
+            emit XProfileUnbound(tokenId, profileHash, from);
+        }
         snapshot.wallet = to;
         snapshot.acquiredAt = uint64(block.timestamp);
         snapshot.epoch++;

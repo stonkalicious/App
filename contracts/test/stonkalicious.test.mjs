@@ -12,7 +12,7 @@ async function fixture() {
   const provider = new ethers.JsonRpcProvider(`http://127.0.0.1:${server.address().port}`);
   const [owner, alice, bob, stranger] = await Promise.all([0, 1, 2, 3].map((index) => provider.getSigner(index)));
   const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode, owner);
-  const contract = await factory.deploy(10, ethers.parseEther("0.01"), 3, "https://metadata.stonkalicious.xyz/token/", await owner.getAddress());
+  const contract = await factory.deploy(10, ethers.parseEther("0.01"), 1, "https://metadata.stonkalicious.xyz/token/", await owner.getAddress());
   await contract.waitForDeployment();
   return { server, provider, contract, owner, alice, bob, stranger };
 }
@@ -20,9 +20,9 @@ async function fixture() {
 test("mints with configured price and exposes metadata and snapshot state", async () => {
   const { server, contract, alice } = await fixture();
   try {
-    await (await contract.connect(alice).mint(2, { value: ethers.parseEther("0.02") })).wait();
-    assert.equal(await contract.totalSupply(), 2n);
-    assert.equal(await contract.balanceOf(await alice.getAddress()), 2n);
+    await (await contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") })).wait();
+    assert.equal(await contract.totalSupply(), 1n);
+    assert.equal(await contract.balanceOf(await alice.getAddress()), 1n);
     assert.equal(await contract.tokenURI(1), "https://metadata.stonkalicious.xyz/token/1");
     const snapshot = await contract.snapshotOf(1);
     assert.equal(snapshot.wallet, await alice.getAddress());
@@ -59,12 +59,31 @@ test("rejects unauthorized snapshot writes and owner-only configuration", async 
   }
 });
 
+test("enforces one lifetime warrior per wallet and binds each X profile once", async () => {
+  const { server, contract, owner, alice, bob } = await fixture();
+  try {
+    await (await contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") })).wait();
+    await assert.rejects(contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") }));
+    const profileHash = ethers.keccak256(ethers.toUtf8Bytes("x-account-123"));
+    await (await contract.bindXProfile(1, profileHash)).wait();
+    assert.equal(await contract.warriorByXProfile(profileHash), 1n);
+    assert.equal(await contract.xProfileOf(1), profileHash);
+    await assert.rejects(contract.bindXProfile(1, ethers.keccak256(ethers.toUtf8Bytes("x-account-456"))));
+    await assert.rejects(contract.connect(alice).bindXProfile(1, profileHash));
+    await (await contract.connect(alice).transferFrom(await alice.getAddress(), await bob.getAddress(), 1)).wait();
+    assert.equal(await contract.warriorByXProfile(profileHash), 0n);
+    assert.equal(await contract.xProfileOf(1), ethers.ZeroHash);
+  } finally {
+    await server.close();
+  }
+});
+
 test("enforces mint limits, exact payment, and supply cap", async () => {
   const { server, contract, alice } = await fixture();
   try {
     await assert.rejects(contract.connect(alice).mint(1, { value: 0 }));
-    await assert.rejects(contract.connect(alice).mint(4, { value: ethers.parseEther("0.04") }));
-    await (await contract.connect(alice).mint(3, { value: ethers.parseEther("0.03") })).wait();
+    await assert.rejects(contract.connect(alice).mint(2, { value: ethers.parseEther("0.02") }));
+    await (await contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") })).wait();
     await assert.rejects(contract.connect(alice).mint(1, { value: ethers.parseEther("0.01") }));
   } finally {
     await server.close();

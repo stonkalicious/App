@@ -259,7 +259,7 @@ function App() {
         <div className="mx-auto grid max-w-[1320px] md:grid-cols-4">
           {[
              ['8', 'market-tested levels'],
-            ['1', 'warrior per bag'],
+             ['1', 'warrior per wallet'],
             ['0', 'random wallet noise'],
             ['∞', 'reasons to keep building'],
           ].map(([value, label], index) => (
@@ -278,12 +278,12 @@ function App() {
             <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT does not hold the bag.<br /><span className="text-[#7666c9]">It holds up a mirror.</span></h2>
           </div>
           <div className="max-w-[490px]">
-            <p className="text-lg leading-relaxed text-[#5c5b62]">The warrior reads the current owner’s allowlisted holdings. It compares that bag to the moment you acquired the NFT, then turns three signals into a status symbol: ROI, time in the arena, and total dollar performance.</p>
+             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior reads the current owner’s allowlisted holdings and turns the live high, low, and current position into a shareable status symbol.</p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                 [WalletCards, 'reads the owner', 'Current wallet, current reality.'],
                 [TrendingUp, 'tracks the climb', 'ROI since your snapshot.'],
-                [Activity, 'counts the reps', 'Time spent in the arena.'],
+               [Activity, 'keeps the record', 'One profile. One performance history.'],
               ].map(([Icon, title, copy]) => {
                 const IconComponent = Icon as typeof WalletCards;
                 return <div key={title as string} className="border-l-2 border-[#ec642f] pl-4"><IconComponent className="mb-3 h-5 w-5 text-[#ec642f]" /><div className="font-bold">{title as string}</div><div className="mt-1 text-sm text-[#6e6b72]">{copy as string}</div></div>;
@@ -423,7 +423,7 @@ function App() {
               <h2 className="display-face max-w-[750px] text-5xl font-bold leading-[.86] md:text-8xl">Make your<br />performance<br /><span className="text-[#ec642f]">visible.</span></h2>
             </div>
             <div>
-              <p className="text-lg leading-relaxed text-[#4c4b51]">Mint details, supply, and the final allowlist will be announced before launch. Until then, get on the signal — no wallet connection, no phantom promises.</p>
+             <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one warrior. Link your X profile to claim your public performance identity, then let the market write the record.</p>
               <button type="button" onClick={() => handleAction('You are on the shortlist. Launch updates will be shared with the community.', 'community')} data-testid="button-join-signal" className="button-cut mt-7 bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">join the signal <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
             </div>
           </div>

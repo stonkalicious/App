@@ -8,13 +8,19 @@ portfolio balances on-chain.
 
 - The contract owns token identity, ownership, minting, URI configuration, and
   transfer lifecycle.
+- The launch policy is one lifetime warrior per wallet. `maxPerWallet` must be
+  configured as `1`, and admin/free allocations count against the same wallet
+  ledger.
+- An authorized identity verifier can bind one hashed X account identifier to
+  one active warrior. The raw X handle and OAuth credentials stay off-chain.
 - `recordStartingBagValue` is called by the configured snapshot oracle after a
   mint or transfer. It records the current owner's starting value without
   storing any portfolio assets in the NFT.
 - On every transfer, the contract resets `startingBagValue` to zero, updates the
   wallet and timestamp, and increments the snapshot epoch.
 - The off-chain metadata service reads `ownerOf`, `snapshotOf`, and its own
-  allowlisted portfolio data to choose Naive, Focused, Hardened, or Elite.
+  allowlisted portfolio data to choose the current warrior level and social
+  performance card.
   `tokenURI` points marketplaces at that service.
 
 ## Local checks
@@ -54,7 +60,7 @@ SNAPSHOT_ORACLE=0x... \
 BASE_TOKEN_URI=https://metadata.example/token/ \
 MAX_SUPPLY=10000 \
 MINT_PRICE_ETH=0.01 \
-MAX_PER_WALLET=3 \
+MAX_PER_WALLET=1 \
 pnpm --dir contracts run deploy:testnet
 ```
 

@@ -123,15 +123,15 @@ function App() {
   const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[7];
 
   useEffect(() => {
-    document.title = 'Stonkalicious — Your bag grows your warrior';
-    setMeta('description', 'A dynamic NFT on Robinhood Chain. Your bag grows your warrior from naive to elite.');
-    setMeta('', 'Stonkalicious — Your bag grows your warrior', 'og:title');
-    setMeta('', 'A dynamic NFT status symbol powered by your allowlisted portfolio.', 'og:description');
+    document.title = 'Stonkalicious — Your wallet, turned warrior';
+    setMeta('description', 'Stonkalicious is a pre-launch dynamic NFT performance mirror for Robinhood Chain.');
+    setMeta('', 'Stonkalicious — Your wallet, turned warrior', 'og:title');
+    setMeta('', 'A pre-launch dynamic NFT performance mirror for Robinhood Chain. No custody. No wallet approvals.', 'og:description');
     setMeta('', 'website', 'og:type');
     setMeta('', window.location.href, 'og:url');
     setMeta('twitter:card', 'summary_large_image');
-    setMeta('twitter:title', 'Stonkalicious — Your bag grows your warrior');
-    setMeta('twitter:description', 'A dynamic NFT status symbol powered by your bag.');
+    setMeta('twitter:title', 'Stonkalicious — Your wallet, turned warrior');
+    setMeta('twitter:description', 'A pre-launch dynamic NFT performance mirror for Robinhood Chain. No custody. No wallet approvals.');
   }, []);
 
   useEffect(() => {
@@ -190,7 +190,7 @@ function App() {
         </div>
         <div className="hidden items-center gap-3 md:flex">
           <button type="button" onClick={() => handleAction('Mint details are being locked. Join the signal to get the first drop notice.', 'mint')} data-testid="button-nav-mint" className="button-cut border-2 border-[#202534] bg-[#ec642f] px-5 py-3 font-bold text-[#eee9dd] transition-transform hover:-translate-y-0.5">
-            mint a warrior <ArrowUpRight className="ml-1 inline h-4 w-4" />
+            get launch access <ArrowUpRight className="ml-1 inline h-4 w-4" />
           </button>
         </div>
         <button type="button" aria-label="Open menu" data-testid="button-open-menu" className="md:hidden" onClick={() => setMobileNavOpen((open) => !open)}>
@@ -209,7 +209,7 @@ function App() {
             ].map(([label, href]) => (
               <a key={href} href={href} onClick={() => setMobileNavOpen(false)} data-testid={`link-mobile-${label.replace(' ', '-')}`} className="mono-face border-b border-[#202534]/15 pb-3 text-xs">{label}</a>
             ))}
-            <button type="button" onClick={() => handleAction('Mint details are being locked. Join the signal to get the first drop notice.', 'mint')} data-testid="button-mobile-mint" className="button-cut bg-[#ec642f] px-4 py-3 text-left font-bold text-[#eee9dd]">mint a warrior <ArrowUpRight className="inline h-4 w-4" /></button>
+            <button type="button" onClick={() => handleAction('Mint details are not live yet. Join the signal for the official launch notice.', 'mint')} data-testid="button-mobile-mint" className="button-cut bg-[#ec642f] px-4 py-3 text-left font-bold text-[#eee9dd]">get launch access <ArrowUpRight className="inline h-4 w-4" /></button>
           </div>
         </div>
       )}
@@ -226,8 +226,8 @@ function App() {
               Your portfolio becomes a warrior. Eight levels track the market. Your bag tells the story.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <button type="button" onClick={() => handleAction('Mint details are coming with the collection announcement. No wallet connection is requested yet.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
-              enter the arena <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
+             <button type="button" onClick={() => handleAction('The public preview is open. Mint details will arrive with the official launch notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
+               see the preview <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
             </button>
             <a href="#evolution" data-testid="link-see-evolution" className="group flex items-center gap-2 px-2 py-3 font-bold">
               see the evolution <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -241,8 +241,8 @@ function App() {
         </div>
 
         <div className="reveal-up delay-2 relative flex min-h-[520px] items-center justify-center overflow-hidden border-2 border-[#202534] bg-[#272b3a] px-5 py-10 scanline">
-          <div className="absolute left-5 top-5 mono-face text-[9px] text-[#aaa7a0]">live specimen / 0001</div>
-          <div className="absolute right-5 top-5 flex items-center gap-2 mono-face text-[9px] text-[#f5bf58]"><span className="h-1.5 w-1.5 rounded-full bg-[#f5bf58]" /> sync ready</div>
+           <div className="absolute left-5 top-5 mono-face text-[9px] text-[#aaa7a0]">preview specimen / 0001</div>
+           <div className="absolute right-5 top-5 flex items-center gap-2 mono-face text-[9px] text-[#f5bf58]"><span className="h-1.5 w-1.5 rounded-full bg-[#f5bf58]" /> preview mode</div>
           <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between border-t border-[#eee9dd]/20 pt-3">
             <div>
               <div className="mono-face text-[9px] text-[#aaa7a0]">current stage</div>
@@ -250,7 +250,7 @@ function App() {
             </div>
             <div className="text-right">
               <div className="mono-face text-[9px] text-[#aaa7a0]">orb status</div>
-              <div className="mt-1 font-mono text-sm text-[#f5bf58]">charged / 94</div>
+               <div className="mt-1 font-mono text-sm text-[#f5bf58]">visual preview / 08</div>
             </div>
           </div>
           <WarriorIllustration stage={activeStage} />

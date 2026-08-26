@@ -1,13 +1,14 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { getOracleConfig } from "../oracle/config";
 import { StaleCache } from "../oracle/cache";
-import { PublicAssetProvider } from "../oracle/provider";
+import { ContractSnapshotProvider, PublicAssetProvider } from "../oracle/provider";
 import { scoreObservation } from "../oracle/scoring";
 import type { MetadataResponse, ScoredWarrior } from "../oracle/types";
 
 const router: IRouter = Router();
 type OracleContext = {
   config: ReturnType<typeof getOracleConfig>;
+  contract: ContractSnapshotProvider;
   provider: PublicAssetProvider;
   cache: StaleCache<ScoredWarrior & { wallet: string; epoch: string }>;
 };
@@ -19,7 +20,8 @@ function getContext(): OracleContext {
     const config = getOracleConfig();
     context = {
       config,
-      provider: new PublicAssetProvider(config.assetDataUrl, config.snapshotDataUrl, config.allowlist),
+      contract: new ContractSnapshotProvider(config.rpcUrl, config.contractAddress),
+      provider: new PublicAssetProvider(config.assetDataUrl, config.allowlist),
       cache: new StaleCache(config.cacheTtlMs, config.staleTtlMs),
     };
   }
@@ -47,14 +49,14 @@ function metadataFor(tokenId: string, score: ScoredWarrior & { wallet: string; e
 }
 
 function lockedResponse(res: Response) {
-  res.set({
-    "Cache-Control": "no-store",
-    "X-Robots-Tag": "noindex, nofollow, noarchive",
-  });
   return res.status(404).json({ error: "metadata is not public" });
 }
 
 async function resolveMetadata(req: Request, res: Response, tokenId: string) {
+  res.set({
+    "Cache-Control": "no-store",
+    "X-Robots-Tag": "noindex, nofollow, noarchive",
+  });
   if (!/^[1-9]\d*$/.test(tokenId)) return res.status(400).json({ error: "tokenId must be a positive integer" });
   let oracle: OracleContext;
   try {
@@ -68,7 +70,7 @@ async function resolveMetadata(req: Request, res: Response, tokenId: string) {
   const cached = oracle.cache.get(key);
   if (cached) return res.json(metadataFor(tokenId, cached.value, cached.stale, oracle.config));
   try {
-    const snapshot = await oracle.provider.getSnapshot(tokenId);
+    const snapshot = await oracle.contract.getSnapshot(tokenId);
     const observation = await oracle.provider.getObservation(snapshot.wallet, snapshot);
     const score = { ...scoreObservation(observation), wallet: snapshot.wallet, epoch: snapshot.epoch };
     oracle.cache.set(key, score);
@@ -85,6 +87,10 @@ router.get("/warriors/:tokenId", (req, res) => resolveMetadata(req, res, req.par
 router.get("/token/:tokenId", (req, res) => resolveMetadata(req, res, req.params.tokenId));
 
 router.get("/collection", (req, res) => {
+  res.set({
+    "Cache-Control": "no-store",
+    "X-Robots-Tag": "noindex, nofollow, noarchive",
+  });
   let oracle: OracleContext;
   try {
     oracle = getContext();

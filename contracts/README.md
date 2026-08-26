@@ -58,8 +58,9 @@ and owner/oracle permissions.
    metadata service base URI, and the snapshot oracle address.
 3. Deploy with those values using a dedicated deployer wallet. Verify the
    source on the testnet explorer.
-4. Set the metadata service to use the deployed contract and verify that
-   `tokenURI`, transfer resets, and `recordStartingBagValue` work end to end.
+4. Set `BASE_TOKEN_URI` to the deployed metadata service's `/api/token/` route
+   and `CONTRACT_URI` to its `/api/collection` route. Verify that `tokenURI`,
+   `contractURI`, transfer resets, and `recordStartingBagValue` work end to end.
 5. Prepare a separate mainnet deployment only after testnet behavior,
    allowlist rules, scoring thresholds, artwork, and metadata caching are
    formally locked. Do not reuse testnet addresses or send irreversible
@@ -73,11 +74,21 @@ DEPLOYER_PRIVATE_KEY=... \
 SNAPSHOT_ORACLE=0x... \
 MINT_SIGNER=0x... \
 BASE_TOKEN_URI=https://metadata.example/token/ \
+CONTRACT_URI=https://metadata.example/collection \
 MAX_SUPPLY=10000 \
 MINT_PRICE_ETH=0.01 \
 MAX_PER_WALLET=1 \
 pnpm --dir contracts run deploy:testnet
 ```
+
+The metadata API reads the deployed contract with read-only `eth_call`
+requests. Its runtime configuration requires `METADATA_BASE_URL`,
+`ROBINHOOD_RPC_URL`, `STONKALICIOUS_CONTRACT_ADDRESS`,
+`PUBLIC_ASSET_DATA_URL`, and `ROBINHOOD_ASSET_ALLOWLIST_JSON`. Metadata remains
+locked unless `METADATA_PUBLIC=true` is explicitly set. Before that release
+flag is enabled, token and collection routes return `404`, set `no-store`, and
+do not expose wallet or portfolio data. `API_ALLOWED_ORIGINS` should contain
+only the official site origin when the metadata is released.
 
 The deployment script is intentionally not hardcoded to an RPC endpoint or
 private key. Supply those values through the deployment environment's secret

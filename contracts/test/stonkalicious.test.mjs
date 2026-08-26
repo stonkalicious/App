@@ -51,6 +51,9 @@ test("mints with configured price and exposes metadata and snapshot state", asyn
     assert.equal(await contract.totalSupply(), 1n);
     assert.equal(await contract.balanceOf(await alice.getAddress()), 1n);
     assert.equal(await contract.tokenURI(1), "https://metadata.stonkalicious.xyz/token/1");
+    await (await contract.setContractURI("https://metadata.stonkalicious.xyz/collection")).wait();
+    assert.equal(await contract.contractURI(), "https://metadata.stonkalicious.xyz/collection");
+    assert.equal(await contract.supportsInterface("0x49064906"), true);
     const snapshot = await contract.snapshotOf(1);
     assert.equal(snapshot.wallet, await alice.getAddress());
     assert.equal(snapshot.startingBagValue, 0n);

@@ -42,8 +42,9 @@ function parseAllowlist(): AllowlistedAsset[] {
 
 export type OracleConfig = {
   metadataBaseUrl: string;
+  rpcUrl: string;
+  contractAddress: string;
   assetDataUrl: string;
-  snapshotDataUrl: string;
   allowlist: AllowlistedAsset[];
   cacheTtlMs: number;
   staleTtlMs: number;
@@ -61,8 +62,9 @@ export function getOracleConfig(): OracleConfig {
   if (!addressPattern.test(feeRecipient)) throw new Error("METADATA_FEE_RECIPIENT must be a valid EVM address");
   return {
     metadataBaseUrl: required("METADATA_BASE_URL").replace(/\/$/, ""),
+    rpcUrl: required("ROBINHOOD_RPC_URL"),
+    contractAddress: required("STONKALICIOUS_CONTRACT_ADDRESS"),
     assetDataUrl: required("PUBLIC_ASSET_DATA_URL"),
-    snapshotDataUrl: required("CONTRACT_SNAPSHOT_DATA_URL"),
     allowlist: parseAllowlist(),
     cacheTtlMs,
     staleTtlMs,

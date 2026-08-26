@@ -19,6 +19,8 @@ const mintPrice = ethers.parseEther(process.env.MINT_PRICE_ETH ?? "0.01");
 const maxPerWallet = BigInt(process.env.MAX_PER_WALLET ?? "1");
 const baseTokenURI = process.env.BASE_TOKEN_URI;
 if (!baseTokenURI) throw new Error("BASE_TOKEN_URI is required");
+const contractURI = process.env.CONTRACT_URI;
+if (!contractURI) throw new Error("CONTRACT_URI is required");
 
 const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode, deployer);
 const contract = await factory.deploy(
@@ -30,6 +32,7 @@ const contract = await factory.deploy(
   process.env.MINT_SIGNER,
 );
 await contract.waitForDeployment();
+await (await contract.setContractURI(contractURI)).wait();
 
 console.log(JSON.stringify({
   network: (await provider.getNetwork()).chainId.toString(),
@@ -39,6 +42,7 @@ console.log(JSON.stringify({
   mintPriceWei: mintPrice.toString(),
   maxPerWallet: maxPerWallet.toString(),
   baseTokenURI,
+  contractURI,
   snapshotOracle: process.env.SNAPSHOT_ORACLE,
   mintSigner: process.env.MINT_SIGNER,
 }, null, 2));

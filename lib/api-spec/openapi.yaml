@@ -128,10 +128,10 @@ components:
           type: string
         image:
           type: string
-          format: uri
+          pattern: "^https?://"
         external_url:
           type: string
-          format: uri
+          pattern: "^https?://"
         attributes:
           type: array
           items:
@@ -159,12 +159,12 @@ components:
           type: string
         image:
           type: string
-          format: uri
+          pattern: "^https?://"
         external_link:
           type: string
-          format: uri
+          pattern: "^https?://"
         seller_fee_basis_points:
-          type: integer
+          type: number
           minimum: 0
         fee_recipient:
           type: string

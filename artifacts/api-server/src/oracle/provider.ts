@@ -12,8 +12,15 @@ type ProviderResponse = {
   assets?: unknown;
 };
 
+const OWNER_OF_SELECTOR = "0x6352211e";
+const SNAPSHOT_OF_SELECTOR = "0x364e5ebe";
+
 function isWallet(value: unknown): value is string {
   return typeof value === "string" && /^0x[a-fA-F0-9]{40}$/.test(value);
+}
+
+function isContractAddress(value: string): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(value);
 }
 
 function numberValue(value: unknown, name: string): number {
@@ -21,30 +28,69 @@ function numberValue(value: unknown, name: string): number {
   return value;
 }
 
+function encodeUint256(value: string): string {
+  if (!/^[1-9]\d*$/.test(value)) throw new Error("Token ID must be a positive integer");
+  return BigInt(value).toString(16).padStart(64, "0");
+}
+
+function decodeWord(data: string, index: number): string {
+  if (!/^0x[0-9a-fA-F]+$/.test(data)) throw new Error("Contract RPC returned invalid ABI data");
+  const word = data.slice(2 + index * 64, 2 + (index + 1) * 64);
+  if (word.length !== 64) throw new Error("Contract RPC returned incomplete ABI data");
+  return word;
+}
+
+async function rpcCall(rpcUrl: string, to: string, data: string): Promise<string> {
+  const response = await fetch(rpcUrl, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to, data }, "latest"] }),
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!response.ok) throw new Error(`Robinhood Chain RPC returned ${response.status}`);
+  const body: unknown = await response.json();
+  if (!body || typeof body !== "object") throw new Error("Robinhood Chain RPC returned invalid JSON");
+  const result = body as { result?: unknown; error?: unknown };
+  if (result.error || typeof result.result !== "string") throw new Error("Robinhood Chain RPC eth_call failed");
+  return result.result;
+}
+
+export class ContractSnapshotProvider {
+  constructor(private readonly rpcUrl: string, private readonly contractAddress: string) {
+    if (!isContractAddress(contractAddress)) throw new Error("Invalid Stonkalicious contract address");
+  }
+
+  async getSnapshot(tokenId: string): Promise<ContractSnapshot> {
+    const encodedTokenId = encodeUint256(tokenId);
+    const ownerData = await rpcCall(this.rpcUrl, this.contractAddress, `${OWNER_OF_SELECTOR}${encodedTokenId}`);
+    const wallet = `0x${decodeWord(ownerData, 0).slice(24)}`;
+    if (!isWallet(wallet)) throw new Error("Contract ownerOf returned an invalid wallet");
+
+    const snapshotData = await rpcCall(this.rpcUrl, this.contractAddress, `${SNAPSHOT_OF_SELECTOR}${encodedTokenId}`);
+    const acquiredAtSeconds = BigInt(`0x${decodeWord(snapshotData, 1)}`);
+    const epoch = BigInt(`0x${decodeWord(snapshotData, 2)}`);
+    const startingBagValueUsd = BigInt(`0x${decodeWord(snapshotData, 3)}`);
+    if (acquiredAtSeconds === 0n || epoch === 0n) throw new Error("Contract snapshot is not initialized");
+    if (startingBagValueUsd > BigInt(Number.MAX_SAFE_INTEGER)) {
+      throw new Error("Contract snapshot value exceeds safe numeric range");
+    }
+    const acquiredAt = new Date(Number(acquiredAtSeconds) * 1000);
+    if (!Number.isFinite(acquiredAt.getTime())) throw new Error("Contract snapshot has an invalid timestamp");
+    return {
+      tokenId,
+      wallet,
+      epoch: epoch.toString(),
+      acquiredAt: acquiredAt.toISOString(),
+      startingBagValueUsd: Number(startingBagValueUsd),
+    };
+  }
+}
+
 export class PublicAssetProvider {
   constructor(
     private readonly assetDataUrl: string,
-    private readonly snapshotDataUrl: string,
     private readonly allowlist: AllowlistedAsset[],
   ) {}
-
-  async getSnapshot(tokenId: string): Promise<ContractSnapshot> {
-    const response = await fetch(`${this.snapshotDataUrl}/${encodeURIComponent(tokenId)}`);
-    if (!response.ok) throw new Error(`Contract snapshot provider returned ${response.status}`);
-    const value: unknown = await response.json();
-    if (!value || typeof value !== "object") throw new Error("Contract snapshot provider returned invalid data");
-    const candidate = value as Record<string, unknown>;
-    if (!isWallet(candidate.wallet) || typeof candidate.epoch !== "string" || typeof candidate.acquiredAt !== "string") {
-      throw new Error("Contract snapshot provider returned an incomplete snapshot");
-    }
-    return {
-      tokenId,
-      wallet: candidate.wallet,
-      epoch: candidate.epoch,
-      acquiredAt: candidate.acquiredAt,
-      startingBagValueUsd: numberValue(candidate.startingBagValueUsd ?? 0, "startingBagValueUsd"),
-    };
-  }
 
   async getObservation(wallet: string, snapshot: ContractSnapshot): Promise<PortfolioObservation> {
     if (!isWallet(wallet) || wallet.toLowerCase() !== snapshot.wallet.toLowerCase()) throw new Error("Snapshot owner mismatch");

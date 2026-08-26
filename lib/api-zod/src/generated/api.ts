@@ -101,3 +101,88 @@ export const GetCollectionMetadataResponse = zod.object({
   "seller_fee_basis_points": zod.number().min(getCollectionMetadataResponseSellerFeeBasisPointsMin),
   "fee_recipient": zod.string().regex(getCollectionMetadataResponseFeeRecipientRegExp)
 })
+
+
+/**
+ * Returns a plain-message challenge. Signing it never approves a transaction or grants custody.
+ * @summary Create a wallet ownership challenge
+ */
+export const createIdentityChallengeBodyWalletRegExp = new RegExp('^0x[a-fA-F0-9]{40}$');
+
+
+export const CreateIdentityChallengeBody = zod.object({
+  "wallet": zod.string().regex(createIdentityChallengeBodyWalletRegExp)
+})
+
+export const CreateIdentityChallengeResponse = zod.object({
+  "challengeId": zod.string(),
+  "message": zod.string(),
+  "expiresAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Verify wallet proof and start X OAuth
+ */
+export const StartXVerificationBody = zod.object({
+  "signature": zod.string()
+})
+
+export const startXVerificationResponseAuthorizeUrlRegExp = new RegExp('^https:/');
+
+
+export const StartXVerificationResponse = zod.object({
+  "status": zod.enum(['oauth_redirect']),
+  "authorizeUrl": zod.string().regex(startXVerificationResponseAuthorizeUrlRegExp)
+})
+
+
+/**
+ * @summary Complete X OAuth verification
+ */
+export const XVerificationCallbackQueryParams = zod.object({
+  "code": zod.coerce.string().optional(),
+  "state": zod.coerce.string().optional(),
+  "error": zod.coerce.string().optional()
+})
+
+export const XVerificationCallbackResponse = zod.void()
+
+
+/**
+ * @summary Get the current verification state
+ */
+export const GetIdentityStatusResponse = zod.object({
+  "status": zod.enum(['anonymous', 'unavailable', 'wallet_pending', 'oauth_pending', 'ready', 'failed']),
+  "walletVerified": zod.boolean().optional(),
+  "xVerified": zod.boolean().optional(),
+  "mintAuthorizationAvailable": zod.boolean().optional(),
+  "expiresAt": zod.coerce.date().optional(),
+  "errorCode": zod.string().optional()
+})
+
+
+/**
+ * Returns an EIP-712 authorization only after wallet proof and X verification. The response is single-use and short-lived.
+ * @summary Consume a one-use mint authorization
+ */
+export const consumeMintAuthorizationResponseWalletRegExp = new RegExp('^0x[a-fA-F0-9]{40}$');
+
+
+export const ConsumeMintAuthorizationResponse = zod.object({
+  "wallet": zod.string().regex(consumeMintAuthorizationResponseWalletRegExp),
+  "quantity": zod.literal(1),
+  "profileHash": zod.string(),
+  "challengeId": zod.string(),
+  "nonce": zod.string(),
+  "deadline": zod.string(),
+  "signature": zod.string(),
+  "mintPriceWei": zod.string(),
+  "expiresAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Clear the local verification session
+ */
+export const ResetIdentityVerificationResponse = zod.void()

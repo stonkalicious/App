@@ -90,6 +90,25 @@ flag is enabled, token and collection routes return `404`, set `no-store`, and
 do not expose wallet or portfolio data. `API_ALLOWED_ORIGINS` should contain
 only the official site origin when the metadata is released.
 
+## Identity verification configuration
+
+The API identity routes require `X_CLIENT_ID`, `X_CLIENT_SECRET`,
+`X_REDIRECT_URI`, `IDENTITY_APP_BASE_URL`, `MINT_SIGNER_PRIVATE_KEY`, and
+`MINT_PRICE_WEI`, plus the existing contract and RPC settings. Keep the X
+client secret and mint signer key in the deployment secret manager; they are
+never returned to the browser or written to logs. The OAuth flow requests
+`users.read` only, uses state plus S256 PKCE, and retains only the stable X
+account identifier's hash in the short-lived process store.
+
+The user first signs a plain wallet-control message. The message explicitly
+does not approve, move, or custody assets. After X verification, the API
+issues one short-lived EIP-712 mint authorization tied to the wallet, profile
+hash, challenge, nonce, chain, and contract. The user submits any future mint
+transaction from their own wallet; the API never asks for a seed phrase or
+private key. Identity sessions and reservations are intentionally short-lived
+and should be backed by a shared expiring store before running multiple API
+instances.
+
 The deployment script is intentionally not hardcoded to an RPC endpoint or
 private key. Supply those values through the deployment environment's secret
 manager, never commit them, and never paste them into chat.

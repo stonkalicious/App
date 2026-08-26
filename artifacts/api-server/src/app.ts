@@ -1,5 +1,6 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
@@ -31,7 +32,9 @@ const allowedOrigins = process.env.API_ALLOWED_ORIGINS
   .filter(Boolean);
 app.use(cors({
   origin: allowedOrigins?.length ? allowedOrigins : false,
+  credentials: Boolean(allowedOrigins?.length),
 }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -47,15 +47,33 @@ type Warrior = {
   cohortSize: number;
 };
 
+type EthereumProvider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+};
+
+type IdentityStatusResponse = {
+  status: 'anonymous' | 'unavailable' | 'wallet_pending' | 'oauth_pending' | 'ready' | 'failed';
+  walletVerified?: boolean;
+  xVerified?: boolean;
+  mintAuthorizationAvailable?: boolean;
+  errorCode?: string;
+};
+
+declare global {
+  interface Window {
+    ethereum?: EthereumProvider;
+  }
+}
+
 const stages: Stage[] = [
   ['newb', 'Newb', '0–12 strength', 'Everyone starts here. The orb is warm, the bag is small, and the first trade is still ahead.', 'open face / soft purple energy', '#7666c9', 'newb'],
-  ['liquidated', 'Liquidated', '13–24 strength', 'The market collected its tax. Not dead — just dramatically underfunded.', 'burned armor / emergency glow', '#8d4654', 'liquidated'],
+  ['liquidated', 'Liquidated', '13–24 strength', 'The bag collected its tax. Not dead — just dramatically underfunded.', 'burned armor / emergency glow', '#8d4654', 'liquidated'],
   ['back', 'Back', '25–36 strength', 'The comeback arc begins. A pulse returns to the orb and the warrior remembers the plan.', 'patched kit / comeback spark', '#bd7653', 'back'],
   ['wrecked', 'Wrecked', '37–48 strength', 'Volatility leaves a mark. The warrior is bruised, watchful, and somehow still holding the orb.', 'scarred steel / volatile fire', '#a75a48', 'wrecked'],
-  ['hardened', 'Hardened', '49–60 strength', 'The portfolio has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c', 'hardened'],
+  ['hardened', 'Hardened', '49–60 strength', 'The coin bag has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c', 'hardened'],
   ['profitable', 'Profitable', '61–72 strength', 'The numbers finally talk back. A positive ROI sharpens every edge.', 'war paint / profit glow', '#d99a48', 'profitable'],
   ['elite', 'Elite', '73–88 strength', 'A battle-worn status symbol. Bright flames, a hard gaze, and nothing left to prove.', 'worn armor / bright aura', '#f5bf58', 'elite'],
-  ['plumber', 'Plumber', '89+ strength', 'The final form. Deep in the pipes of the market, this warrior fixes leaks and keeps building.', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
+  ['plumber', 'Plumber', '89+ strength', 'The final form. Deep in the pipes of the chain, this warrior fixes leaks and keeps building.', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
 ].map(([key, name, threshold, description, trait, color, image], index) => ({
   key: key as StageKey,
   number: String(index + 1).padStart(2, '0'),
@@ -107,7 +125,7 @@ function BrandMark() {
       </div>
       <div>
         <div className="display-face text-[18px] font-extrabold leading-none tracking-[-.08em]">stonkalicious</div>
-        <div className="mono-face mt-1 text-[9px] text-[#6e6b72]">market status</div>
+        <div className="mono-face mt-1 text-[9px] text-[#6e6b72]">coin status</div>
       </div>
     </div>
   );
@@ -120,6 +138,9 @@ function App() {
   const [sortMode, setSortMode] = useState<'rank' | 'growth'>('rank');
   const [notice, setNotice] = useState('');
   const [copied, setCopied] = useState(false);
+  const [identityState, setIdentityState] = useState<'idle' | 'signing' | 'oauth' | 'success' | 'error' | 'unavailable'>('idle');
+  const [identityError, setIdentityError] = useState('');
+  const [identityBusy, setIdentityBusy] = useState(false);
   const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[7];
 
   useEffect(() => {
@@ -132,6 +153,29 @@ function App() {
     setMeta('twitter:card', 'summary_large_image');
     setMeta('twitter:title', 'Stonkalicious — Your wallet, turned warrior');
     setMeta('twitter:description', 'A pre-launch dynamic NFT performance mirror for Robinhood Chain. No custody. No wallet approvals.');
+  }, []);
+
+  useEffect(() => {
+    const verification = new URLSearchParams(window.location.search).get('verification');
+    const reason = new URLSearchParams(window.location.search).get('reason') ?? '';
+    if (verification === 'success') setIdentityState('success');
+    if (verification === 'error') {
+      setIdentityState('error');
+      setIdentityError(reason);
+    }
+    if (verification) window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+    void fetch('/api/identity/status', { credentials: 'include' })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const status = await response.json() as IdentityStatusResponse;
+        if (status.status === 'ready') setIdentityState('success');
+        if (status.status === 'failed') {
+          setIdentityState('error');
+          setIdentityError(status.errorCode ?? '');
+        }
+        if (status.status === 'unavailable') setIdentityState('unavailable');
+      })
+      .catch(() => setIdentityState('unavailable'));
   }, []);
 
   useEffect(() => {
@@ -161,6 +205,74 @@ function App() {
       window.setTimeout(() => setCopied(false), 2400);
     } catch {
       setNotice('Contract details will be published with the mint announcement.');
+    }
+  };
+
+  const identityErrorCopy = (code: string) => ({
+    invalid_wallet: 'Your wallet address was not accepted. Try again with a compatible EVM wallet.',
+    wallet_signature_invalid: 'The wallet proof did not match this wallet. Nothing was submitted or approved.',
+    wallet_challenge_expired: 'That wallet proof expired. Start again to receive a fresh challenge.',
+    x_denied: 'X verification was cancelled. You can safely try again.',
+    state_invalid: 'The verification link could not be trusted. Start again from this page.',
+    identity_already_bound: 'That X identity already has an active warrior.',
+    wallet_already_claimed: 'That wallet already has its lifetime warrior.',
+    mint_signer_mismatch: 'Mint authorization is temporarily unavailable. No transaction was opened.',
+    claim_in_progress: 'This wallet or X identity is already being verified in another session.',
+    oauth_already_started: 'The X verification window is already in progress. Finish it or try again.',
+    verification_unavailable: 'Verification is temporarily unavailable. No wallet permission was requested.',
+  } as Record<string, string>)[code] ?? 'Verification did not complete. Try again from this page.';
+
+  const startIdentityVerification = async () => {
+    setIdentityBusy(true);
+    setIdentityError('');
+    if (!window.ethereum) {
+      setIdentityState('error');
+      setIdentityError('wallet_missing');
+      setIdentityBusy(false);
+      return;
+    }
+    try {
+      setIdentityState('signing');
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const wallet = Array.isArray(accounts) && typeof accounts[0] === 'string' ? accounts[0] : '';
+      if (!wallet) throw new Error('invalid_wallet');
+      const challengeResponse = await fetch('/api/identity/challenge', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ wallet }),
+      });
+      const challenge = await challengeResponse.json() as { message?: string; challengeId?: string; error?: string };
+      if (!challengeResponse.ok || !challenge.message || !challenge.challengeId) throw new Error(challenge.error ?? 'verification_unavailable');
+      const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [challenge.message, wallet],
+      });
+      const startResponse = await fetch('/api/identity/x/start', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ signature }),
+      });
+      const start = await startResponse.json() as { authorizeUrl?: string; error?: string };
+      if (!startResponse.ok || !start.authorizeUrl) throw new Error(start.error ?? 'verification_unavailable');
+      setIdentityState('oauth');
+      window.location.assign(start.authorizeUrl);
+    } catch (error) {
+      setIdentityState('error');
+      setIdentityError(error instanceof Error ? error.message : 'verification_unavailable');
+      setIdentityBusy(false);
+    }
+  };
+
+  const resetIdentityVerification = async () => {
+    setIdentityBusy(true);
+    try {
+      await fetch('/api/identity/reset', { method: 'POST', credentials: 'include' });
+    } finally {
+      setIdentityState('idle');
+      setIdentityError('');
+      setIdentityBusy(false);
     }
   };
 
@@ -223,7 +335,7 @@ function App() {
              who’s <span className="text-[#ec642f]">king</span><br />of the<br />Hood?
           </h1>
           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
-              Your portfolio becomes a warrior. Eight levels track the market. Your bag tells the story.
+              NFTs that track your bag from newb to elite.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
              <button type="button" onClick={() => handleAction('The public preview is open. Mint details will arrive with the official launch notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
@@ -235,7 +347,7 @@ function App() {
           </div>
           <div className="mt-16 flex flex-wrap gap-x-8 gap-y-4 border-t border-[#202534]/15 pt-5 text-[11px] text-[#6e6b72]">
             <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#4a8b68]" /> no vaults. no token.</span>
-            <span className="flex items-center gap-2"><LockKeyhole className="h-3.5 w-3.5" /> allowlist only</span>
+            <span className="flex items-center gap-2"><LockKeyhole className="h-3.5 w-3.5" /> coin allowlist only</span>
             <span className="flex items-center gap-2"><RotateCcw className="h-3.5 w-3.5" /> transfer resets</span>
           </div>
         </div>
@@ -260,7 +372,7 @@ function App() {
       <section className="border-y-2 border-[#202534] bg-[#202534] text-[#eee9dd]" aria-label="Collection facts" data-testid="section-collection-facts">
         <div className="mx-auto grid max-w-[1320px] md:grid-cols-4">
           {[
-             ['8', 'market-tested levels'],
+             ['8', 'coin-tested levels'],
              ['1', 'warrior per wallet'],
              ['1:1', 'wallet / X identity'],
             ['∞', 'reasons to keep building'],
@@ -280,7 +392,7 @@ function App() {
             <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT tracks<br /><span className="text-[#7666c9]">the bag.</span></h2>
           </div>
           <div className="max-w-[490px]">
-             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior has read-only access to qualifying holdings: it can observe performance, but never move, trade, approve, or withdraw your assets. This site will never ask for a seed phrase, private key, or token approval.</p>
+             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior has read-only access to qualifying Robinhood Chain coins: it can observe performance, but never move, trade, approve, or withdraw your coins. This site will never ask for a seed phrase, private key, or coin approval.</p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                  [WalletCards, 'read-only by design', 'It observes the wallet. It never controls the wallet.'],
@@ -304,7 +416,7 @@ function App() {
             <div className="bg-[#eee9dd] p-5">
               <div className="mono-face text-[9px] text-[#6e6b72]">wallet mirror / now</div>
               <div className="mt-3 font-mono text-2xl text-[#4a8b68]">$76,340</div>
-              <div className="mt-2 text-sm text-[#6e6b72]">the current owner’s allowlisted value</div>
+              <div className="mt-2 text-sm text-[#6e6b72]">the current owner’s eligible coin value</div>
             </div>
             <ArrowDownUp className="hidden h-7 w-7 text-[#ec642f] md:block" />
             <div className="bg-[#202534] p-5 text-[#eee9dd]">
@@ -369,12 +481,12 @@ function App() {
           <div>
             <div className="mono-face mb-5 text-[10px] text-[#ec642f]">03 / the rules of the ring</div>
             <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">The flex is<br /><span className="text-[#4a8b68]">the visual.</span></h2>
-            <p className="mt-8 max-w-[390px] text-lg leading-relaxed text-[#5c5b62]">A clean system for a messy market. The warrior only responds to signals we can actually defend.</p>
+            <p className="mt-8 max-w-[390px] text-lg leading-relaxed text-[#5c5b62]">A clean system for a messy chain. The warrior only responds to signals we can actually defend.</p>
           </div>
           <div className="grid gap-3">
             {[
               [Shield, 'One identity per warrior', 'One wallet gets one warrior. One verified X profile gets one active performance identity.'],
-              [WalletCards, 'Allowlisted assets only', 'Official Robinhood tokenized stocks and ETFs, plus a short fixed list of large Robinhood Chain coins.'],
+              [WalletCards, 'Robinhood Chain coins only', 'A fixed allowlist of eligible Robinhood Chain coins powers the mirror.'],
               [Flame, 'Capped coin contribution', 'Allowlisted coins count, but a meme pump cannot instantly summon a Tier 4 warrior.'],
               [RotateCcw, 'Transfer means reset', 'When the NFT moves, its snapshot moves with it. The new owner starts fresh. The warrior can drop tiers.'],
             ].map(([Icon, title, copy], index) => {
@@ -426,8 +538,16 @@ function App() {
               <h2 className="display-face max-w-[750px] text-5xl font-bold leading-[.86] md:text-8xl">Make your<br />performance<br /><span className="text-[#ec642f]">visible.</span></h2>
             </div>
             <div>
-             <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one warrior. Link your X profile to claim your public performance identity, then let the market write the record.</p>
-              <button type="button" onClick={() => handleAction('You are on the shortlist. Launch updates will be shared with the community.', 'community')} data-testid="button-join-signal" className="button-cut mt-7 bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">join the signal <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
+             <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one warrior. Link your X profile to claim your public performance identity, then let your coin bag write the record.</p>
+              <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityState === 'success'} data-testid="button-join-signal" className="button-cut mt-7 bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityState === 'success' ? 'identity verified' : identityBusy ? 'checking proof…' : 'verify your X identity'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
+              <div className="mt-5 border-l-2 border-[#202534] pl-4 text-sm leading-relaxed text-[#4c4b51]" aria-live="polite" data-testid="identity-status">
+                {identityState === 'idle' && <span>First: prove you control a wallet with a plain signature. Then X confirms the profile. No approval, seed phrase, or custody.</span>}
+                {identityState === 'signing' && <span>Check your wallet. The message proves control only; it cannot move coins.</span>}
+                {identityState === 'oauth' && <span>Redirecting to X for permission to verify your account. Stonkalicious never sees your X password.</span>}
+                {identityState === 'success' && <span className="font-bold">X identity verified. Mint authorization is kept separate and remains closed until the official launch.</span>}
+                {identityState === 'unavailable' && <span>Verification is not configured for this preview yet. No wallet connection was opened.</span>}
+                {identityState === 'error' && <span><strong>{identityError === 'wallet_missing' ? 'A compatible wallet is needed.' : identityErrorCopy(identityError)}</strong> <button type="button" onClick={() => { void resetIdentityVerification(); }} className="ml-1 underline underline-offset-4" data-testid="button-retry-identity">try again</button></span>}
+              </div>
             </div>
           </div>
         </div>
@@ -448,8 +568,8 @@ function App() {
            <div className="mono-face border-2 border-[#202534] px-3 py-2 text-[10px] font-bold">high risk / read this</div>
            <div className="max-w-[900px]">
              <h2 className="display-face text-3xl font-bold leading-none md:text-5xl">Expect to lose everything.</h2>
-             <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain assets and crypto assets are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
-             <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, market moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring a warrior. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
+             <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain coins are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
+             <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, coin price moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring a warrior. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
            </div>
          </div>
        </section>

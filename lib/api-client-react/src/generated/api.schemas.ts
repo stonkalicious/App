@@ -48,3 +48,78 @@ export interface CollectionMetadata {
   /** @pattern ^0x[a-fA-F0-9]{40}$ */
   fee_recipient: string;
 }
+
+export interface WalletChallengeRequest {
+  /** @pattern ^0x[a-fA-F0-9]{40}$ */
+  wallet: string;
+}
+
+export interface WalletChallenge {
+  challengeId: string;
+  message: string;
+  expiresAt: string;
+}
+
+export interface WalletSignatureRequest {
+  signature: string;
+}
+
+export type OAuthRedirectStatus = typeof OAuthRedirectStatus[keyof typeof OAuthRedirectStatus];
+
+
+export const OAuthRedirectStatus = {
+  oauth_redirect: 'oauth_redirect',
+} as const;
+
+export interface OAuthRedirect {
+  status: OAuthRedirectStatus;
+  /** @pattern ^https:// */
+  authorizeUrl: string;
+}
+
+export type IdentityStatusStatus = typeof IdentityStatusStatus[keyof typeof IdentityStatusStatus];
+
+
+export const IdentityStatusStatus = {
+  anonymous: 'anonymous',
+  unavailable: 'unavailable',
+  wallet_pending: 'wallet_pending',
+  oauth_pending: 'oauth_pending',
+  ready: 'ready',
+  failed: 'failed',
+} as const;
+
+export interface IdentityStatus {
+  status: IdentityStatusStatus;
+  walletVerified?: boolean;
+  xVerified?: boolean;
+  mintAuthorizationAvailable?: boolean;
+  expiresAt?: string;
+  errorCode?: string;
+}
+
+export type MintAuthorizationQuantity = typeof MintAuthorizationQuantity[keyof typeof MintAuthorizationQuantity];
+
+
+export const MintAuthorizationQuantity = {
+  NUMBER_1: 1,
+} as const;
+
+export interface MintAuthorization {
+  /** @pattern ^0x[a-fA-F0-9]{40}$ */
+  wallet: string;
+  quantity: MintAuthorizationQuantity;
+  profileHash: string;
+  challengeId: string;
+  nonce: string;
+  deadline: string;
+  signature: string;
+  mintPriceWei: string;
+  expiresAt: string;
+}
+
+export type XVerificationCallbackParams = {
+code?: string;
+state?: string;
+error?: string;
+};

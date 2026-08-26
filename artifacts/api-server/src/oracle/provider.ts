@@ -1,4 +1,5 @@
 import type { AllowlistedAsset, AssetKind, ContractSnapshot, PortfolioObservation } from "./types";
+import { id } from "ethers";
 
 type ProviderResponse = {
   wallet?: unknown;
@@ -14,6 +15,9 @@ type ProviderResponse = {
 
 const OWNER_OF_SELECTOR = "0x6352211e";
 const SNAPSHOT_OF_SELECTOR = "0x364e5ebe";
+const WARRIOR_BY_X_PROFILE_SELECTOR = id("warriorByXProfile(bytes32)").slice(0, 10);
+const MINTED_BY_WALLET_SELECTOR = id("mintedByWallet(address)").slice(0, 10);
+const MINT_SIGNER_SELECTOR = id("mintSigner()").slice(0, 10);
 
 function isWallet(value: unknown): value is string {
   return typeof value === "string" && /^0x[a-fA-F0-9]{40}$/.test(value);
@@ -31,6 +35,16 @@ function numberValue(value: unknown, name: string): number {
 function encodeUint256(value: string): string {
   if (!/^[1-9]\d*$/.test(value)) throw new Error("Token ID must be a positive integer");
   return BigInt(value).toString(16).padStart(64, "0");
+}
+
+function encodeBytes32(value: string): string {
+  if (!/^0x[0-9a-fA-F]{64}$/.test(value)) throw new Error("Profile hash must be bytes32");
+  return value.slice(2);
+}
+
+function encodeAddress(value: string): string {
+  if (!isWallet(value)) throw new Error("Wallet must be an EVM address");
+  return value.slice(2).padStart(64, "0");
 }
 
 function decodeWord(data: string, index: number): string {
@@ -83,6 +97,40 @@ export class ContractSnapshotProvider {
       acquiredAt: acquiredAt.toISOString(),
       startingBagValueUsd: Number(startingBagValueUsd),
     };
+  }
+
+  async getWarriorByXProfile(profileHash: string): Promise<bigint> {
+    const data = await rpcCall(this.rpcUrl, this.contractAddress, `${WARRIOR_BY_X_PROFILE_SELECTOR}${encodeBytes32(profileHash)}`);
+    return BigInt(`0x${decodeWord(data, 0)}`);
+  }
+
+  async getMintedByWallet(wallet: string): Promise<bigint> {
+    const data = await rpcCall(this.rpcUrl, this.contractAddress, `${MINTED_BY_WALLET_SELECTOR}${encodeAddress(wallet)}`);
+    return BigInt(`0x${decodeWord(data, 0)}`);
+  }
+
+  async getMintSigner(): Promise<string> {
+    const data = await rpcCall(this.rpcUrl, this.contractAddress, MINT_SIGNER_SELECTOR);
+    const signer = `0x${decodeWord(data, 0).slice(24)}`;
+    if (!isWallet(signer)) throw new Error("Contract mintSigner returned an invalid address");
+    return signer;
+  }
+
+  async getChainId(): Promise<bigint> {
+    const response = await fetch(this.rpcUrl, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_chainId", params: [] }),
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!response.ok) throw new Error(`Robinhood Chain RPC returned ${response.status}`);
+    const body: unknown = await response.json();
+    if (!body || typeof body !== "object") throw new Error("Robinhood Chain RPC returned invalid JSON");
+    const result = body as { result?: unknown; error?: unknown };
+    if (result.error || typeof result.result !== "string" || !/^0x[0-9a-fA-F]+$/.test(result.result)) {
+      throw new Error("Robinhood Chain RPC eth_chainId failed");
+    }
+    return BigInt(result.result);
   }
 }
 

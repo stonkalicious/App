@@ -6,11 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -19,11 +23,18 @@ import type {
   ApiError,
   CollectionMetadata,
   HealthStatus,
-  WarriorMetadata
+  IdentityStatus,
+  MintAuthorization,
+  OAuthRedirect,
+  WalletChallenge,
+  WalletChallengeRequest,
+  WalletSignatureRequest,
+  WarriorMetadata,
+  XVerificationCallbackParams
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -121,6 +132,12 @@ export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+
+
+
+
+
+
 export const getGetWarriorMetadataUrl = (tokenId: string,) => {
 
 
@@ -192,6 +209,12 @@ export function useGetWarriorMetadata<TData = Awaited<ReturnType<typeof getWarri
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
 
 export const getGetTokenMetadataUrl = (tokenId: string,) => {
 
@@ -265,6 +288,12 @@ export function useGetTokenMetadata<TData = Awaited<ReturnType<typeof getTokenMe
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+
+
+
+
+
+
 export const getGetCollectionMetadataUrl = () => {
 
 
@@ -335,3 +364,456 @@ export function useGetCollectionMetadata<TData = Awaited<ReturnType<typeof getCo
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
+
+export const getCreateIdentityChallengeUrl = () => {
+
+
+
+
+  return `/api/identity/challenge`
+}
+
+/**
+ * Returns a plain-message challenge. Signing it never approves a transaction or grants custody.
+ * @summary Create a wallet ownership challenge
+ */
+export const createIdentityChallenge = async (walletChallengeRequest: WalletChallengeRequest, options?: Parameters<typeof customFetch>[1]): Promise<WalletChallenge> => {
+
+  return customFetch<WalletChallenge>(getCreateIdentityChallengeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(walletChallengeRequest)
+  }
+);}
+
+
+
+
+
+export const getCreateIdentityChallengeMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createIdentityChallenge>>, TError,{data: BodyType<WalletChallengeRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createIdentityChallenge>>, TError,{data: BodyType<WalletChallengeRequest>}, TContext> => {
+
+const mutationKey = ['createIdentityChallenge'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createIdentityChallenge>>, {data: BodyType<WalletChallengeRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createIdentityChallenge(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateIdentityChallengeMutationResult = NonNullable<Awaited<ReturnType<typeof createIdentityChallenge>>>
+    export type CreateIdentityChallengeMutationBody = BodyType<WalletChallengeRequest>
+    export type CreateIdentityChallengeMutationError = ErrorType<void>
+
+    /**
+ * @summary Create a wallet ownership challenge
+ */
+export const useCreateIdentityChallenge = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createIdentityChallenge>>, TError,{data: BodyType<WalletChallengeRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createIdentityChallenge>>,
+        TError,
+        {data: BodyType<WalletChallengeRequest>},
+        TContext
+      > => {
+      return useMutation(getCreateIdentityChallengeMutationOptions(options));
+    }
+
+export const getStartXVerificationUrl = () => {
+
+
+
+
+  return `/api/identity/x/start`
+}
+
+/**
+ * @summary Verify wallet proof and start X OAuth
+ */
+export const startXVerification = async (walletSignatureRequest: WalletSignatureRequest, options?: Parameters<typeof customFetch>[1]): Promise<OAuthRedirect> => {
+
+  return customFetch<OAuthRedirect>(getStartXVerificationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(walletSignatureRequest)
+  }
+);}
+
+
+
+
+
+export const getStartXVerificationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startXVerification>>, TError,{data: BodyType<WalletSignatureRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startXVerification>>, TError,{data: BodyType<WalletSignatureRequest>}, TContext> => {
+
+const mutationKey = ['startXVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startXVerification>>, {data: BodyType<WalletSignatureRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  startXVerification(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartXVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof startXVerification>>>
+    export type StartXVerificationMutationBody = BodyType<WalletSignatureRequest>
+    export type StartXVerificationMutationError = ErrorType<void>
+
+    /**
+ * @summary Verify wallet proof and start X OAuth
+ */
+export const useStartXVerification = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startXVerification>>, TError,{data: BodyType<WalletSignatureRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof startXVerification>>,
+        TError,
+        {data: BodyType<WalletSignatureRequest>},
+        TContext
+      > => {
+      return useMutation(getStartXVerificationMutationOptions(options));
+    }
+
+export const getXVerificationCallbackUrl = (params?: XVerificationCallbackParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/identity/x/callback?${stringifiedParams}` : `/api/identity/x/callback`
+}
+
+/**
+ * @summary Complete X OAuth verification
+ */
+export const xVerificationCallback = async (params?: XVerificationCallbackParams, options?: Parameters<typeof customFetch>[1]): Promise<unknown> => {
+
+  return customFetch<unknown>(getXVerificationCallbackUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getXVerificationCallbackQueryKey = (params?: XVerificationCallbackParams,) => {
+    return [
+    `/api/identity/x/callback`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getXVerificationCallbackQueryOptions = <TData = Awaited<ReturnType<typeof xVerificationCallback>>, TError = ErrorType<void>>(params?: XVerificationCallbackParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof xVerificationCallback>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getXVerificationCallbackQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof xVerificationCallback>>> = ({ signal }) => xVerificationCallback(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof xVerificationCallback>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type XVerificationCallbackQueryResult = NonNullable<Awaited<ReturnType<typeof xVerificationCallback>>>
+export type XVerificationCallbackQueryError = ErrorType<void>
+
+
+/**
+ * @summary Complete X OAuth verification
+ */
+
+export function useXVerificationCallback<TData = Awaited<ReturnType<typeof xVerificationCallback>>, TError = ErrorType<void>>(
+ params?: XVerificationCallbackParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof xVerificationCallback>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getXVerificationCallbackQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetIdentityStatusUrl = () => {
+
+
+
+
+  return `/api/identity/status`
+}
+
+/**
+ * @summary Get the current verification state
+ */
+export const getIdentityStatus = async ( options?: Parameters<typeof customFetch>[1]): Promise<IdentityStatus> => {
+
+  return customFetch<IdentityStatus>(getGetIdentityStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIdentityStatusQueryKey = () => {
+    return [
+    `/api/identity/status`
+    ] as const;
+    }
+
+
+export const getGetIdentityStatusQueryOptions = <TData = Awaited<ReturnType<typeof getIdentityStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIdentityStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIdentityStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIdentityStatus>>> = ({ signal }) => getIdentityStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIdentityStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIdentityStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getIdentityStatus>>>
+export type GetIdentityStatusQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the current verification state
+ */
+
+export function useGetIdentityStatus<TData = Awaited<ReturnType<typeof getIdentityStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIdentityStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIdentityStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getConsumeMintAuthorizationUrl = () => {
+
+
+
+
+  return `/api/identity/mint-authorization`
+}
+
+/**
+ * Returns an EIP-712 authorization only after wallet proof and X verification. The response is single-use and short-lived.
+ * @summary Consume a one-use mint authorization
+ */
+export const consumeMintAuthorization = async ( options?: Parameters<typeof customFetch>[1]): Promise<MintAuthorization> => {
+
+  return customFetch<MintAuthorization>(getConsumeMintAuthorizationUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getConsumeMintAuthorizationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consumeMintAuthorization>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof consumeMintAuthorization>>, TError,void, TContext> => {
+
+const mutationKey = ['consumeMintAuthorization'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof consumeMintAuthorization>>, void> = () => {
+
+
+          return  consumeMintAuthorization(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConsumeMintAuthorizationMutationResult = NonNullable<Awaited<ReturnType<typeof consumeMintAuthorization>>>
+
+    export type ConsumeMintAuthorizationMutationError = ErrorType<void>
+
+    /**
+ * @summary Consume a one-use mint authorization
+ */
+export const useConsumeMintAuthorization = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consumeMintAuthorization>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof consumeMintAuthorization>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getConsumeMintAuthorizationMutationOptions(options));
+    }
+
+export const getResetIdentityVerificationUrl = () => {
+
+
+
+
+  return `/api/identity/reset`
+}
+
+/**
+ * @summary Clear the local verification session
+ */
+export const resetIdentityVerification = async ( options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getResetIdentityVerificationUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getResetIdentityVerificationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIdentityVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resetIdentityVerification>>, TError,void, TContext> => {
+
+const mutationKey = ['resetIdentityVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetIdentityVerification>>, void> = () => {
+
+
+          return  resetIdentityVerification(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResetIdentityVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof resetIdentityVerification>>>
+
+    export type ResetIdentityVerificationMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Clear the local verification session
+ */
+export const useResetIdentityVerification = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIdentityVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof resetIdentityVerification>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getResetIdentityVerificationMutationOptions(options));
+    }

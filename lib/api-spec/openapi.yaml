@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: warriors
     description: Live warrior metadata
+  - name: identity
+    description: Wallet ownership and X identity verification
 paths:
   /healthz:
     get:
@@ -94,6 +96,115 @@ paths:
           description: Metadata is locked before launch
         "503":
           description: Metadata is unavailable or not configured
+  /identity/challenge:
+    post:
+      operationId: createIdentityChallenge
+      tags: [identity]
+      summary: Create a wallet ownership challenge
+      description: Returns a plain-message challenge. Signing it never approves a transaction or grants custody.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletChallengeRequest"
+      responses:
+        "200":
+          description: Wallet challenge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletChallenge"
+        "400":
+          description: Invalid wallet address
+        "429":
+          description: Too many attempts
+        "503":
+          description: Identity verification is not configured
+  /identity/x/start:
+    post:
+      operationId: startXVerification
+      tags: [identity]
+      summary: Verify wallet proof and start X OAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletSignatureRequest"
+      responses:
+        "200":
+          description: OAuth authorization URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthRedirect"
+        "400":
+          description: Invalid or expired wallet proof
+        "401":
+          description: Wallet challenge required
+        "429":
+          description: Too many attempts
+  /identity/x/callback:
+    get:
+      operationId: xVerificationCallback
+      tags: [identity]
+      summary: Complete X OAuth verification
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema: { type: string }
+        - name: state
+          in: query
+          required: false
+          schema: { type: string }
+        - name: error
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "303":
+          description: Redirects to the showcase with a generic verification result
+        "400":
+          description: Verification session missing
+  /identity/status:
+    get:
+      operationId: getIdentityStatus
+      tags: [identity]
+      summary: Get the current verification state
+      responses:
+        "200":
+          description: Verification state without raw X identity data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentityStatus"
+  /identity/mint-authorization:
+    post:
+      operationId: consumeMintAuthorization
+      tags: [identity]
+      summary: Consume a one-use mint authorization
+      description: Returns an EIP-712 authorization only after wallet proof and X verification. The response is single-use and short-lived.
+      responses:
+        "200":
+          description: Signed mint authorization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MintAuthorization"
+        "409":
+          description: Verification is required
+        "410":
+          description: Authorization was already used or expired
+  /identity/reset:
+    post:
+      operationId: resetIdentityVerification
+      tags: [identity]
+      summary: Clear the local verification session
+      responses:
+        "204":
+          description: Session cleared
 components:
   schemas:
     HealthStatus:
@@ -170,4 +281,81 @@ components:
           type: string
           pattern: "^0x[a-fA-F0-9]{40}$"
       required: [name, description, image, external_link, seller_fee_basis_points, fee_recipient]
+    WalletChallengeRequest:
+      type: object
+      properties:
+        wallet:
+          type: string
+          pattern: "^0x[a-fA-F0-9]{40}$"
+      required: [wallet]
+    WalletChallenge:
+      type: object
+      properties:
+        challengeId:
+          type: string
+        message:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+      required: [challengeId, message, expiresAt]
+    WalletSignatureRequest:
+      type: object
+      properties:
+        signature:
+          type: string
+      required: [signature]
+    OAuthRedirect:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [oauth_redirect]
+        authorizeUrl:
+          type: string
+          pattern: "^https://"
+      required: [status, authorizeUrl]
+    IdentityStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [anonymous, unavailable, wallet_pending, oauth_pending, ready, failed]
+        walletVerified:
+          type: boolean
+        xVerified:
+          type: boolean
+        mintAuthorizationAvailable:
+          type: boolean
+        expiresAt:
+          type: string
+          format: date-time
+        errorCode:
+          type: string
+      required: [status]
+    MintAuthorization:
+      type: object
+      properties:
+        wallet:
+          type: string
+          pattern: "^0x[a-fA-F0-9]{40}$"
+        quantity:
+          type: integer
+          enum: [1]
+        profileHash:
+          type: string
+        challengeId:
+          type: string
+        nonce:
+          type: string
+        deadline:
+          type: string
+        signature:
+          type: string
+        mintPriceWei:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+      required: [wallet, quantity, profileHash, challengeId, nonce, deadline, signature, mintPriceWei, expiresAt]
 

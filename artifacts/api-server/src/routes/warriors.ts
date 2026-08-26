@@ -62,8 +62,8 @@ async function resolveMetadata(req: Request, res: Response, tokenId: string) {
   try {
     oracle = getContext();
   } catch (error) {
-    req.log.warn({ route: "warrior-metadata" }, "oracle configuration is unavailable");
-    return res.status(503).json({ error: "warrior data is not configured" });
+     req.log.warn({ route: "nft-metadata" }, "oracle configuration is unavailable");
+     return res.status(503).json({ error: "NFT data is not configured" });
   }
   if (!oracle.config.metadataPublic) return lockedResponse(res);
   const key = `warrior:${tokenId}`;
@@ -76,10 +76,10 @@ async function resolveMetadata(req: Request, res: Response, tokenId: string) {
     oracle.cache.set(key, score);
     return res.json(metadataFor(tokenId, score, false, oracle.config));
   } catch (error) {
-    req.log.warn({ route: "warrior-metadata" }, "warrior metadata resolution failed");
+    req.log.warn({ route: "nft-metadata" }, "NFT metadata resolution failed");
     const stale = oracle.cache.get(key);
     if (stale) return res.json(metadataFor(tokenId, stale.value, true, oracle.config));
-    return res.status(503).json({ error: "warrior data is temporarily unavailable" });
+    return res.status(503).json({ error: "NFT data is temporarily unavailable" });
   }
 }
 

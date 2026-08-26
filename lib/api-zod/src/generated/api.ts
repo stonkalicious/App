@@ -19,7 +19,7 @@ export const HealthCheckResponse = zod.object({
 
 /**
  * Returns current metadata derived from the owner's qualifying public portfolio data. Stale data is explicitly marked.
- * @summary Get live metadata for a warrior
+ * @summary Get live metadata for an NFT
  */
 export const getWarriorMetadataPathTokenIdRegExp = new RegExp('^[1-9][0-9]*$');
 
@@ -51,7 +51,7 @@ export const GetWarriorMetadataResponse = zod.object({
 
 
 /**
- * Contract-facing alias for the live warrior metadata route.
+ * Contract-facing alias for the live NFT metadata route.
  * @summary Get marketplace token metadata
  */
 export const getTokenMetadataPathTokenIdRegExp = new RegExp('^[1-9][0-9]*$');

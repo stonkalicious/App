@@ -12,20 +12,20 @@ or private key.
 
 - The contract owns token identity, ownership, minting, URI configuration, and
   transfer lifecycle.
-- The launch policy is one lifetime warrior per wallet. Public minting requires
+- The launch policy is one lifetime NFT per wallet. Public minting requires
   an EIP-712 authorization from the configured `mintSigner`, bound to the
   wallet, X profile hash, challenge, nonce, and expiry. `maxPerWallet` must be
   configured as `1`, and admin/free allocations count against the same wallet
   ledger.
 - An authorized identity verifier can bind one hashed X account identifier to
-  one active warrior. The raw X handle and OAuth credentials stay off-chain.
+  one active NFT. The raw X handle and OAuth credentials stay off-chain.
 - `recordStartingBagValue` is called by the configured snapshot oracle after a
   mint or transfer. It records the current owner's starting value without
   storing any portfolio assets in the NFT.
 - On every transfer, the contract resets `startingBagValue` to zero, updates the
   wallet and timestamp, and increments the snapshot epoch.
 - The off-chain metadata service reads `ownerOf`, `snapshotOf`, and its own
-  allowlisted Robinhood Chain coin data to choose the current warrior level and
+  allowlisted Robinhood Chain coin data to choose the current NFT level and
   social performance card.
   `tokenURI` points marketplaces at that service.
 - Metadata stays mutable by design. Base URI changes emit ERC-4906-compatible

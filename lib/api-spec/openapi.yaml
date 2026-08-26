@@ -11,7 +11,7 @@ tags:
   - name: health
     description: Health operations
   - name: warriors
-    description: Live warrior metadata
+    description: Live NFT metadata
   - name: identity
     description: Wallet ownership and X identity verification
 paths:
@@ -32,7 +32,7 @@ paths:
     get:
       operationId: getWarriorMetadata
       tags: [warriors]
-      summary: Get live metadata for a warrior
+      summary: Get live metadata for an NFT
       description: Returns current metadata derived from the owner's qualifying public portfolio data. Stale data is explicitly marked.
       parameters:
         - name: tokenId
@@ -43,7 +43,7 @@ paths:
             pattern: "^[1-9][0-9]*$"
       responses:
         "200":
-          description: Warrior metadata
+          description: NFT metadata
           content:
             application/json:
               schema:
@@ -61,7 +61,7 @@ paths:
       operationId: getTokenMetadata
       tags: [warriors]
       summary: Get marketplace token metadata
-      description: Contract-facing alias for the live warrior metadata route.
+      description: Contract-facing alias for the live NFT metadata route.
       parameters:
         - name: tokenId
           in: path
@@ -71,7 +71,7 @@ paths:
             pattern: "^[1-9][0-9]*$"
       responses:
         "200":
-          description: Warrior metadata
+          description: NFT metadata
           content:
             application/json:
               schema:

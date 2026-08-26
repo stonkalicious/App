@@ -6,9 +6,9 @@
 
 ## Security goals
 
-1. Only an authorized launch process can create warriors, change price/supply parameters, or withdraw funds.
-2. A wallet cannot mint more than one lifetime warrior, including free, public, and admin allocations.
-3. A transferred warrior starts a new performance run and cannot retain the previous owner's X identity.
+1. Only an authorized launch process can create NFTs, change price/supply parameters, or withdraw funds.
+2. A wallet cannot mint more than one lifetime NFT, including free, public, and admin allocations.
+3. A transferred NFT starts a new performance run and cannot retain the previous owner's X identity.
 4. Portfolio valuation and level changes are reproducible, bounded, attributable to a snapshot, and resistant to oracle tampering.
 5. Metadata cannot silently become malicious, disappear, or be rewritten without an observable record.
 6. A challenge ranking cannot be inflated by duplicate identities, fake progress, replayed claims, or unbounded API traffic.
@@ -91,7 +91,7 @@ The contract correctly enforces one lifetime mint per address, but a person can 
 ### Positive controls already present
 
 - Exact payment and max supply checks are on-chain.
-- One lifetime warrior per wallet is enforced across public and admin mints.
+- One lifetime NFT per wallet is enforced across public and admin mints.
 - Zero-address and nonexistent-token checks exist.
 - Transfers clear approvals, reset the snapshot epoch, and clear the X-profile binding.
 - Safe transfers revert if the receiver contract does not implement the ERC-721 receiver interface.

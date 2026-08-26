@@ -87,7 +87,7 @@ test("rejects unauthorized snapshot writes and owner-only configuration", async 
   }
 });
 
-test("enforces one lifetime warrior per wallet and binds each X profile once", async () => {
+test("enforces one lifetime NFT per wallet and binds each X profile once", async () => {
   const { server, provider, contract, owner, alice, bob } = await fixture();
   try {
     await (await mintOne(contract, owner, alice, 3, "x-account-123")).wait();

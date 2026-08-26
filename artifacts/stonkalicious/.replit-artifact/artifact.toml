@@ -1,7 +1,7 @@
 kind = "web"
 previewPath = "/"
 title = "Stonkalicious"
-description = "A dynamic NFT showcase for Robinhood Chain where each warrior evolves from naive to elite as the owner's allowlisted portfolio grows."
+description = "A dynamic NFT showcase for Robinhood Chain where each NFT evolves from naive to elite as the owner's allowlisted coin bag grows."
 version = "1.0.0"
 id = "artifacts/stonkalicious"
 router = "path"

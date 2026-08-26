@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 /// @title Stonkalicious
-/// @notice An ERC-721 warrior whose visual tier is resolved by an off-chain
+/// @notice An ERC-721 NFT whose visual tier is resolved by an off-chain
 /// metadata service from the current owner's allowlisted Robinhood Chain coins.
 contract Stonkalicious {
     string public name = "Stonkalicious";
@@ -206,7 +206,7 @@ contract Stonkalicious {
         emit MetadataUpdate(tokenId);
     }
 
-    /// @notice Binds a verified X account to the current owner's warrior.
+    /// @notice Binds a verified X account to the current owner's NFT.
     /// @dev The off-chain verifier must authenticate X and pass a non-reversible
     /// hash of the provider's stable account identifier, never the handle.
     function bindXProfile(uint256 tokenId, bytes32 profileHash) external onlySnapshotOracle whenNotPaused {

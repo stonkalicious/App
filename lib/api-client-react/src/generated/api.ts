@@ -148,7 +148,7 @@ export const getGetWarriorMetadataUrl = (tokenId: string,) => {
 
 /**
  * Returns current metadata derived from the owner's qualifying public portfolio data. Stale data is explicitly marked.
- * @summary Get live metadata for a warrior
+ * @summary Get live metadata for an NFT
  */
 export const getWarriorMetadata = async (tokenId: string, options?: Parameters<typeof customFetch>[1]): Promise<WarriorMetadata> => {
 
@@ -195,7 +195,7 @@ export type GetWarriorMetadataQueryError = ErrorType<void | ApiError>
 
 
 /**
- * @summary Get live metadata for a warrior
+ * @summary Get live metadata for an NFT
  */
 
 export function useGetWarriorMetadata<TData = Awaited<ReturnType<typeof getWarriorMetadata>>, TError = ErrorType<void | ApiError>>(
@@ -225,7 +225,7 @@ export const getGetTokenMetadataUrl = (tokenId: string,) => {
 }
 
 /**
- * Contract-facing alias for the live warrior metadata route.
+ * Contract-facing alias for the live NFT metadata route.
  * @summary Get marketplace token metadata
  */
 export const getTokenMetadata = async (tokenId: string, options?: Parameters<typeof customFetch>[1]): Promise<WarriorMetadata> => {

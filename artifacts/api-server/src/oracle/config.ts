@@ -47,6 +47,8 @@ export type OracleConfig = {
   allowlist: AllowlistedAsset[];
   cacheTtlMs: number;
   staleTtlMs: number;
+  metadataPublic: boolean;
+  feeRecipient: string;
 };
 
 export function getOracleConfig(): OracleConfig {
@@ -55,6 +57,8 @@ export function getOracleConfig(): OracleConfig {
   if (!Number.isFinite(cacheTtlMs) || cacheTtlMs <= 0 || !Number.isFinite(staleTtlMs) || staleTtlMs < cacheTtlMs) {
     throw new Error("Oracle cache TTL values are invalid");
   }
+  const feeRecipient = process.env.METADATA_FEE_RECIPIENT ?? "0x0000000000000000000000000000000000000000";
+  if (!addressPattern.test(feeRecipient)) throw new Error("METADATA_FEE_RECIPIENT must be a valid EVM address");
   return {
     metadataBaseUrl: required("METADATA_BASE_URL").replace(/\/$/, ""),
     assetDataUrl: required("PUBLIC_ASSET_DATA_URL"),
@@ -62,5 +66,7 @@ export function getOracleConfig(): OracleConfig {
     allowlist: parseAllowlist(),
     cacheTtlMs,
     staleTtlMs,
+    metadataPublic: process.env.METADATA_PUBLIC === "true",
+    feeRecipient,
   };
 }

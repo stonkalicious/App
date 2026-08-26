@@ -54,6 +54,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /token/{tokenId}:
+    get:
+      operationId: getTokenMetadata
+      tags: [warriors]
+      summary: Get marketplace token metadata
+      description: Contract-facing alias for the live warrior metadata route.
+      parameters:
+        - name: tokenId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[1-9][0-9]*$"
+      responses:
+        "200":
+          description: Warrior metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WarriorMetadata"
+        "404":
+          description: Metadata is locked before launch
+        "503":
+          description: Data source is unavailable or not configured
+  /collection:
+    get:
+      operationId: getCollectionMetadata
+      tags: [warriors]
+      summary: Get OpenSea collection metadata
+      responses:
+        "200":
+          description: Collection metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionMetadata"
+        "404":
+          description: Metadata is locked before launch
+        "503":
+          description: Metadata is unavailable or not configured
 components:
   schemas:
     HealthStatus:
@@ -110,4 +150,24 @@ components:
               type: boolean
           required: [wallet, epoch, observedAt, stale]
       required: [name, description, image, external_url, attributes, properties]
+    CollectionMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+          format: uri
+        external_link:
+          type: string
+          format: uri
+        seller_fee_basis_points:
+          type: integer
+          minimum: 0
+        fee_recipient:
+          type: string
+          pattern: "^0x[a-fA-F0-9]{40}$"
+      required: [name, description, image, external_link, seller_fee_basis_points, fee_recipient]
 

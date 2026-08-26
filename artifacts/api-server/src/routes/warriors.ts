@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router, type IRouter, type Request, type Response } from "express";
 import { getOracleConfig } from "../oracle/config";
 import { StaleCache } from "../oracle/cache";
 import { PublicAssetProvider } from "../oracle/provider";
@@ -46,16 +46,24 @@ function metadataFor(tokenId: string, score: ScoredWarrior & { wallet: string; e
   };
 }
 
-router.get("/warriors/:tokenId", async (req, res) => {
-  const tokenId = req.params.tokenId;
+function lockedResponse(res: Response) {
+  res.set({
+    "Cache-Control": "no-store",
+    "X-Robots-Tag": "noindex, nofollow, noarchive",
+  });
+  return res.status(404).json({ error: "metadata is not public" });
+}
+
+async function resolveMetadata(req: Request, res: Response, tokenId: string) {
   if (!/^[1-9]\d*$/.test(tokenId)) return res.status(400).json({ error: "tokenId must be a positive integer" });
   let oracle: OracleContext;
   try {
     oracle = getContext();
   } catch (error) {
-    req.log.error({ error }, "oracle configuration is unavailable");
+    req.log.warn({ route: "warrior-metadata" }, "oracle configuration is unavailable");
     return res.status(503).json({ error: "warrior data is not configured" });
   }
+  if (!oracle.config.metadataPublic) return lockedResponse(res);
   const key = `warrior:${tokenId}`;
   const cached = oracle.cache.get(key);
   if (cached) return res.json(metadataFor(tokenId, cached.value, cached.stale, oracle.config));
@@ -66,11 +74,35 @@ router.get("/warriors/:tokenId", async (req, res) => {
     oracle.cache.set(key, score);
     return res.json(metadataFor(tokenId, score, false, oracle.config));
   } catch (error) {
-    req.log.error({ error, tokenId }, "warrior metadata resolution failed");
+    req.log.warn({ route: "warrior-metadata" }, "warrior metadata resolution failed");
     const stale = oracle.cache.get(key);
     if (stale) return res.json(metadataFor(tokenId, stale.value, true, oracle.config));
     return res.status(503).json({ error: "warrior data is temporarily unavailable" });
   }
+}
+
+router.get("/warriors/:tokenId", (req, res) => resolveMetadata(req, res, req.params.tokenId));
+router.get("/token/:tokenId", (req, res) => resolveMetadata(req, res, req.params.tokenId));
+
+router.get("/collection", (req, res) => {
+  let oracle: OracleContext;
+  try {
+    oracle = getContext();
+  } catch {
+    req.log.warn({ route: "collection-metadata" }, "oracle configuration is unavailable");
+    return res.status(503).json({ error: "metadata is not configured" });
+  }
+  if (!oracle.config.metadataPublic) return lockedResponse(res);
+  return res.json({
+    name: "Stonkalicious",
+    description: "A live performance identity that reflects its owner's qualifying portfolio.",
+    image: `${oracle.config.metadataBaseUrl}/images/plumber.png`,
+    external_link: oracle.config.metadataBaseUrl,
+    seller_fee_basis_points: 0,
+    fee_recipient: oracle.config.feeRecipient,
+  });
 });
+
+router.get("/contract", (req, res) => res.redirect(307, "/api/collection"));
 
 export default router;

@@ -480,8 +480,6 @@ function App() {
         <div className="grid gap-14 md:grid-cols-[.9fr_1.1fr]">
           <div>
             <div className="mono-face mb-5 text-[10px] text-[#ec642f]">03 / the rules of the ring</div>
-            <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">The flex is<br /><span className="text-[#4a8b68]">the visual.</span></h2>
-            <p className="mt-8 max-w-[390px] text-lg leading-relaxed text-[#5c5b62]">A clean system for a messy chain. The NFT only responds to signals we can actually defend.</p>
           </div>
           <div className="grid gap-3">
             {[

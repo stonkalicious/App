@@ -68,12 +68,12 @@ declare global {
 const stages: Stage[] = [
   ['newb', 'Newb', '0–12 strength', 'Everyone starts here. The orb is warm, the bag is small, and the first trade is still ahead.', 'open face / soft purple energy', '#7666c9', 'newb'],
   ['liquidated', 'Liquidated', '13–24 strength', 'The bag collected its tax. Not dead — just dramatically underfunded.', 'burned armor / emergency glow', '#8d4654', 'liquidated'],
-  ['back', 'Back', '25–36 strength', 'The comeback arc begins. A pulse returns to the orb and the warrior remembers the plan.', 'patched kit / comeback spark', '#bd7653', 'back'],
-  ['wrecked', 'Wrecked', '37–48 strength', 'Volatility leaves a mark. The warrior is bruised, watchful, and somehow still holding the orb.', 'scarred steel / volatile fire', '#a75a48', 'wrecked'],
+  ['back', 'Back', '25–36 strength', 'The comeback arc begins. A pulse returns to the orb and the NFT remembers the plan.', 'patched kit / comeback spark', '#bd7653', 'back'],
+  ['wrecked', 'Wrecked', '37–48 strength', 'Volatility leaves a mark. The NFT is bruised, watchful, and somehow still holding the orb.', 'scarred steel / volatile fire', '#a75a48', 'wrecked'],
   ['hardened', 'Hardened', '49–60 strength', 'The coin bag has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c', 'hardened'],
   ['profitable', 'Profitable', '61–72 strength', 'The numbers finally talk back. A positive ROI sharpens every edge.', 'war paint / profit glow', '#d99a48', 'profitable'],
   ['elite', 'Elite', '73–88 strength', 'A battle-worn status symbol. Bright flames, a hard gaze, and nothing left to prove.', 'worn armor / bright aura', '#f5bf58', 'elite'],
-  ['plumber', 'Plumber', '89+ strength', 'The final form. Deep in the pipes of the chain, this warrior fixes leaks and keeps building.', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
+  ['plumber', 'Plumber', '89+ strength', 'The final form. Deep in the pipes of the chain, this NFT fixes leaks and keeps building.', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
 ].map(([key, name, threshold, description, trait, color, image], index) => ({
   key: key as StageKey,
   number: String(index + 1).padStart(2, '0'),
@@ -109,8 +109,8 @@ function setMeta(name: string, content: string, property?: string) {
 function WarriorIllustration({ stage }: { stage: StageKey }) {
   const artwork = stages.find((item) => item.key === stage)?.image ?? stages[0].image;
   return (
-    <div className={`warrior-art warrior-float level-${stage}`} aria-label={`${stage} warrior visual`} data-testid={`illustration-warrior-${stage}`}>
-      <img src={artwork} alt={`${stage} Stonkalicious warrior`} />
+    <div className={`warrior-art warrior-float level-${stage}`} aria-label={`${stage} NFT visual`} data-testid={`illustration-warrior-${stage}`}>
+      <img src={artwork} alt={`${stage} Stonkalicious NFT`} />
       <div className="artwork-glow" />
     </div>
   );
@@ -144,14 +144,14 @@ function App() {
   const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[7];
 
   useEffect(() => {
-    document.title = 'Stonkalicious — Your wallet, turned warrior';
+    document.title = 'Stonkalicious — Your wallet, turned NFT';
     setMeta('description', 'Stonkalicious is a pre-launch dynamic NFT performance mirror for Robinhood Chain.');
-    setMeta('', 'Stonkalicious — Your wallet, turned warrior', 'og:title');
+    setMeta('', 'Stonkalicious — Your wallet, turned NFT', 'og:title');
     setMeta('', 'A pre-launch dynamic NFT performance mirror for Robinhood Chain. No custody. No wallet approvals.', 'og:description');
     setMeta('', 'website', 'og:type');
     setMeta('', window.location.href, 'og:url');
     setMeta('twitter:card', 'summary_large_image');
-    setMeta('twitter:title', 'Stonkalicious — Your wallet, turned warrior');
+    setMeta('twitter:title', 'Stonkalicious — Your wallet, turned NFT');
     setMeta('twitter:description', 'A pre-launch dynamic NFT performance mirror for Robinhood Chain. No custody. No wallet approvals.');
   }, []);
 
@@ -214,8 +214,8 @@ function App() {
     wallet_challenge_expired: 'That wallet proof expired. Start again to receive a fresh challenge.',
     x_denied: 'X verification was cancelled. You can safely try again.',
     state_invalid: 'The verification link could not be trusted. Start again from this page.',
-    identity_already_bound: 'That X identity already has an active warrior.',
-    wallet_already_claimed: 'That wallet already has its lifetime warrior.',
+    identity_already_bound: 'That X identity already has an active NFT.',
+    wallet_already_claimed: 'That wallet already has its lifetime NFT.',
     mint_signer_mismatch: 'Mint authorization is temporarily unavailable. No transaction was opened.',
     claim_in_progress: 'This wallet or X identity is already being verified in another session.',
     oauth_already_started: 'The X verification window is already in progress. Finish it or try again.',
@@ -373,7 +373,7 @@ function App() {
         <div className="mx-auto grid max-w-[1320px] md:grid-cols-4">
           {[
              ['8', 'coin-tested levels'],
-             ['1', 'warrior per wallet'],
+             ['1', 'NFT per wallet'],
              ['1:1', 'wallet / X identity'],
             ['∞', 'reasons to keep building'],
           ].map(([value, label], index) => (
@@ -392,7 +392,7 @@ function App() {
             <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT tracks<br /><span className="text-[#7666c9]">the bag.</span></h2>
           </div>
           <div className="max-w-[490px]">
-             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one warrior, one public performance identity. The warrior has read-only access to qualifying Robinhood Chain coins: it can observe performance, but never move, trade, approve, or withdraw your coins. This site will never ask for a seed phrase, private key, or coin approval.</p>
+             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one NFT, one public performance identity. The NFT has read-only access to qualifying Robinhood Chain coins: it can observe performance, but never move, trade, approve, or withdraw your coins. This site will never ask for a seed phrase, private key, or coin approval.</p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                  [WalletCards, 'read-only by design', 'It observes the wallet. It never controls the wallet.'],
@@ -410,7 +410,7 @@ function App() {
             <div className="bg-[#eee9dd] p-5">
               <div className="mono-face text-[9px] text-[#6e6b72]">snapshot / day zero</div>
               <div className="mt-3 font-mono text-2xl">$34,820</div>
-              <div className="mt-2 text-sm text-[#6e6b72]">your bag when the warrior became yours</div>
+              <div className="mt-2 text-sm text-[#6e6b72]">your bag when the NFT became yours</div>
             </div>
             <ArrowDownUp className="hidden h-7 w-7 text-[#ec642f] md:block" />
             <div className="bg-[#eee9dd] p-5">
@@ -481,14 +481,14 @@ function App() {
           <div>
             <div className="mono-face mb-5 text-[10px] text-[#ec642f]">03 / the rules of the ring</div>
             <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">The flex is<br /><span className="text-[#4a8b68]">the visual.</span></h2>
-            <p className="mt-8 max-w-[390px] text-lg leading-relaxed text-[#5c5b62]">A clean system for a messy chain. The warrior only responds to signals we can actually defend.</p>
+            <p className="mt-8 max-w-[390px] text-lg leading-relaxed text-[#5c5b62]">A clean system for a messy chain. The NFT only responds to signals we can actually defend.</p>
           </div>
           <div className="grid gap-3">
             {[
-              [Shield, 'One identity per warrior', 'One wallet gets one warrior. One verified X profile gets one active performance identity.'],
+              [Shield, 'One identity per NFT', 'One wallet gets one NFT. One verified X profile gets one active performance identity.'],
               [WalletCards, 'Robinhood Chain coins only', 'A fixed allowlist of eligible Robinhood Chain coins powers the mirror.'],
-              [Flame, 'Capped coin contribution', 'Allowlisted coins count, but a meme pump cannot instantly summon a Tier 4 warrior.'],
-              [RotateCcw, 'Transfer means reset', 'When the NFT moves, its snapshot moves with it. The new owner starts fresh. The warrior can drop tiers.'],
+              [Flame, 'Capped coin contribution', 'Allowlisted coins count, but a meme pump cannot instantly summon a Tier 4 NFT.'],
+              [RotateCcw, 'Transfer means reset', 'When the NFT moves, its snapshot moves with it. The new owner starts fresh. The NFT can drop tiers.'],
             ].map(([Icon, title, copy], index) => {
               const IconComponent = Icon as typeof Shield;
               return <article key={title as string} className="group border-2 border-[#202534] p-6 transition-colors hover:bg-[#202534] hover:text-[#eee9dd] md:p-8"><div className="flex gap-6"><div className="grid h-11 w-11 shrink-0 place-items-center bg-[#f5bf58] text-[#202534]"><IconComponent className="h-5 w-5" /></div><div><div className="mono-face mb-2 text-[9px] text-[#ec642f]">0{index + 1}</div><h3 className="display-face text-3xl font-bold">{title as string}</h3><p className="mt-3 max-w-[530px] text-base leading-relaxed text-[#6e6b72] group-hover:text-[#aaa7a0]">{copy as string}</p></div></div></article>;
@@ -504,24 +504,24 @@ function App() {
               <div className="mono-face mb-5 text-[10px] text-[#f5bf58]">04 / public signal</div>
               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Who is<br /><span className="text-[#ec642f]">still climbing?</span></h2>
             </div>
-            <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">No fake global ranking. Every warrior competes inside a challenge cohort, like a $1K → $100K run.</p>
+            <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">No fake global ranking. Every NFT competes inside a challenge cohort, like a $1K → $100K run.</p>
           </div>
           <div className="mt-12 flex flex-col justify-between gap-4 border-y border-[#eee9dd]/15 py-4 md:flex-row md:items-center">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter leaderboard by stage">
               {(['all', ...stages.map((stage) => stage.key)] as const).map((filter) => (
-                <button type="button" key={filter} onClick={() => setLeaderboardFilter(filter)} data-testid={`button-filter-${filter}`} className={`mono-face border px-3 py-2 text-[9px] transition-colors ${leaderboardFilter === filter ? 'border-[#f5bf58] bg-[#f5bf58] text-[#202534]' : 'border-[#eee9dd]/20 text-[#aaa7a0] hover:border-[#f5bf58] hover:text-[#f5bf58]'}`}>{filter === 'all' ? 'all warriors' : filter}</button>
+                <button type="button" key={filter} onClick={() => setLeaderboardFilter(filter)} data-testid={`button-filter-${filter}`} className={`mono-face border px-3 py-2 text-[9px] transition-colors ${leaderboardFilter === filter ? 'border-[#f5bf58] bg-[#f5bf58] text-[#202534]' : 'border-[#eee9dd]/20 text-[#aaa7a0] hover:border-[#f5bf58] hover:text-[#f5bf58]'}`}>{filter === 'all' ? 'all NFTs' : filter}</button>
               ))}
             </div>
              <button type="button" onClick={() => setSortMode(sortMode === 'rank' ? 'growth' : 'rank')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'rank' ? 'challenge rank' : 'ROI'} <ChevronDown className="h-3.5 w-3.5" /></button>
           </div>
           <div className="mt-4 overflow-x-auto">
             <div className="min-w-[700px]">
-              <div className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] gap-4 px-4 py-3 mono-face text-[9px] text-[#777985]"><span>rank / cohort</span><span>warrior / wallet</span><span>level</span><span>current value</span><span>ROI in challenge</span></div>
+              <div className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] gap-4 px-4 py-3 mono-face text-[9px] text-[#777985]"><span>rank / cohort</span><span>NFT / wallet</span><span>level</span><span>current value</span><span>ROI in challenge</span></div>
               {visibleWarriors.map((warrior, index) => {
                 const stage = stages.find((item) => item.key === warrior.stage) ?? stages[0];
                 return <div key={warrior.name} data-testid={`row-leaderboard-${warrior.name}`} className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] items-center gap-4 border-t border-[#eee9dd]/15 px-4 py-5 transition-colors hover:bg-[#2b3042]"><span className={`font-mono text-sm ${index === 0 ? 'text-[#f5bf58]' : 'text-[#777985]'}`}>{String(warrior.cohortRank).padStart(2, '0')}<span className="text-[10px] text-[#777985]"> / {warrior.cohortSize}</span></span><div><div className="font-bold">{warrior.name}</div><div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div></div><span className="flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</span><span className="font-mono text-[#f5bf58]">{warrior.bag}</span><span className="font-mono text-[#4a8b68]">+{warrior.growth}%</span></div>;
               })}
-              {visibleWarriors.length === 0 && <div className="border-t border-[#eee9dd]/15 py-14 text-center text-[#aaa7a0]" data-testid="empty-leaderboard">No warriors at this stage yet. The arena is still open.</div>}
+              {visibleWarriors.length === 0 && <div className="border-t border-[#eee9dd]/15 py-14 text-center text-[#aaa7a0]" data-testid="empty-leaderboard">No NFTs at this stage yet. The arena is still open.</div>}
             </div>
           </div>
           <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Preview cohort: $1K → $100K / 247 participants. Live challenge rankings arrive with the metadata layer.</div>
@@ -538,7 +538,7 @@ function App() {
               <h2 className="display-face max-w-[750px] text-5xl font-bold leading-[.86] md:text-8xl">Make your<br />performance<br /><span className="text-[#ec642f]">visible.</span></h2>
             </div>
             <div>
-             <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one warrior. Link your X profile to claim your public performance identity, then let your coin bag write the record.</p>
+             <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Link your X profile to claim your public performance identity, then let your coin bag write the record.</p>
               <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityState === 'success'} data-testid="button-join-signal" className="button-cut mt-7 bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityState === 'success' ? 'identity verified' : identityBusy ? 'checking proof…' : 'verify your X identity'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
               <div className="mt-5 border-l-2 border-[#202534] pl-4 text-sm leading-relaxed text-[#4c4b51]" aria-live="polite" data-testid="identity-status">
                 {identityState === 'idle' && <span>First: prove you control a wallet with a plain signature. Then X confirms the profile. No approval, seed phrase, or custody.</span>}
@@ -569,7 +569,7 @@ function App() {
            <div className="max-w-[900px]">
              <h2 className="display-face text-3xl font-bold leading-none md:text-5xl">Expect to lose everything.</h2>
              <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain coins are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
-             <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, coin price moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring a warrior. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
+             <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, coin price moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring an NFT. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
            </div>
          </div>
        </section>

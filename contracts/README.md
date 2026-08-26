@@ -1,8 +1,8 @@
 # Stonkalicious dynamic NFT contract
 
 This package contains the ERC-721 foundation for the Robinhood Chain testnet.
-The contract does not hold stocks, ETFs, or coins and does not try to read
-portfolio balances on-chain.
+The contract does not hold Robinhood Chain coins and does not try to read
+coin balances on-chain.
 The NFT and metadata service are strictly observational: they can read
 qualifying public on-chain balances and prices, but cannot move, trade,
 approve, or withdraw wallet assets. Never give the project a wallet seed phrase
@@ -25,8 +25,8 @@ or private key.
 - On every transfer, the contract resets `startingBagValue` to zero, updates the
   wallet and timestamp, and increments the snapshot epoch.
 - The off-chain metadata service reads `ownerOf`, `snapshotOf`, and its own
-  allowlisted portfolio data to choose the current warrior level and social
-  performance card.
+  allowlisted Robinhood Chain coin data to choose the current warrior level and
+  social performance card.
   `tokenURI` points marketplaces at that service.
 - Metadata stays mutable by design. Base URI changes emit ERC-4906-compatible
   `BatchMetadataUpdate`; snapshot and identity changes emit `MetadataUpdate`.

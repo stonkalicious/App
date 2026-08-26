@@ -13,6 +13,25 @@ const artifact = JSON.parse(
 );
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const deployer = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
+const network = await provider.getNetwork();
+if (network.chainId !== 46630n) {
+  throw new Error(`Refusing deployment: expected Robinhood Chain testnet chain ID 46630, got ${network.chainId}`);
+}
+
+const roleAddresses = {
+  deployer: deployer.address,
+  snapshotOracle: process.env.SNAPSHOT_ORACLE,
+  mintSigner: process.env.MINT_SIGNER,
+};
+for (const [role, address] of Object.entries(roleAddresses)) {
+  if (!ethers.isAddress(address) || address === ethers.ZeroAddress) {
+    throw new Error(`${role} must be a non-zero EVM address`);
+  }
+}
+const uniqueRoles = new Set(Object.values(roleAddresses).map((address) => address.toLowerCase()));
+if (uniqueRoles.size !== Object.keys(roleAddresses).length) {
+  throw new Error("deployer, snapshotOracle, and mintSigner must be separate addresses");
+}
 
 const maxSupply = BigInt(process.env.MAX_SUPPLY ?? "10000");
 const mintPrice = ethers.parseEther(process.env.MINT_PRICE_ETH ?? "0.01");
@@ -35,7 +54,8 @@ await contract.waitForDeployment();
 await (await contract.setContractURI(contractURI)).wait();
 
 console.log(JSON.stringify({
-  network: (await provider.getNetwork()).chainId.toString(),
+  network: network.chainId.toString(),
+  explorer: "https://explorer.testnet.chain.robinhood.com",
   deployer: deployer.address,
   contract: await contract.getAddress(),
   maxSupply: maxSupply.toString(),

@@ -8,7 +8,7 @@ export type WarriorLevel =
   | "Elite"
   | "Plumber";
 
-export type AssetKind = "stock" | "etf" | "coin";
+export type AssetKind = "coin";
 
 export type AllowlistedAsset = {
   symbol: string;

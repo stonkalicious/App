@@ -164,7 +164,7 @@ export class PublicAssetProvider {
       );
       const capped = configured?.maxContributionUsd !== undefined && valueUsd > configured.maxContributionUsd;
       const included = Boolean(configured) && !capped;
-      const normalizedKind: AssetKind = kind === "stock" || kind === "etf" || kind === "coin" ? kind : "coin";
+       const normalizedKind: AssetKind = "coin";
       return {
         symbol: symbol || "UNKNOWN",
         kind: normalizedKind,

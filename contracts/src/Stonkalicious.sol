@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 /// @title Stonkalicious
 /// @notice An ERC-721 warrior whose visual tier is resolved by an off-chain
-/// metadata service from the current owner's allowlisted portfolio.
+/// metadata service from the current owner's allowlisted Robinhood Chain coins.
 contract Stonkalicious {
     string public name = "Stonkalicious";
     string public symbol = "STONK";

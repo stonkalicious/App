@@ -26,8 +26,8 @@ function parseAllowlist(): AllowlistedAsset[] {
     const contractAddress = typeof candidate.contractAddress === "string" ? candidate.contractAddress : "";
     const kind = candidate.kind;
     const decimals = candidate.decimals;
-    if (!symbol || !addressPattern.test(contractAddress) || !["stock", "etf", "coin"].includes(String(kind))) {
-      throw new Error(`Allowlist entry ${index} must contain symbol, EVM contractAddress, and kind`);
+    if (!symbol || !addressPattern.test(contractAddress) || kind !== "coin") {
+      throw new Error(`Allowlist entry ${index} must contain symbol, EVM contractAddress, and kind=coin`);
     }
     if (typeof decimals !== "number" || !Number.isInteger(decimals) || decimals < 0 || decimals > 36) {
       throw new Error(`Allowlist entry ${index} has invalid decimals`);

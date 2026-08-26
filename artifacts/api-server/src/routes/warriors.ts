@@ -32,7 +32,7 @@ function metadataFor(tokenId: string, score: ScoredWarrior & { wallet: string; e
   const imageLevel = score.level.toLowerCase();
   return {
     name: `Stonkalicious #${tokenId} — ${score.level}`,
-    description: "A live performance identity that reflects its owner's qualifying portfolio.",
+    description: "A live performance identity that reflects its owner's qualifying Robinhood Chain coin bag.",
     image: `${config.metadataBaseUrl}/images/${imageLevel}.png`,
     external_url: `${config.metadataBaseUrl}/warriors/${tokenId}`,
     attributes: [
@@ -101,7 +101,7 @@ router.get("/collection", (req, res) => {
   if (!oracle.config.metadataPublic) return lockedResponse(res);
   return res.json({
     name: "Stonkalicious",
-    description: "A live performance identity that reflects its owner's qualifying portfolio.",
+    description: "A live performance identity that reflects its owner's qualifying Robinhood Chain coin bag.",
     image: `${oracle.config.metadataBaseUrl}/images/plumber.png`,
     external_link: oracle.config.metadataBaseUrl,
     seller_fee_basis_points: 0,

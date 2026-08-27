@@ -52,6 +52,13 @@ function lockedResponse(res: Response) {
   return res.status(404).json({ error: "metadata is not public" });
 }
 
+function matchesSnapshot(
+  score: ScoredWarrior & { wallet: string; epoch: string },
+  snapshot: { wallet: string; epoch: string },
+): boolean {
+  return score.epoch === snapshot.epoch && score.wallet.toLowerCase() === snapshot.wallet.toLowerCase();
+}
+
 async function resolveMetadata(req: Request, res: Response, tokenId: string) {
   res.set({
     "Cache-Control": "no-store",
@@ -67,10 +74,13 @@ async function resolveMetadata(req: Request, res: Response, tokenId: string) {
   }
   if (!oracle.config.metadataPublic) return lockedResponse(res);
   const key = `warrior:${tokenId}`;
-  const cached = oracle.cache.get(key);
-  if (cached) return res.json(metadataFor(tokenId, cached.value, cached.stale, oracle.config));
+  let snapshot: Awaited<ReturnType<ContractSnapshotProvider["getSnapshot"]>> | undefined;
   try {
-    const snapshot = await oracle.contract.getSnapshot(tokenId);
+    snapshot = await oracle.contract.getSnapshot(tokenId);
+    const cached = oracle.cache.get(key);
+    if (cached && matchesSnapshot(cached.value, snapshot)) {
+      return res.json(metadataFor(tokenId, cached.value, cached.stale, oracle.config));
+    }
     const observation = await oracle.provider.getObservation(snapshot.wallet, snapshot);
     const score = { ...scoreObservation(observation), wallet: snapshot.wallet, epoch: snapshot.epoch };
     oracle.cache.set(key, score);
@@ -78,7 +88,9 @@ async function resolveMetadata(req: Request, res: Response, tokenId: string) {
   } catch (error) {
     req.log.warn({ route: "nft-metadata" }, "NFT metadata resolution failed");
     const stale = oracle.cache.get(key);
-    if (stale) return res.json(metadataFor(tokenId, stale.value, true, oracle.config));
+    if (stale && (!snapshot || matchesSnapshot(stale.value, snapshot))) {
+      return res.json(metadataFor(tokenId, stale.value, true, oracle.config));
+    }
     return res.status(503).json({ error: "NFT data is temporarily unavailable" });
   }
 }

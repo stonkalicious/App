@@ -65,4 +65,5 @@ console.log(JSON.stringify({
   contractURI,
   snapshotOracle: process.env.SNAPSHOT_ORACLE,
   mintSigner: process.env.MINT_SIGNER,
+  snapshotWriteInterface: "recordStartingBagValue(tokenId, expectedEpoch, startingBagValue)",
 }, null, 2));

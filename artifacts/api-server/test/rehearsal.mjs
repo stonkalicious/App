@@ -10,6 +10,7 @@ const assetContract = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const contractAddress = `0x${"b".repeat(40)}`;
 
 let assetMode = "fresh";
+let snapshotEpoch = 1;
 
 function abiWord(value) {
   return value.toString(16).padStart(64, "0");
@@ -27,7 +28,7 @@ const mockServer = createServer(async (request, response) => {
     const callData = rpcRequest.params?.[0]?.data ?? "";
     const result = callData.startsWith("0x6352211e")
       ? `0x${addressWord(wallet)}`
-      : `0x${addressWord(wallet)}${abiWord(1_700_000_000)}${abiWord(1)}${abiWord(100)}`;
+      : `0x${addressWord(wallet)}${abiWord(1_700_000_000)}${abiWord(snapshotEpoch)}${abiWord(100)}`;
     response.writeHead(200, { "content-type": "application/json" });
     response.end(JSON.stringify({ jsonrpc: "2.0", id: rpcRequest.id, result }));
     return;
@@ -148,6 +149,12 @@ try {
   assert.equal(fresh.properties.stale, false);
   assert.equal(fresh.attributes.find((attribute) => attribute.trait_type === "Current value (USD)").value, 150);
   assert.equal(fresh.attributes.find((attribute) => attribute.trait_type === "Data status").value, "fresh");
+
+  snapshotEpoch = 2;
+  const newEpochResponse = await fetch(metadataUrl(1));
+  assert.equal(newEpochResponse.status, 200, "new snapshot epoch bypasses prior cache");
+  const newEpoch = await newEpochResponse.json();
+  assert.equal(newEpoch.properties.epoch, "2");
 
   assetMode = "outage";
   await new Promise((resolve) => setTimeout(resolve, 70));

@@ -45,6 +45,9 @@ contract Stonkalicious {
     }
 
     mapping(uint256 tokenId => Snapshot) private _snapshots;
+    // A token is eligible once per epoch. The zero value means the initial
+    // epoch has not been written yet; snapshot epochs start at one.
+    mapping(uint256 tokenId => uint64) private _snapshotWriteEpoch;
 
     error NotOwner();
     error NotAuthorized();
@@ -61,6 +64,8 @@ contract Stonkalicious {
     error MintNonceUsed();
     error TransferLocked();
     error SnapshotNotAllowed();
+    error SnapshotEpochMismatch(uint64 expectedEpoch, uint64 currentEpoch);
+    error SnapshotAlreadyRecorded(uint64 epoch);
     error XProfileAlreadyBound();
     error InvalidXProfile();
     error WithdrawalFailed();
@@ -100,7 +105,7 @@ contract Stonkalicious {
     }
 
     modifier onlySnapshotOracle() {
-        if (msg.sender != snapshotOracle && msg.sender != owner) revert SnapshotNotAllowed();
+        if (msg.sender != snapshotOracle) revert SnapshotNotAllowed();
         _;
     }
 
@@ -192,9 +197,20 @@ contract Stonkalicious {
         }
     }
 
-    function recordStartingBagValue(uint256 tokenId, uint256 startingBagValue) external onlySnapshotOracle whenNotPaused {
+    function recordStartingBagValue(
+        uint256 tokenId,
+        uint64 expectedEpoch,
+        uint256 startingBagValue
+    ) external onlySnapshotOracle whenNotPaused {
         address tokenOwner = ownerOf(tokenId);
         Snapshot storage snapshot = _snapshots[tokenId];
+        if (snapshot.epoch != expectedEpoch) {
+            revert SnapshotEpochMismatch(expectedEpoch, snapshot.epoch);
+        }
+        if (_snapshotWriteEpoch[tokenId] == snapshot.epoch) {
+            revert SnapshotAlreadyRecorded(snapshot.epoch);
+        }
+        _snapshotWriteEpoch[tokenId] = snapshot.epoch;
         snapshot.wallet = tokenOwner;
         snapshot.startingBagValue = startingBagValue;
         emit WarriorSnapshotRecorded(

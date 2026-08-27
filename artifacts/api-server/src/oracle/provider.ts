@@ -74,6 +74,9 @@ export class ContractSnapshotProvider {
     if (!isContractAddress(contractAddress)) throw new Error("Invalid Stonkalicious contract address");
   }
 
+  // This adapter is intentionally read-only. A snapshot writer must read the
+  // returned epoch and pass it as expectedEpoch to
+  // recordStartingBagValue(tokenId, expectedEpoch, startingBagValue).
   async getSnapshot(tokenId: string): Promise<ContractSnapshot> {
     const encodedTokenId = encodeUint256(tokenId);
     const ownerData = await rpcCall(this.rpcUrl, this.contractAddress, `${OWNER_OF_SELECTOR}${encodedTokenId}`);

@@ -49,11 +49,17 @@ and requires a new review.
 
 ### P0 — Centralized oracle can falsify performance
 
-`recordStartingBagValue` accepts an arbitrary value from `snapshotOracle`, and the owner is also allowed to call oracle-authorized functions. The metadata service can therefore make ROI and levels look better or worse than the underlying wallet data.
+The contract now requires `recordStartingBagValue` to include the token's
+current snapshot epoch, permits only one starting-value write per epoch
+(including zero), and keeps owner authority separate from the snapshot oracle.
+This narrows the overwrite/replay risk, but the configured oracle can still
+submit a false value unless the off-chain valuation and audit controls below are
+also enforced.
 
 **Required before mainnet or public launch**
 
-- Separate owner/governance from the operating oracle.
+- Keep the owner/governance and operating oracle as separate independently
+  controlled roles.
 - Put owner and oracle control behind a multisig, not a single hot key.
 - Define the exact allowlisted assets, valuation timestamps, price source, decimals, and stale-price behavior.
 - Store a signed snapshot record containing wallet, token ID, epoch, valuation timestamp, asset-set version, total value, and source identifiers.
@@ -101,8 +107,9 @@ The contract correctly enforces one lifetime mint per address, but a person can 
 - A wallet's lifetime mint count is enforced on-chain, with a maximum of one.
 - Transfers are locked for seven days, reset the snapshot epoch, clear the
   X-profile binding, and emit metadata update events.
-- Snapshot and identity writes are restricted to the configured oracle or owner,
-  and the contract has a pause control and two-step ownership transfer.
+- Snapshot and identity writes are restricted to the configured oracle, with
+  epoch-bound single-write snapshot authorization; the contract also has a
+  pause control and two-step ownership transfer.
 - ERC-4906 interface support, token-level update events, collection metadata, and
   a custom withdrawal failure error are present.
 
@@ -112,6 +119,10 @@ The controls above do not remove the following blockers: no deployed testnet
 address, no configured coin allowlist, no live metadata endpoint, no verified
 testnet rehearsal, no independently controlled deployment roles, and no
 qualified human contract review. These must remain explicit NO-GO conditions.
+This task also does not close the mutable metadata strategy, admin-mint
+governance, X-profile recovery, pause governance/transfer semantics, or the
+global mint-nonce policy; each still needs an explicit launch decision and
+operational control.
 
 ## Contract-specific review
 
@@ -122,7 +133,9 @@ qualified human contract review. These must remain explicit NO-GO conditions.
 - Zero-address and nonexistent-token checks exist.
 - Transfers clear approvals, reset the snapshot epoch, and clear the X-profile binding.
 - Safe transfers revert if the receiver contract does not implement the ERC-721 receiver interface.
-- Snapshot and X-profile writes are restricted to the configured oracle or owner.
+- Snapshot and X-profile writes are restricted to the configured oracle only.
+- Starting-value writes require the current snapshot epoch and are single-use
+  per epoch, including when the value is zero.
 
 ### Required contract hardening
 
@@ -143,6 +156,8 @@ qualified human contract review. These must remain explicit NO-GO conditions.
 - **Unsupported assets:** ignore assets outside the allowlist and publish the allowlist version.
 - **Self-referential pricing:** do not value an asset using a manipulable thin pool controlled by the same participant.
 - **Replay/out-of-order snapshots:** include monotonically increasing epoch/version and reject older updates.
+- **Same-epoch baseline overwrite:** reject a second starting-value write for
+  the token's current epoch, including a second zero-valued write.
 - **Transfer race:** process the on-chain transfer event as the authority; do not let a pre-transfer oracle job write post-transfer data.
 - **Wallet classification:** define whether smart-contract wallets are supported and test them explicitly.
 - **Service outage:** show the last verified snapshot and timestamp; never silently display fabricated zeros or a fresh run.
@@ -205,6 +220,8 @@ Do not fund or announce the deployment until all of these are true:
 - Independent contract review and testnet rehearsal complete.
 - Multisig ownership/oracle control configured and recovery tested.
 - Pause and emergency response process documented.
+- Metadata mutability/pinning, admin-mint allocation controls, X-profile
+  recovery, and global mint-nonce policy explicitly reviewed and accepted.
 - Metadata service has schema validation, monitoring, backups, and safe failure behavior.
 - EIP-712 claims and anti-bot launch flow tested under load.
 - OAuth flow has state/PKCE, consent, privacy policy, and token handling review.

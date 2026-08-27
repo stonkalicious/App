@@ -37,6 +37,9 @@ deployment secret manager and must never be committed or pasted into chat.
 The local contract suite covers minting, payment and supply limits, ownership,
 snapshot recording, transfer resets and locks, metadata permissions, duplicate
 identity enforcement, pause behavior, and ownership controls.
+Snapshot tests use distinct owner, snapshot-oracle, mint-signer, and user
+accounts and cover expected-epoch mismatches, one write per epoch (including
+zero), owner rejection, valid oracle writes, and transfer reset eligibility.
 
 The API rehearsal covers:
 
@@ -65,8 +68,30 @@ explorer verification, or production metadata availability.
 - [ ] Exercise mint authorization, one-wallet lifetime enforcement, identity
       uniqueness, seven-day transfer lock/reset, pause recovery, and metadata
       update events on testnet.
+- [ ] Exercise `recordStartingBagValue(tokenId, expectedEpoch,
+      startingBagValue)` with the live `snapshotOf(tokenId).epoch`; confirm
+      wrong-epoch and duplicate writes (including zero) revert, while the
+      configured oracle can write once per epoch and the owner cannot.
 - [ ] Confirm no mainnet transaction, public mint, funding request, or
       announcement is included in the testnet rehearsal.
+
+## Review findings still open outside this task
+
+The snapshot boundary is hardened above, but this task does not silently close
+other review findings. Before a launch go decision, explicitly resolve or
+accept each of these:
+
+- [ ] Choose a mutable-versus-pinned metadata strategy and protect URI changes
+      with the selected governance control; keep endpoint monitoring and safe
+      failure behavior in place.
+- [ ] Put admin minting behind the selected multisig/manifest process and audit
+      every emergency allocation.
+- [ ] Document and test X-profile recovery/rebinding for a compromised account
+      without permitting arbitrary rebinding.
+- [ ] Define pause authority, transfer behavior while paused, and recovery
+      procedures under the selected governance control.
+- [ ] Review the global mint-nonce namespace and replay policy as part of the
+      final claim-signing design.
 
 ## Automatic no-go conditions
 
@@ -81,5 +106,9 @@ Do not proceed if any of the following is true:
    or arbitrary transactions.
 6. A provider outage fabricates fresh performance instead of serving explicitly
    stale data or returning unavailable.
-7. Source verification, transfer reset, identity uniqueness, or pause recovery
+7. Snapshot writes omit the expected epoch, accept duplicate writes in one
+   epoch, or allow owner bypass of the configured oracle.
+8. Any open review finding above is treated as fixed without an explicit
+   design decision, test, and operational control.
+9. Source verification, transfer reset, identity uniqueness, or pause recovery
    fails on testnet.

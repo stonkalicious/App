@@ -19,9 +19,13 @@ or private key.
   ledger.
 - An authorized identity verifier can bind one hashed X account identifier to
   one active NFT. The raw X handle and OAuth credentials stay off-chain.
-- `recordStartingBagValue` is called by the configured snapshot oracle after a
-  mint or transfer. It records the current owner's starting value without
-  storing any portfolio assets in the NFT.
+- `recordStartingBagValue(tokenId, expectedEpoch, startingBagValue)` is called
+  by the configured snapshot oracle after a mint or transfer. The expected
+  epoch must equal the token's current on-chain epoch, and each epoch accepts
+  only one write, including a valid zero value. It records the current owner's
+  starting value without storing any portfolio assets in the NFT. The owner
+  cannot use this function or `bindXProfile`; ownership and oracle authority
+  are separate.
 - On every transfer, the contract resets `startingBagValue` to zero, updates the
   wallet and timestamp, and increments the snapshot epoch.
 - The off-chain metadata service reads `ownerOf`, `snapshotOf`, and its own
@@ -60,7 +64,11 @@ and owner/oracle permissions.
    source on the testnet explorer.
 4. Set `BASE_TOKEN_URI` to the deployed metadata service's `/api/token/` route
    and `CONTRACT_URI` to its `/api/collection` route. Verify that `tokenURI`,
-   `contractURI`, transfer resets, and `recordStartingBagValue` work end to end.
+   `contractURI`, transfer resets, and
+   `recordStartingBagValue(tokenId, expectedEpoch, startingBagValue)` work end
+   to end. The oracle worker must read `snapshotOf(tokenId)` immediately before
+   submitting the transaction and pass its returned epoch; stale or repeated
+   writes must be treated as expected rejections.
 5. Prepare a separate mainnet deployment only after testnet behavior,
    allowlist rules, scoring thresholds, artwork, and metadata caching are
    formally locked. Do not reuse testnet addresses or send irreversible
@@ -82,7 +90,8 @@ pnpm --dir contracts run deploy:testnet
 ```
 
 The metadata API reads the deployed contract with read-only `eth_call`
-requests. Its runtime configuration requires `METADATA_BASE_URL`,
+requests; it does not submit snapshot or X-binding transactions. Its runtime
+configuration requires `METADATA_BASE_URL`,
 `ROBINHOOD_RPC_URL`, `STONKALICIOUS_CONTRACT_ADDRESS`,
 `PUBLIC_ASSET_DATA_URL`, and `ROBINHOOD_ASSET_ALLOWLIST_JSON`. Metadata remains
 locked unless `METADATA_PUBLIC=true` is explicitly set. Before that release

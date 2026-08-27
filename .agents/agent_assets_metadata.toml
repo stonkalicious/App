@@ -8,3 +8,17 @@ type = "image"
 title = "Stonkalicious X Profile Banner — Clean"
 description = "1500×500 PNG banner with the warrior artwork and main WHO'S KING OF THE HOOD? headline only; all small supporting text removed."
 logical_id = "939ed3ad-6239-4a58-97cf-94888bd76bad"
+
+[[outputs]]
+id = "mclXC4vNh0Hz0VZY9IhOI"
+uri = "file://contract-review.zip"
+type = "unspecified"
+title = "Stonkalicious contract review package"
+description = "Downloadable review package containing the Solidity contract, tests, deployment script, README, testnet checklist, compiled ABI/bytecode, and threat model."
+logical_id = "665d45ee-f3d0-485c-96d9-a97656c348c0"
+content_hash = "sha256:d2cbe4951fd8314b592f0d18a3a6800d81cb5d41d73173a79bde73e69e903141"
+size = 27098
+mtime_ms = 1787833514109
+storage_uri = "gcs://replit-rams-assets-kirk/rams/assets/repl:d02ff542-2bc0-448d-a728-30a17bd1db02/665d45ee-f3d0-485c-96d9-a97656c348c0/fdddf061-d945-4c13-8885-1e4bfe6b1024"
+storage_version_token = "1787833519819450"
+content_type = "application/octet-stream"

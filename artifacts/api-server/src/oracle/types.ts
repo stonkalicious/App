@@ -42,6 +42,7 @@ export type ContractSnapshot = {
   epoch: string;
   acquiredAt: string;
   startingBagValueUsd: number;
+  snapshotRecorded: boolean;
 };
 
 export type ScoredWarrior = {

@@ -71,7 +71,9 @@ explorer verification, or production metadata availability.
 - [ ] Exercise `recordStartingBagValue(tokenId, expectedEpoch,
       startingBagValue)` with the live `snapshotOf(tokenId).epoch`; confirm
       wrong-epoch and duplicate writes (including zero) revert, while the
-      configured oracle can write once per epoch and the owner cannot.
+       configured oracle can write once per epoch and the owner cannot. Confirm
+       `snapshotWriteEpoch(tokenId) == snapshotOf(tokenId).epoch` after a write,
+       including a zero-valued write, and keep metadata unavailable until then.
 - [ ] Confirm no mainnet transaction, public mint, funding request, or
       announcement is included in the testnet rehearsal.
 

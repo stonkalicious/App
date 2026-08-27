@@ -52,15 +52,20 @@ and requires a new review.
 The contract now requires `recordStartingBagValue` to include the token's
 current snapshot epoch, permits only one starting-value write per epoch
 (including zero), and keeps owner authority separate from the snapshot oracle.
-This narrows the overwrite/replay risk, but the configured oracle can still
-submit a false value unless the off-chain valuation and audit controls below are
-also enforced.
+`snapshotWriteEpoch` publicly distinguishes an unrecorded baseline from a
+recorded zero baseline, and the metadata service refuses to score an
+unrecorded epoch. These controls prevent silent overwrites and zero-value
+ambiguity, but the configured oracle can still attest to a false value, and
+the owner can still rotate the oracle, unless the off-chain valuation and
+governance controls below are enforced.
 
 **Required before mainnet or public launch**
 
 - Keep the owner/governance and operating oracle as separate independently
   controlled roles.
 - Put owner and oracle control behind a multisig, not a single hot key.
+- Treat oracle rotation as a privileged governance action and audit every
+  rotation; the contract does not prevent the owner from choosing a new oracle.
 - Define the exact allowlisted assets, valuation timestamps, price source, decimals, and stale-price behavior.
 - Store a signed snapshot record containing wallet, token ID, epoch, valuation timestamp, asset-set version, total value, and source identifiers.
 - Reject stale, future-dated, out-of-order, or impossible updates.
@@ -108,8 +113,9 @@ The contract correctly enforces one lifetime mint per address, but a person can 
 - Transfers are locked for seven days, reset the snapshot epoch, clear the
   X-profile binding, and emit metadata update events.
 - Snapshot and identity writes are restricted to the configured oracle, with
-  epoch-bound single-write snapshot authorization; the contract also has a
-  pause control and two-step ownership transfer.
+  epoch-bound single-write snapshot authorization. The public snapshot-write
+  epoch marker distinguishes a recorded zero from an unrecorded baseline. The
+  contract also has a pause control and two-step ownership transfer.
 - ERC-4906 interface support, token-level update events, collection metadata, and
   a custom withdrawal failure error are present.
 
@@ -136,6 +142,8 @@ operational control.
 - Snapshot and X-profile writes are restricted to the configured oracle only.
 - Starting-value writes require the current snapshot epoch and are single-use
   per epoch, including when the value is zero.
+- `snapshotWriteEpoch(tokenId)` lets read-only consumers verify that the current
+  epoch has a recorded starting value instead of inferring status from zero.
 
 ### Required contract hardening
 
@@ -158,6 +166,11 @@ operational control.
 - **Replay/out-of-order snapshots:** include monotonically increasing epoch/version and reject older updates.
 - **Same-epoch baseline overwrite:** reject a second starting-value write for
   the token's current epoch, including a second zero-valued write.
+- **Oracle attestation:** the contract cannot prove that the submitted value came
+  from the wallet's assets; publish valuation inputs, signed snapshot records,
+  freshness data, and audit trails, and govern oracle rotation separately.
+- **Unrecorded zero baseline:** compare `snapshotWriteEpoch(tokenId)` with the
+  current snapshot epoch; metadata must not score an epoch until they match.
 - **Transfer race:** process the on-chain transfer event as the authority; do not let a pre-transfer oracle job write post-transfer data.
 - **Wallet classification:** define whether smart-contract wallets are supported and test them explicitly.
 - **Service outage:** show the last verified snapshot and timestamp; never silently display fabricated zeros or a fresh run.

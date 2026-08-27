@@ -65,6 +65,7 @@ test("mints with configured price and exposes metadata and snapshot state", asyn
     assert.equal(snapshot.wallet, await alice.getAddress());
     assert.equal(snapshot.startingBagValue, 0n);
     assert.equal(snapshot.epoch, 1n);
+    assert.equal(await contract.snapshotWriteEpoch(1), 0n);
   } finally {
     await server.close();
   }
@@ -107,6 +108,7 @@ test("binds snapshots to the current epoch and permits one write including zero"
     await (await contract.connect(oracle).recordStartingBagValue(1, 1, 0)).wait();
     const recorded = await contract.snapshotOf(1);
     assert.equal(recorded.startingBagValue, 0n);
+    assert.equal(await contract.snapshotWriteEpoch(1), 1n);
     await assert.rejects(async () => (
       await contract.connect(oracle).recordStartingBagValue(1, 1, 500)
     ).wait());
@@ -129,8 +131,10 @@ test("transfer starts a new epoch and resets snapshot-write eligibility", async 
     assert.equal(reset.wallet, await bob.getAddress());
     assert.equal(reset.epoch, 2n);
     assert.equal(reset.startingBagValue, 0n);
+    assert.equal(await contract.snapshotWriteEpoch(1), 1n);
     await (await contract.connect(oracle).recordStartingBagValue(1, 2, 654321)).wait();
     assert.equal((await contract.snapshotOf(1)).startingBagValue, 654321n);
+    assert.equal(await contract.snapshotWriteEpoch(1), 2n);
   } finally {
     await server.close();
   }

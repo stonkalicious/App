@@ -11,6 +11,7 @@ const contractAddress = `0x${"b".repeat(40)}`;
 
 let assetMode = "fresh";
 let snapshotEpoch = 1;
+let snapshotWriteEpoch = 1;
 
 function abiWord(value) {
   return value.toString(16).padStart(64, "0");
@@ -28,7 +29,9 @@ const mockServer = createServer(async (request, response) => {
     const callData = rpcRequest.params?.[0]?.data ?? "";
     const result = callData.startsWith("0x6352211e")
       ? `0x${addressWord(wallet)}`
-      : `0x${addressWord(wallet)}${abiWord(1_700_000_000)}${abiWord(snapshotEpoch)}${abiWord(100)}`;
+      : callData.startsWith("0x1042c951")
+        ? `0x${abiWord(snapshotWriteEpoch)}`
+        : `0x${addressWord(wallet)}${abiWord(1_700_000_000)}${abiWord(snapshotEpoch)}${abiWord(100)}`;
     response.writeHead(200, { "content-type": "application/json" });
     response.end(JSON.stringify({ jsonrpc: "2.0", id: rpcRequest.id, result }));
     return;
@@ -142,6 +145,10 @@ try {
   const api = await startApi(true);
   const metadataUrl = (tokenId) => `http://127.0.0.1:${api.port}/api/token/${tokenId}`;
 
+  snapshotWriteEpoch = 0;
+  const pendingResponse = await fetch(metadataUrl(1));
+  assert.equal(pendingResponse.status, 503, "metadata is unavailable before the baseline is recorded");
+  snapshotWriteEpoch = 1;
   assetMode = "fresh";
   const freshResponse = await fetch(metadataUrl(1));
   assert.equal(freshResponse.status, 200, "fresh metadata is served");
@@ -151,6 +158,7 @@ try {
   assert.equal(fresh.attributes.find((attribute) => attribute.trait_type === "Data status").value, "fresh");
 
   snapshotEpoch = 2;
+  snapshotWriteEpoch = 2;
   const newEpochResponse = await fetch(metadataUrl(1));
   assert.equal(newEpochResponse.status, 200, "new snapshot epoch bypasses prior cache");
   const newEpoch = await newEpochResponse.json();
@@ -176,7 +184,7 @@ try {
   }
 
   await stopApi(api);
-  console.log("API rehearsal passed: fresh, stale, expired, locked, and invalid data paths.");
+  console.log("API rehearsal passed: pending baseline, fresh, stale, expired, locked, and invalid data paths.");
 } finally {
   mockServer.close();
 }

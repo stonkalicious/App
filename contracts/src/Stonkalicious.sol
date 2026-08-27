@@ -263,6 +263,14 @@ contract Stonkalicious {
         return _snapshots[tokenId];
     }
 
+    /// @notice Returns the epoch whose starting value was most recently recorded.
+    /// @dev Compare this with snapshotOf(tokenId).epoch. Equality means the
+    /// current epoch has a recorded value, including when that value is zero.
+    function snapshotWriteEpoch(uint256 tokenId) external view returns (uint64) {
+        _requireOwned(tokenId);
+        return _snapshotWriteEpoch[tokenId];
+    }
+
     function transferFrom(address from, address to, uint256 tokenId) public whenNotPaused {
         if (block.timestamp < transferableAfter[tokenId]) revert TransferLocked();
         if (!_isApprovedOrOwner(msg.sender, tokenId)) revert NotAuthorized();

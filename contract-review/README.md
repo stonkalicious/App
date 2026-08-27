@@ -26,6 +26,9 @@ or private key.
   starting value without storing any portfolio assets in the NFT. The owner
   cannot use this function or `bindXProfile`; ownership and oracle authority
   are separate.
+- `snapshotWriteEpoch(tokenId)` publicly identifies whether the current epoch
+  has a recorded baseline. Consumers must compare it with `snapshotOf(tokenId).epoch`
+  instead of treating a zero `startingBagValue` as proof that no write occurred.
 - On every transfer, the contract resets `startingBagValue` to zero, updates the
   wallet and timestamp, and increments the snapshot epoch.
 - The off-chain metadata service reads `ownerOf`, `snapshotOf`, and its own
@@ -64,7 +67,7 @@ and owner/oracle permissions.
    source on the testnet explorer.
 4. Set `BASE_TOKEN_URI` to the deployed metadata service's `/api/token/` route
    and `CONTRACT_URI` to its `/api/collection` route. Verify that `tokenURI`,
-   `contractURI`, transfer resets, and
+   `contractURI`, transfer resets, snapshot-write status, and
    `recordStartingBagValue(tokenId, expectedEpoch, startingBagValue)` work end
    to end. The oracle worker must read `snapshotOf(tokenId)` immediately before
    submitting the transaction and pass its returned epoch; stale or repeated

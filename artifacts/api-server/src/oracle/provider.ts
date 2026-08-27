@@ -15,6 +15,7 @@ type ProviderResponse = {
 
 const OWNER_OF_SELECTOR = "0x6352211e";
 const SNAPSHOT_OF_SELECTOR = "0x364e5ebe";
+const SNAPSHOT_WRITE_EPOCH_SELECTOR = id("snapshotWriteEpoch(uint256)").slice(0, 10);
 const WARRIOR_BY_X_PROFILE_SELECTOR = id("warriorByXProfile(bytes32)").slice(0, 10);
 const MINTED_BY_WALLET_SELECTOR = id("mintedByWallet(address)").slice(0, 10);
 const MINT_SIGNER_SELECTOR = id("mintSigner()").slice(0, 10);
@@ -87,7 +88,10 @@ export class ContractSnapshotProvider {
     const acquiredAtSeconds = BigInt(`0x${decodeWord(snapshotData, 1)}`);
     const epoch = BigInt(`0x${decodeWord(snapshotData, 2)}`);
     const startingBagValueUsd = BigInt(`0x${decodeWord(snapshotData, 3)}`);
+    const writeEpochData = await rpcCall(this.rpcUrl, this.contractAddress, `${SNAPSHOT_WRITE_EPOCH_SELECTOR}${encodedTokenId}`);
+    const writeEpoch = BigInt(`0x${decodeWord(writeEpochData, 0)}`);
     if (acquiredAtSeconds === 0n || epoch === 0n) throw new Error("Contract snapshot is not initialized");
+    if (writeEpoch > epoch) throw new Error("Contract snapshot write epoch is invalid");
     if (startingBagValueUsd > BigInt(Number.MAX_SAFE_INTEGER)) {
       throw new Error("Contract snapshot value exceeds safe numeric range");
     }
@@ -99,6 +103,7 @@ export class ContractSnapshotProvider {
       epoch: epoch.toString(),
       acquiredAt: acquiredAt.toISOString(),
       startingBagValueUsd: Number(startingBagValueUsd),
+      snapshotRecorded: writeEpoch === epoch,
     };
   }
 
@@ -145,6 +150,7 @@ export class PublicAssetProvider {
 
   async getObservation(wallet: string, snapshot: ContractSnapshot): Promise<PortfolioObservation> {
     if (!isWallet(wallet) || wallet.toLowerCase() !== snapshot.wallet.toLowerCase()) throw new Error("Snapshot owner mismatch");
+    if (!snapshot.snapshotRecorded) throw new Error("Contract snapshot baseline is not recorded");
     const response = await fetch(`${this.assetDataUrl}/${wallet}`);
     if (!response.ok) throw new Error(`Public asset provider returned ${response.status}`);
     const value: unknown = await response.json();

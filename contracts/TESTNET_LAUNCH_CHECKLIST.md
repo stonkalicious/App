@@ -57,6 +57,8 @@ explorer verification, or production metadata availability.
 - [ ] Configure the explicit Robinhood Chain coin-only allowlist.
 - [ ] Deploy with a dedicated testnet wallet.
 - [ ] Verify deployed source and constructor values on the testnet explorer.
+- [ ] Complete qualified human contract review; AI-assisted review is informational
+      only and is not independent audit assurance.
 - [ ] Set and validate the metadata base URL and collection URL.
 - [ ] Keep metadata locked until the endpoint, cache, stale fallback, and
       wallet-data privacy checks pass against the deployed contract.

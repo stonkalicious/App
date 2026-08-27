@@ -63,6 +63,7 @@ contract Stonkalicious {
     error SnapshotNotAllowed();
     error XProfileAlreadyBound();
     error InvalidXProfile();
+    error WithdrawalFailed();
 
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
@@ -329,7 +330,7 @@ contract Stonkalicious {
     function withdraw(address payable recipient) external onlyOwner {
         if (recipient == address(0)) revert InvalidAddress();
         (bool success,) = recipient.call{value: address(this).balance}("");
-        require(success, "withdraw failed");
+        if (!success) revert WithdrawalFailed();
     }
 
     function transferOwnership(address newOwner) external onlyOwner {

@@ -140,3 +140,20 @@ test("supports emergency pause and two-step ownership", async () => {
     await server.close();
   }
 });
+
+test("rejects a failed withdrawal with a custom error", async () => {
+  const { server, contract, owner } = await fixture();
+  try {
+    const rejectingRecipient = await owner.sendTransaction({
+      data: "0x6005600c60003960056000f360006000fd",
+    });
+    const receipt = await rejectingRecipient.wait();
+    assert.ok(receipt?.contractAddress);
+    await assert.rejects(
+      contract.withdraw(receipt.contractAddress),
+      /withdraw/i,
+    );
+  } finally {
+    await server.close();
+  }
+});

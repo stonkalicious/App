@@ -566,8 +566,9 @@ function App() {
            <div className="mono-face border-2 border-[#202534] px-3 py-2 text-[10px] font-bold">high risk / read this</div>
            <div className="max-w-[900px]">
              <h2 className="display-face text-3xl font-bold leading-none md:text-5xl">Expect to lose everything.</h2>
-             <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain coins are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
-             <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, coin price moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring an NFT. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
+              <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain coins are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
+              <p className="mt-4 text-sm leading-relaxed opacity-80">This project has received an AI-assisted review for informational purposes only. It is not a formal independent smart-contract audit, does not guarantee contract or service safety, and does not replace qualified human security review. The collection is testnet-only while these checks are unfinished, and the contract, metadata, and service may change or be unavailable.</p>
+              <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, coin price moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring an NFT. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
            </div>
          </div>
        </section>
@@ -578,7 +579,7 @@ function App() {
            <div className="mono-face text-[9px]">dynamic nft / robinhood chain / 2026</div>
            <div className="flex flex-wrap gap-5 text-sm"><a href="#rules" data-testid="link-footer-rules" className="hover:text-[#f5bf58]">rules</a><a href="#risk" data-testid="link-footer-risk" className="hover:text-[#f5bf58]">risk notice</a><a href="#mint" data-testid="link-footer-mint" className="hover:text-[#f5bf58]">mint</a><a href="#top" data-testid="link-footer-top" className="hover:text-[#f5bf58]">back to top ↑</a></div>
         </div>
-         <div className="mx-auto mt-6 max-w-[1320px] border-t border-[#eee9dd]/15 pt-5 text-[10px] leading-relaxed text-[#777985]">Digital collectibles are high risk. No guarantee of value, liquidity, uptime, or future performance. This notice is not a substitute for advice from a qualified lawyer or financial professional.</div>
+          <div className="mx-auto mt-6 max-w-[1320px] border-t border-[#eee9dd]/15 pt-5 text-[10px] leading-relaxed text-[#777985]">Digital collectibles are high risk. No guarantee of value, liquidity, uptime, or future performance. AI-assisted review is informational only, not an independent audit, and does not replace qualified human security review. This notice is not a substitute for advice from a qualified lawyer or financial professional.</div>
       </footer>
     </main>
   );

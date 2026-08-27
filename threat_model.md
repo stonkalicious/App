@@ -2,7 +2,9 @@
 
 **Scope:** Robinhood Chain testnet-first ERC-721, dynamic metadata service, public showcase, future X identity verifier, and future challenge leaderboard.
 
-**Status:** Pre-launch review. No deployment, mint opening, or public announcement is authorized.
+**Status:** AI-assisted pre-launch review. This is informational analysis, not a
+formal independent smart-contract audit or security certification. No
+deployment, mint opening, or public announcement is authorized.
 
 ## Security goals
 
@@ -61,7 +63,11 @@ and requires a new review.
 
 ### P0 — Mutable metadata endpoint can rewrite the collection
 
-The base URI is mutable and the contract currently has no ERC-4906 metadata update events or `contractURI`. A compromised metadata server could serve malicious images/links, change historical values, or disappear; indexers may also keep stale cached responses.
+The contract now exposes `contractURI()` and emits ERC-4906-compatible
+`MetadataUpdate` and `BatchMetadataUpdate` events, but the base URI and
+collection URI remain owner-controlled and the metadata service remains mutable.
+A compromised metadata server could serve malicious images/links, change
+historical values, or disappear; indexers may also keep stale cached responses.
 
 **Required before launch**
 
@@ -85,6 +91,27 @@ The contract correctly enforces one lifetime mint per address, but a person can 
 - Use a fair launch mechanism: queue, capped claim window, or signed allowlist rather than an unrestricted gas race.
 - Add a pause/emergency stop controlled by multisig, with clear limits and an auditable unpause process.
 - Rate-limit the website/API separately; never treat frontend gating as security.
+
+## Review disposition
+
+### Controls present in the reviewed contract
+
+- EIP-712 mint signatures are bound to the wallet, profile hash, challenge,
+  nonce, deadline, chain ID, and verifying contract.
+- A wallet's lifetime mint count is enforced on-chain, with a maximum of one.
+- Transfers are locked for seven days, reset the snapshot epoch, clear the
+  X-profile binding, and emit metadata update events.
+- Snapshot and identity writes are restricted to the configured oracle or owner,
+  and the contract has a pause control and two-step ownership transfer.
+- ERC-4906 interface support, token-level update events, collection metadata, and
+  a custom withdrawal failure error are present.
+
+### Launch blockers still requiring operational controls
+
+The controls above do not remove the following blockers: no deployed testnet
+address, no configured coin allowlist, no live metadata endpoint, no verified
+testnet rehearsal, no independently controlled deployment roles, and no
+qualified human contract review. These must remain explicit NO-GO conditions.
 
 ## Contract-specific review
 

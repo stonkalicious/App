@@ -75,7 +75,7 @@ const stages: Stage[] = [
   ['hardened', 'Forged', '49–60 strength', 'The coin bag has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c', 'hardened'],
   ['profitable', 'Master', '61–72 strength', 'The numbers have become a discipline. Every move sharpens the shape of the run.', 'war paint / master glow', '#d99a48', 'profitable'],
   ['elite', 'Elite', '73–88 strength', 'A battle-worn status symbol. Bright flames, a hard gaze, and nothing left to prove.', 'worn armor / bright aura', '#f5bf58', 'elite'],
-  ['plumber', 'God', '89+ strength', 'Just the final form.', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
+  ['plumber', 'God', '89+ strength', 'The Final Form', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
 ].map(([key, name, threshold, description, trait, color, image], index) => ({
   key: key as StageKey,
   number: String(index + 1).padStart(2, '0'),

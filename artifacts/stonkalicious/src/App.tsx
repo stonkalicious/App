@@ -534,10 +534,10 @@ function App() {
         <div className="relative overflow-hidden border-2 border-[#202534] bg-[#f5bf58] p-7 md:p-14">
           <div className="absolute -right-10 -top-20 h-72 w-72 rounded-full border-[30px] border-[#ec642f]/20" />
           <div className="absolute -bottom-28 right-24 h-72 w-72 rounded-full border border-[#202534]/15" />
-           <div className="relative grid min-w-0 gap-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] md:items-end">
+           <div className="relative grid min-w-0 gap-10 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] xl:items-end">
              <div className="min-w-0">
               <div className="mono-face mb-5 text-[10px] text-[#ec642f]">05 / claim your mirror</div>
-               <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl lg:text-8xl">
+               <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl xl:text-8xl">
                  <span className="block">Make your</span>
                  <span className="block">performance</span>
                  <span className="block text-[#ec642f]">visible.</span>

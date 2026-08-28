@@ -41,10 +41,10 @@ type Warrior = {
   wallet: string;
   stage: StageKey;
   strength: number;
-  growth: number;
+  pnl: number;
   bag: string;
-  cohortRank: number;
-  cohortSize: number;
+  holderRank: number;
+  holderCount: number;
 };
 
 type EthereumProvider = {
@@ -66,14 +66,14 @@ declare global {
 }
 
 const stages: Stage[] = [
-  ['newb', 'Newb', '0–12 strength', 'Everyone starts here. The orb is warm, the bag is small, and the first trade is still ahead.', 'open face / soft purple energy', '#7666c9', 'newb'],
-  ['liquidated', 'Liquidated', '13–24 strength', 'The bag collected its tax. Not dead — just dramatically underfunded.', 'burned armor / emergency glow', '#8d4654', 'liquidated'],
-  ['back', 'Back', '25–36 strength', 'The comeback arc begins. A pulse returns to the orb and the NFT remembers the plan.', 'patched kit / comeback spark', '#bd7653', 'back'],
-  ['wrecked', 'Wrecked', '37–48 strength', 'Volatility leaves a mark. The NFT is bruised, watchful, and somehow still holding the orb.', 'scarred steel / volatile fire', '#a75a48', 'wrecked'],
-  ['hardened', 'Hardened', '49–60 strength', 'The coin bag has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c', 'hardened'],
-  ['profitable', 'Profitable', '61–72 strength', 'The numbers finally talk back. A positive ROI sharpens every edge.', 'war paint / profit glow', '#d99a48', 'profitable'],
+  ['newb', 'Beginning', '0–12 strength', 'Everyone starts here. The orb is warm, the bag is small, and the first signal is still ahead.', 'open face / soft purple energy', '#7666c9', 'newb'],
+  ['liquidated', 'Climbing', '13–24 strength', 'The first real momentum shows. The orb catches heat and the run has room to grow.', 'first momentum / warm glow', '#8d4654', 'liquidated'],
+  ['back', 'Contender', '25–36 strength', 'The comeback becomes a contest. The NFT has a plan, a pulse, and something to defend.', 'patched kit / contender spark', '#bd7653', 'back'],
+  ['wrecked', 'Stacked', '37–48 strength', 'The bag is taking shape. Layer by layer, the orb carries more weight and the signal gets louder.', 'layered kit / stacked glow', '#a75a48', 'wrecked'],
+  ['hardened', 'Forged', '49–60 strength', 'The coin bag has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c', 'hardened'],
+  ['profitable', 'Master', '61–72 strength', 'The numbers have become a discipline. Every move sharpens the shape of the run.', 'war paint / master glow', '#d99a48', 'profitable'],
   ['elite', 'Elite', '73–88 strength', 'A battle-worn status symbol. Bright flames, a hard gaze, and nothing left to prove.', 'worn armor / bright aura', '#f5bf58', 'elite'],
-  ['plumber', 'Plumber', '89+ strength', 'The final form. Deep in the pipes of the chain, this NFT fixes leaks and keeps building.', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
+  ['plumber', 'God', '89+ strength', 'The final form. A mythic signal, a maxed-out aura, and a level no one reaches by accident.', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
 ].map(([key, name, threshold, description, trait, color, image], index) => ({
   key: key as StageKey,
   number: String(index + 1).padStart(2, '0'),
@@ -86,12 +86,12 @@ const stages: Stage[] = [
 }));
 
 const warriors: Warrior[] = [
-  { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, growth: 218.4, bag: '$482,190', cohortRank: 1, cohortSize: 247 },
-  { rank: 2, name: 'marauder.eth', wallet: '0xD2…4F10', stage: 'elite', strength: 88, growth: 167.9, bag: '$301,842', cohortRank: 2, cohortSize: 247 },
-  { rank: 3, name: 'cold_storage', wallet: '0xA8…BC33', stage: 'hardened', strength: 73, growth: 112.6, bag: '$188,460', cohortRank: 3, cohortSize: 247 },
-  { rank: 4, name: 'redline_rider', wallet: '0x3C…008E', stage: 'hardened', strength: 68, growth: 92.3, bag: '$124,707', cohortRank: 4, cohortSize: 247 },
-  { rank: 5, name: 'smallcap_samurai', wallet: '0x11…E2A9', stage: 'wrecked', strength: 46, growth: 71.8, bag: '$76,340', cohortRank: 5, cohortSize: 247 },
-  { rank: 6, name: 'index_apprentice', wallet: '0xBE…771C', stage: 'back', strength: 38, growth: 48.7, bag: '$44,920', cohortRank: 6, cohortSize: 247 },
+  { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, pnl: 218400, bag: '$482,190', holderRank: 1, holderCount: 247 },
+  { rank: 2, name: 'marauder.eth', wallet: '0xD2…4F10', stage: 'elite', strength: 88, pnl: 167900, bag: '$301,842', holderRank: 2, holderCount: 247 },
+  { rank: 3, name: 'cold_storage', wallet: '0xA8…BC33', stage: 'hardened', strength: 73, pnl: 112600, bag: '$188,460', holderRank: 3, holderCount: 247 },
+  { rank: 4, name: 'redline_rider', wallet: '0x3C…008E', stage: 'hardened', strength: 68, pnl: 92300, bag: '$124,707', holderRank: 4, holderCount: 247 },
+  { rank: 5, name: 'smallcap_samurai', wallet: '0x11…E2A9', stage: 'wrecked', strength: 46, pnl: 71800, bag: '$76,340', holderRank: 5, holderCount: 247 },
+  { rank: 6, name: 'index_apprentice', wallet: '0xBE…771C', stage: 'back', strength: 38, pnl: 48700, bag: '$44,920', holderRank: 6, holderCount: 247 },
 ];
 
 function setMeta(name: string, content: string, property?: string) {
@@ -107,13 +107,17 @@ function setMeta(name: string, content: string, property?: string) {
 }
 
 function WarriorIllustration({ stage }: { stage: StageKey }) {
-  const artwork = stages.find((item) => item.key === stage)?.image ?? stages[0].image;
+  const stageDetails = stages.find((item) => item.key === stage) ?? stages[0];
   return (
-    <div className={`warrior-art warrior-float level-${stage}`} aria-label={`${stage} NFT visual`} data-testid={`illustration-warrior-${stage}`}>
-      <img src={artwork} alt={`${stage} Stonkalicious NFT`} />
+    <div className={`warrior-art warrior-float level-${stage}`} aria-label={`${stageDetails.name} NFT visual`} data-testid={`illustration-warrior-${stage}`}>
+      <img src={stageDetails.image} alt={`${stageDetails.name} Stonkalicious NFT`} />
       <div className="artwork-glow" />
     </div>
   );
+}
+
+function formatPnl(value: number) {
+  return `${value >= 0 ? '+' : '-'}$${Math.abs(value).toLocaleString('en-US')}`;
 }
 
 function BrandMark() {
@@ -135,7 +139,7 @@ function App() {
   const [activeStage, setActiveStage] = useState<StageKey>('plumber');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [leaderboardFilter, setLeaderboardFilter] = useState<'all' | StageKey>('all');
-  const [sortMode, setSortMode] = useState<'rank' | 'growth'>('rank');
+  const [sortMode, setSortMode] = useState<'rank' | 'pnl'>('rank');
   const [notice, setNotice] = useState('');
   const [copied, setCopied] = useState(false);
   const [identityState, setIdentityState] = useState<'idle' | 'signing' | 'oauth' | 'success' | 'error' | 'unavailable'>('idle');
@@ -188,7 +192,7 @@ function App() {
     const filtered = leaderboardFilter === 'all'
       ? warriors
       : warriors.filter((warrior) => warrior.stage === leaderboardFilter);
-    return [...filtered].sort((a, b) => sortMode === 'rank' ? a.cohortRank - b.cohortRank : b.growth - a.growth);
+    return [...filtered].sort((a, b) => sortMode === 'rank' ? a.holderRank - b.holderRank : b.pnl - a.pnl);
   }, [leaderboardFilter, sortMode]);
 
   const handleAction = (message: string, target?: string) => {
@@ -335,7 +339,7 @@ function App() {
              who’s <span className="text-[#ec642f]">king</span><br />of the<br />Hood?
           </h1>
           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
-              NFTs that track your bag from newb to elite.
+               NFTs that track your bag from Beginning to God.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
              <button type="button" onClick={() => handleAction('The public preview is open. Mint details will arrive with the official launch notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
@@ -396,7 +400,7 @@ function App() {
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                  [WalletCards, 'read-only by design', 'It observes the wallet. It never controls the wallet.'],
-                [TrendingUp, 'tracks the climb', 'ROI since your snapshot.'],
+                  [TrendingUp, 'tracks the climb', 'Absolute P&L since your snapshot.'],
                [Activity, 'keeps the record', 'One profile. One performance history.'],
               ].map(([Icon, title, copy]) => {
                 const IconComponent = Icon as typeof WalletCards;
@@ -421,7 +425,7 @@ function App() {
             <ArrowDownUp className="hidden h-7 w-7 text-[#ec642f] md:block" />
             <div className="bg-[#202534] p-5 text-[#eee9dd]">
               <div className="mono-face text-[9px] text-[#aaa7a0]">visual output / now</div>
-              <div className="mt-3 display-face text-3xl text-[#f5bf58]">Hardened</div>
+               <div className="mt-3 display-face text-3xl text-[#f5bf58]">Forged</div>
               <div className="mt-2 text-sm text-[#aaa7a0]">a stronger bag gets a stronger body</div>
             </div>
           </div>
@@ -502,27 +506,27 @@ function App() {
               <div className="mono-face mb-5 text-[10px] text-[#f5bf58]">04 / public signal</div>
               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Who is<br /><span className="text-[#ec642f]">still climbing?</span></h2>
             </div>
-            <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">No fake global ranking. Every NFT competes inside a challenge cohort, like a $1K → $100K run.</p>
+             <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">Every NFT competes in the global holder ranking once its seven-day run is eligible.</p>
           </div>
           <div className="mt-12 flex flex-col justify-between gap-4 border-y border-[#eee9dd]/15 py-4 md:flex-row md:items-center">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter leaderboard by stage">
               {(['all', ...stages.map((stage) => stage.key)] as const).map((filter) => (
-                <button type="button" key={filter} onClick={() => setLeaderboardFilter(filter)} data-testid={`button-filter-${filter}`} className={`mono-face border px-3 py-2 text-[9px] transition-colors ${leaderboardFilter === filter ? 'border-[#f5bf58] bg-[#f5bf58] text-[#202534]' : 'border-[#eee9dd]/20 text-[#aaa7a0] hover:border-[#f5bf58] hover:text-[#f5bf58]'}`}>{filter === 'all' ? 'all NFTs' : filter}</button>
+                <button type="button" key={filter} onClick={() => setLeaderboardFilter(filter)} data-testid={`button-filter-${filter}`} className={`mono-face border px-3 py-2 text-[9px] transition-colors ${leaderboardFilter === filter ? 'border-[#f5bf58] bg-[#f5bf58] text-[#202534]' : 'border-[#eee9dd]/20 text-[#aaa7a0] hover:border-[#f5bf58] hover:text-[#f5bf58]'}`}>{filter === 'all' ? 'all NFTs' : stages.find((stage) => stage.key === filter)?.name}</button>
               ))}
             </div>
-             <button type="button" onClick={() => setSortMode(sortMode === 'rank' ? 'growth' : 'rank')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'rank' ? 'challenge rank' : 'ROI'} <ChevronDown className="h-3.5 w-3.5" /></button>
+             <button type="button" onClick={() => setSortMode(sortMode === 'rank' ? 'pnl' : 'rank')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'rank' ? 'global rank' : 'P&L'} <ChevronDown className="h-3.5 w-3.5" /></button>
           </div>
           <div className="mt-4 overflow-x-auto">
             <div className="min-w-[700px]">
-              <div className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] gap-4 px-4 py-3 mono-face text-[9px] text-[#777985]"><span>rank / cohort</span><span>NFT / wallet</span><span>level</span><span>current value</span><span>ROI in challenge</span></div>
+              <div className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] gap-4 px-4 py-3 mono-face text-[9px] text-[#777985]"><span>rank / holders</span><span>NFT / wallet</span><span>level</span><span>current value</span><span>P&L since snapshot</span></div>
               {visibleWarriors.map((warrior, index) => {
                 const stage = stages.find((item) => item.key === warrior.stage) ?? stages[0];
-                return <div key={warrior.name} data-testid={`row-leaderboard-${warrior.name}`} className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] items-center gap-4 border-t border-[#eee9dd]/15 px-4 py-5 transition-colors hover:bg-[#2b3042]"><span className={`font-mono text-sm ${index === 0 ? 'text-[#f5bf58]' : 'text-[#777985]'}`}>{String(warrior.cohortRank).padStart(2, '0')}<span className="text-[10px] text-[#777985]"> / {warrior.cohortSize}</span></span><div><div className="font-bold">{warrior.name}</div><div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div></div><span className="flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</span><span className="font-mono text-[#f5bf58]">{warrior.bag}</span><span className="font-mono text-[#4a8b68]">+{warrior.growth}%</span></div>;
+                 return <div key={warrior.name} data-testid={`row-leaderboard-${warrior.name}`} className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] items-center gap-4 border-t border-[#eee9dd]/15 px-4 py-5 transition-colors hover:bg-[#2b3042]"><span className={`font-mono text-sm ${index === 0 ? 'text-[#f5bf58]' : 'text-[#777985]'}`}>{String(warrior.holderRank).padStart(2, '0')}<span className="text-[10px] text-[#777985]"> / {warrior.holderCount}</span></span><div><div className="font-bold">{warrior.name}</div><div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div></div><span className="flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</span><span className="font-mono text-[#f5bf58]">{warrior.bag}</span><span className="font-mono text-[#4a8b68]">{formatPnl(warrior.pnl)}</span></div>;
               })}
               {visibleWarriors.length === 0 && <div className="border-t border-[#eee9dd]/15 py-14 text-center text-[#aaa7a0]" data-testid="empty-leaderboard">No NFTs at this stage yet. The arena is still open.</div>}
             </div>
           </div>
-          <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Preview cohort: $1K → $100K / 247 participants. Live challenge rankings arrive with the metadata layer.</div>
+           <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Preview global ranking: 247 eligible holders. Live holder rankings arrive with the metadata layer.</div>
         </div>
       </section>
 

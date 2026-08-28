@@ -1,4 +1,4 @@
-import type { PortfolioObservation, ScoredWarrior, WarriorLevel } from "./types";
+import { WARRIOR_LEVEL_LABELS, type PortfolioObservation, type ScoredWarrior, type WarriorStageKey } from "./types";
 
 function boundedPercent(value: number): number {
   return Math.round(value * 100) / 100;
@@ -29,17 +29,18 @@ export function scoreObservation(observation: PortfolioObservation): ScoredWarri
     ? boundedPercent(((highWaterMarkUsd - currentValueUsd) / highWaterMarkUsd) * 100)
     : null;
 
-  let level: WarriorLevel = "Newb";
-  if (startingValueUsd > 0 && currentValueUsd <= highWaterMarkUsd * 0.25) level = "Liquidated";
-  else if (startingValueUsd > 0 && recoveredFromDrawdown && roiPct !== null && roiPct >= 50) level = "Plumber";
-  else if (startingValueUsd > 0 && roiPct !== null && roiPct >= 25 && (drawdownPct ?? 100) <= 15) level = "Elite";
-  else if (startingValueUsd > 0 && roiPct !== null && roiPct > 0) level = "Profitable";
-  else if ((drawdownPct ?? 0) > 35) level = "Wrecked";
-  else if (startingValueUsd > 0 && (roiPct ?? 0) > -25) level = "Back";
-  else if (startingValueUsd > 0) level = "Hardened";
+  let stage: WarriorStageKey = "newb";
+  if (startingValueUsd > 0 && currentValueUsd <= highWaterMarkUsd * 0.25) stage = "liquidated";
+  else if (startingValueUsd > 0 && recoveredFromDrawdown && roiPct !== null && roiPct >= 50) stage = "plumber";
+  else if (startingValueUsd > 0 && roiPct !== null && roiPct >= 25 && (drawdownPct ?? 100) <= 15) stage = "elite";
+  else if (startingValueUsd > 0 && roiPct !== null && roiPct > 0) stage = "profitable";
+  else if ((drawdownPct ?? 0) > 35) stage = "wrecked";
+  else if (startingValueUsd > 0 && (roiPct ?? 0) > -25) stage = "back";
+  else if (startingValueUsd > 0) stage = "hardened";
 
   return {
-    level,
+    stage,
+    level: WARRIOR_LEVEL_LABELS[stage],
     roiPct,
     drawdownPct,
     currentValueUsd: boundedPercent(currentValueUsd),

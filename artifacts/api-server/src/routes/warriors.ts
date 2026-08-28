@@ -29,7 +29,7 @@ function getContext(): OracleContext {
 }
 
 function metadataFor(tokenId: string, score: ScoredWarrior & { wallet: string; epoch: string }, stale: boolean, config: ReturnType<typeof getOracleConfig>): MetadataResponse {
-  const imageLevel = score.level.toLowerCase();
+  const imageLevel = score.stage;
   return {
     name: `Stonkalicious #${tokenId} — ${score.level}`,
     description: "A live performance identity that reflects its owner's qualifying Robinhood Chain coin bag.",

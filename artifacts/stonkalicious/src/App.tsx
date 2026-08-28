@@ -537,7 +537,11 @@ function App() {
           <div className="relative grid gap-10 md:grid-cols-[1.1fr_.9fr] md:items-end">
             <div>
               <div className="mono-face mb-5 text-[10px] text-[#ec642f]">05 / claim your mirror</div>
-              <h2 className="display-face max-w-[750px] text-5xl font-bold leading-[.86] md:text-8xl">Make your<br />performance<br /><span className="text-[#ec642f]">visible.</span></h2>
+               <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-8xl">
+                 <span className="block">Make your</span>
+                 <span className="block">performance</span>
+                 <span className="block text-[#ec642f]">visible.</span>
+               </h2>
             </div>
             <div>
              <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Link your X profile to claim your public performance identity, then let your coin bag write the record.</p>

@@ -9,6 +9,7 @@ import {
   Copy,
   ExternalLink,
   Flame,
+  Link2,
   LockKeyhole,
   Menu,
   MousePointer2,
@@ -123,6 +124,10 @@ function formatGrowth(value: number) {
   return `${value >= 0 ? '+' : '-'}${Math.abs(value)}%`;
 }
 
+function formatReferralCode(value: string) {
+  return value.length > 14 ? `${value.slice(0, 8)}…${value.slice(-4)}` : value;
+}
+
 function BrandMark() {
   return (
     <div className="flex items-center gap-3" data-testid="brand-mark">
@@ -146,7 +151,9 @@ function App() {
   const [notice, setNotice] = useState('');
   const [copied, setCopied] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [referralCopied, setReferralCopied] = useState(false);
   const [previewWallet, setPreviewWallet] = useState('');
+  const [referrer, setReferrer] = useState('');
   const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [identityState, setIdentityState] = useState<'idle' | 'signing' | 'oauth' | 'success' | 'error' | 'unavailable'>('idle');
   const [identityKind, setIdentityKind] = useState<IdentityKind | null>(null);
@@ -157,6 +164,9 @@ function App() {
   const previewStage = stages.find((stage) => stage.key === 'hardened') ?? stages[4];
   const previewRank = 12;
   const previewHolderCount = 247;
+  const referralLink = previewWallet
+    ? `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(previewWallet.toLowerCase())}#watch`
+    : '';
 
   useEffect(() => {
     document.title = 'Stonkalicious — Your wallet, turned NFT';
@@ -171,8 +181,11 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const verification = new URLSearchParams(window.location.search).get('verification');
-    const reason = new URLSearchParams(window.location.search).get('reason') ?? '';
+    const params = new URLSearchParams(window.location.search);
+    const verification = params.get('verification');
+    const reason = params.get('reason') ?? '';
+    const incomingRef = params.get('ref');
+    if (incomingRef) setReferrer(incomingRef);
     if (verification === 'success') {
       setIdentityState('success');
       setIdentityKind('x');
@@ -238,6 +251,21 @@ function App() {
       window.setTimeout(() => setShareCopied(false), 2400);
     } catch {
       setNotice(`Share caption: “${caption}”`);
+    }
+  };
+
+  const copyReferralLink = async () => {
+    if (!referralLink) {
+      setNotice('Connect your wallet first to generate your referral link.');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setReferralCopied(true);
+      setNotice('Referral link copied. Send it to the next warrior.');
+      window.setTimeout(() => setReferralCopied(false), 2400);
+    } catch {
+      setNotice(`Referral link: ${referralLink}`);
     }
   };
 
@@ -571,6 +599,24 @@ function App() {
                  {previewState === 'ready' && <span>Connected {previewWallet.slice(0, 6)}…{previewWallet.slice(-4)}. Preview only — this warrior is not minted.</span>}
                  {previewState === 'error' && <span>A compatible wallet is needed. No transaction was requested.</span>}
                </div>
+                {referrer && (
+                  <div className="mt-5 border border-[#4a8b68]/50 bg-[#4a8b68]/10 px-4 py-3 text-sm leading-relaxed text-[#4c4b51]" data-testid="referral-attribution">
+                    <Link2 className="mr-2 inline h-4 w-4 text-[#4a8b68]" /> You arrived through warrior link <span className="font-mono text-xs">{formatReferralCode(referrer)}</span>.
+                  </div>
+                )}
+                <div className="mt-5 border-t border-[#202534]/15 pt-5">
+                  <div className="flex items-center gap-2 mono-face text-[9px] text-[#ec642f]"><Link2 className="h-3.5 w-3.5" /> your warrior link</div>
+                  {referralLink ? (
+                    <>
+                      <div className="mt-2 break-all font-mono text-[10px] leading-relaxed text-[#6e6b72]" data-testid="referral-link">{referralLink}</div>
+                      <button type="button" onClick={() => { void copyReferralLink(); }} data-testid="button-copy-referral" className="mono-face mt-3 flex items-center gap-2 border border-[#ec642f] px-3 py-2 text-[9px] text-[#ec642f] transition-colors hover:bg-[#ec642f] hover:text-[#eee9dd]">
+                        {referralCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {referralCopied ? 'copied' : 'copy referral link'}
+                      </button>
+                    </>
+                  ) : (
+                    <div className="mt-2 text-sm text-[#6e6b72]">Connect your wallet to generate a link that carries your ref code.</div>
+                  )}
+                </div>
              </div>
              <div className="border-2 border-[#202534] bg-[#272b3a] p-5 text-[#eee9dd] md:p-8">
                <div className="flex flex-wrap items-start justify-between gap-5">

@@ -170,14 +170,14 @@ function App() {
 
   useEffect(() => {
     document.title = 'Stonkalicious — Your wallet, turned NFT';
-    setMeta('description', 'Stonkalicious is a pre-launch dynamic NFT performance mirror for Robinhood Chain.');
+     setMeta('description', 'Stonkalicious is an experimental Robinhood Chain collectible with illustrative performance previews.');
     setMeta('', 'Stonkalicious — Your wallet, turned NFT', 'og:title');
-    setMeta('', 'A pre-launch dynamic NFT performance mirror for Robinhood Chain. No custody. No wallet approvals.', 'og:description');
+     setMeta('', 'An experimental Robinhood Chain collectible with illustrative previews. No custody. No wallet approvals.', 'og:description');
     setMeta('', 'website', 'og:type');
     setMeta('', window.location.href, 'og:url');
     setMeta('twitter:card', 'summary_large_image');
     setMeta('twitter:title', 'Stonkalicious — Your wallet, turned NFT');
-    setMeta('twitter:description', 'A pre-launch dynamic NFT performance mirror for Robinhood Chain. No custody. No wallet approvals.');
+     setMeta('twitter:description', 'An experimental Robinhood Chain collectible with illustrative previews. No custody. No wallet approvals.');
   }, []);
 
   useEffect(() => {
@@ -243,14 +243,14 @@ function App() {
   };
 
   const copyShareCaption = async () => {
-    const caption = `I minted 9 days ago. This is the same token. ${selectedStage.name} · #12 of 247 · +71% since I minted.`;
+    const caption = `Example only: ${selectedStage.name} · example rank #12 · example change +71% since snapshot.`;
     try {
       await navigator.clipboard.writeText(caption);
       setShareCopied(true);
       setNotice('Share caption copied.');
       window.setTimeout(() => setShareCopied(false), 2400);
     } catch {
-      setNotice(`Share caption: “${caption}”`);
+      setNotice(`Example share caption: “${caption}”`);
     }
   };
 
@@ -462,13 +462,13 @@ function App() {
 
         <div className="reveal-up delay-2 relative overflow-hidden border-2 border-[#202534] bg-[#272b3a] px-4 py-5 scanline sm:px-5 sm:py-6">
           <div className="flex items-center justify-between">
-            <div className="mono-face text-[9px] text-[#aaa7a0]">share card / sample 0001</div>
+            <div className="mono-face text-[9px] text-[#aaa7a0]">share card / illustrative sample 0001</div>
             <div className="flex items-center gap-2 mono-face text-[9px] text-[#f5bf58]"><span className="h-1.5 w-1.5 rounded-full bg-[#f5bf58]" /> preview mode</div>
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {[
-              { label: 'start / day 0', stage: startStage, value: '$34,820' },
-              { label: 'now / day 9', stage: selectedStage, value: '+71% since mint' },
+              { label: 'start / example', stage: startStage, value: '$34,820 example' },
+              { label: 'now / example', stage: selectedStage, value: '+71% example change' },
             ].map((frame) => (
               <div key={frame.label} className="border border-[#eee9dd]/20 bg-[#202534]/45 p-3">
                 <div className="flex items-start justify-between gap-2">
@@ -487,8 +487,8 @@ function App() {
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#eee9dd]/20 pt-4">
             <div>
-              <div className="mono-face text-[9px] text-[#aaa7a0]">the same token / still climbing</div>
-              <div className="mt-1 text-sm font-bold text-[#eee9dd]">{selectedStage.name} · #12 of 247</div>
+              <div className="mono-face text-[9px] text-[#aaa7a0]">illustrative card / no live result</div>
+              <div className="mt-1 text-sm font-bold text-[#eee9dd]">{selectedStage.name} · example rank #12</div>
             </div>
             <button type="button" onClick={() => { void copyShareCaption(); }} data-testid="button-copy-share-caption" className="mono-face flex items-center gap-2 border border-[#f5bf58] px-3 py-2 text-[9px] text-[#f5bf58] transition-colors hover:bg-[#f5bf58] hover:text-[#202534]">
               {shareCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {shareCopied ? 'copied' : 'copy the story'}
@@ -517,14 +517,14 @@ function App() {
         <div className="grid gap-14 md:grid-cols-[.8fr_1.2fr] md:items-end">
           <div>
             <div className="mono-face mb-5 text-[10px] text-[#ec642f]">01 / the mirror</div>
-            <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT tracks<br /><span className="text-[#7666c9]">the bag.</span></h2>
+            <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT can mirror<br /><span className="text-[#7666c9]">the bag.</span></h2>
           </div>
           <div className="max-w-[490px]">
-             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one NFT, show off your level. The NFT has read-only access to qualifying Robinhood Chain coins: it can observe performance, but never move, trade, approve, or withdraw your coins. This site will never ask for a seed phrase, private key, or coin approval.</p>
+             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one NFT, show off your level. When enabled, the metadata service can read public data for qualifying Robinhood Chain coins to calculate an illustrative state. It cannot move, trade, approve, or withdraw your coins. This site will never ask for a seed phrase, private key, or coin approval.</p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                  [WalletCards, 'read-only by design', 'It observes the wallet. It never controls the wallet.'],
-                  [TrendingUp, 'tracks the climb', 'Absolute P&L since your snapshot.'],
+                  [TrendingUp, 'shows the snapshot delta', 'A configured change metric for allowlisted coins.'],
                   [Activity, 'keeps the record', 'One wallet. One performance history.'],
               ].map(([Icon, title, copy]) => {
                 const IconComponent = Icon as typeof WalletCards;

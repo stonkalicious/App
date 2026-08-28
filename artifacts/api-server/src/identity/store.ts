@@ -141,15 +141,15 @@ export function getAuthorization(id: string): MintAuthorization | undefined {
   return authorization;
 }
 
-export function reserveClaim(profileHash: string, wallet: string, sessionId: string, expiresAt: number): boolean {
+export function reserveClaim(profileHash: string | undefined, wallet: string, sessionId: string, expiresAt: number): boolean {
   const now = Date.now();
-  const existingProfile = profileReservations.get(profileHash);
+  const existingProfile = profileHash ? profileReservations.get(profileHash) : undefined;
   const existingWallet = walletReservations.get(wallet);
   if ((existingProfile && existingProfile.expiresAt > now && existingProfile.sessionId !== sessionId)
     || (existingWallet && existingWallet.expiresAt > now && existingWallet.sessionId !== sessionId)) {
     return false;
   }
-  profileReservations.set(profileHash, { sessionId, expiresAt });
+  if (profileHash) profileReservations.set(profileHash, { sessionId, expiresAt });
   walletReservations.set(wallet, { sessionId, expiresAt });
   return true;
 }

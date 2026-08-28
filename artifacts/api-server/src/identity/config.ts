@@ -31,6 +31,7 @@ export type IdentityConfig = {
   xTokenUrl: string;
   xUserInfoUrl: string;
   xScopes: string;
+  xConfigured: boolean;
   appBaseUrl: string;
   contractAddress: string;
   mintSignerPrivateKey: string;
@@ -54,18 +55,26 @@ export function getIdentityConfig(): IdentityConfig {
   const mintPriceWei = required("MINT_PRICE_WEI");
   if (!/^(0|[1-9]\d*)$/.test(mintPriceWei)) throw new Error("MINT_PRICE_WEI must be an unsigned integer");
 
+  const xClientId = process.env.X_CLIENT_ID?.trim() ?? "";
+  const xClientSecret = process.env.X_CLIENT_SECRET?.trim() ?? "";
+  const xRedirectUriValue = process.env.X_REDIRECT_URI?.trim() ?? "";
+  const xConfigured = Boolean(xClientId || xClientSecret || xRedirectUriValue);
+  if (xConfigured && (!xClientId || !xClientSecret || !xRedirectUriValue)) {
+    throw new Error("X OAuth configuration is incomplete");
+  }
   const xScopes = (process.env.X_OAUTH_SCOPES ?? "users.read").trim();
-  if (!xScopes.split(/\s+/).includes("users.read")) throw new Error("X_OAUTH_SCOPES must include users.read");
+  if (xConfigured && !xScopes.split(/\s+/).includes("users.read")) throw new Error("X_OAUTH_SCOPES must include users.read");
 
   return {
     sessionSecret: required("SESSION_SECRET"),
-    xClientId: required("X_CLIENT_ID"),
-    xClientSecret: required("X_CLIENT_SECRET"),
-    xRedirectUri: url("X_REDIRECT_URI", required("X_REDIRECT_URI")),
+    xClientId,
+    xClientSecret,
+    xRedirectUri: xConfigured ? url("X_REDIRECT_URI", xRedirectUriValue) : "",
     xAuthorizeUrl: url("X_AUTHORIZE_URL", process.env.X_AUTHORIZE_URL ?? "https://twitter.com/i/oauth2/authorize"),
     xTokenUrl: url("X_TOKEN_URL", process.env.X_TOKEN_URL ?? "https://api.x.com/2/oauth2/token"),
     xUserInfoUrl: url("X_USERINFO_URL", process.env.X_USERINFO_URL ?? "https://api.x.com/2/users/me"),
     xScopes,
+    xConfigured,
     appBaseUrl: url("IDENTITY_APP_BASE_URL", required("IDENTITY_APP_BASE_URL")),
     contractAddress,
     mintSignerPrivateKey: required("MINT_SIGNER_PRIVATE_KEY"),

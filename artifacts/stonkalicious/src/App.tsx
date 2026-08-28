@@ -59,6 +59,8 @@ type IdentityStatusResponse = {
   errorCode?: string;
 };
 
+type IdentityKind = 'wallet' | 'x';
+
 declare global {
   interface Window {
     ethereum?: EthereumProvider;
@@ -143,6 +145,7 @@ function App() {
   const [notice, setNotice] = useState('');
   const [copied, setCopied] = useState(false);
   const [identityState, setIdentityState] = useState<'idle' | 'signing' | 'oauth' | 'success' | 'error' | 'unavailable'>('idle');
+  const [identityKind, setIdentityKind] = useState<IdentityKind | null>(null);
   const [identityError, setIdentityError] = useState('');
   const [identityBusy, setIdentityBusy] = useState(false);
   const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[7];
@@ -162,7 +165,10 @@ function App() {
   useEffect(() => {
     const verification = new URLSearchParams(window.location.search).get('verification');
     const reason = new URLSearchParams(window.location.search).get('reason') ?? '';
-    if (verification === 'success') setIdentityState('success');
+    if (verification === 'success') {
+      setIdentityState('success');
+      setIdentityKind('x');
+    }
     if (verification === 'error') {
       setIdentityState('error');
       setIdentityError(reason);
@@ -172,7 +178,10 @@ function App() {
       .then(async (response) => {
         if (!response.ok) return;
         const status = await response.json() as IdentityStatusResponse;
-        if (status.status === 'ready') setIdentityState('success');
+        if (status.status === 'ready') {
+          setIdentityState('success');
+          setIdentityKind(status.xVerified ? 'x' : 'wallet');
+        }
         if (status.status === 'failed') {
           setIdentityState('error');
           setIdentityError(status.errorCode ?? '');
@@ -223,35 +232,61 @@ function App() {
     mint_signer_mismatch: 'Mint authorization is temporarily unavailable. No transaction was opened.',
     claim_in_progress: 'This wallet or X identity is already being verified in another session.',
     oauth_already_started: 'The X verification window is already in progress. Finish it or try again.',
+    x_verification_unavailable: 'Optional X linking is not configured for this preview.',
+    wallet_challenge_required: 'Start with wallet verification before requesting an optional identity link.',
     verification_unavailable: 'Verification is temporarily unavailable. No wallet permission was requested.',
   } as Record<string, string>)[code] ?? 'Verification did not complete. Try again from this page.';
+
+  const proveWallet = async () => {
+    if (!window.ethereum) {
+      throw new Error('wallet_missing');
+    }
+    setIdentityState('signing');
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const wallet = Array.isArray(accounts) && typeof accounts[0] === 'string' ? accounts[0] : '';
+    if (!wallet) throw new Error('invalid_wallet');
+    const challengeResponse = await fetch('/api/identity/challenge', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ wallet }),
+    });
+    const challenge = await challengeResponse.json() as { message?: string; challengeId?: string; error?: string };
+    if (!challengeResponse.ok || !challenge.message || !challenge.challengeId) throw new Error(challenge.error ?? 'verification_unavailable');
+    return window.ethereum.request({
+      method: 'personal_sign',
+      params: [challenge.message, wallet],
+    });
+  };
+
+  const startWalletVerification = async () => {
+    setIdentityBusy(true);
+    setIdentityError('');
+    try {
+      const signature = await proveWallet();
+      const authorizationResponse = await fetch('/api/identity/wallet/authorize', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ signature }),
+      });
+      const authorization = await authorizationResponse.json() as { error?: string };
+      if (!authorizationResponse.ok) throw new Error(authorization.error ?? 'verification_unavailable');
+      setIdentityKind('wallet');
+      setIdentityState('success');
+    } catch (error) {
+      setIdentityState('error');
+      setIdentityError(error instanceof Error ? error.message : 'verification_unavailable');
+    } finally {
+      setIdentityBusy(false);
+    }
+  };
 
   const startIdentityVerification = async () => {
     setIdentityBusy(true);
     setIdentityError('');
-    if (!window.ethereum) {
-      setIdentityState('error');
-      setIdentityError('wallet_missing');
-      setIdentityBusy(false);
-      return;
-    }
     try {
-      setIdentityState('signing');
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const wallet = Array.isArray(accounts) && typeof accounts[0] === 'string' ? accounts[0] : '';
-      if (!wallet) throw new Error('invalid_wallet');
-      const challengeResponse = await fetch('/api/identity/challenge', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ wallet }),
-      });
-      const challenge = await challengeResponse.json() as { message?: string; challengeId?: string; error?: string };
-      if (!challengeResponse.ok || !challenge.message || !challenge.challengeId) throw new Error(challenge.error ?? 'verification_unavailable');
-      const signature = await window.ethereum.request({
-        method: 'personal_sign',
-        params: [challenge.message, wallet],
-      });
+      const signature = await proveWallet();
       const startResponse = await fetch('/api/identity/x/start', {
         method: 'POST',
         credentials: 'include',
@@ -260,6 +295,7 @@ function App() {
       });
       const start = await startResponse.json() as { authorizeUrl?: string; error?: string };
       if (!startResponse.ok || !start.authorizeUrl) throw new Error(start.error ?? 'verification_unavailable');
+      setIdentityKind('x');
       setIdentityState('oauth');
       window.location.assign(start.authorizeUrl);
     } catch (error) {
@@ -275,6 +311,7 @@ function App() {
       await fetch('/api/identity/reset', { method: 'POST', credentials: 'include' });
     } finally {
       setIdentityState('idle');
+      setIdentityKind(null);
       setIdentityError('');
       setIdentityBusy(false);
     }
@@ -341,13 +378,10 @@ function App() {
           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
                NFTs that track your bag from Beginning to God.
           </p>
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-             <button type="button" onClick={() => handleAction('The public preview is open. Mint details will arrive with the official launch notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
-               see the preview <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
-            </button>
-            <a href="#evolution" data-testid="link-see-evolution" className="group flex items-center gap-2 px-2 py-3 font-bold">
-              see the evolution <span className="transition-transform group-hover:translate-x-1">→</span>
-            </a>
+           <div className="mt-9 flex flex-wrap items-center gap-4">
+              <button type="button" onClick={() => handleAction('Mint details are being locked. Join the signal to get the first drop notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#ec642f] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
+                get launch access <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
+             </button>
           </div>
           <div className="mt-16 flex flex-wrap gap-x-8 gap-y-4 border-t border-[#202534]/15 pt-5 text-[11px] text-[#6e6b72]">
             <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#4a8b68]" /> no vaults. no token.</span>
@@ -378,7 +412,7 @@ function App() {
           {[
              ['8', 'coin-tested levels'],
              ['1', 'NFT per wallet'],
-             ['1:1', 'wallet / X identity'],
+             ['1:1', 'wallet / optional X'],
             ['∞', 'reasons to keep building'],
           ].map(([value, label], index) => (
             <div key={label} className={`px-5 py-7 md:px-10 ${index < 3 ? 'border-b border-[#eee9dd]/15 md:border-b-0 md:border-r' : ''}`}>
@@ -401,7 +435,7 @@ function App() {
               {[
                  [WalletCards, 'read-only by design', 'It observes the wallet. It never controls the wallet.'],
                   [TrendingUp, 'tracks the climb', 'Absolute P&L since your snapshot.'],
-               [Activity, 'keeps the record', 'One profile. One performance history.'],
+                  [Activity, 'keeps the record', 'One wallet. One performance history.'],
               ].map(([Icon, title, copy]) => {
                 const IconComponent = Icon as typeof WalletCards;
                 return <div key={title as string} className="border-l-2 border-[#ec642f] pl-4"><IconComponent className="mb-3 h-5 w-5 text-[#ec642f]" /><div className="font-bold">{title as string}</div><div className="mt-1 text-sm text-[#6e6b72]">{copy as string}</div></div>;
@@ -487,9 +521,9 @@ function App() {
           </div>
           <div className="grid gap-3">
             {[
-              [Shield, 'One identity per NFT', 'One wallet gets one NFT. One verified X profile gets one active performance identity.'],
+               [Shield, 'One wallet per NFT', 'Every wallet can claim one NFT. Optional X linking adds a public performance identity.'],
               [WalletCards, 'Robinhood Chain coins only', 'A fixed allowlist of eligible Robinhood Chain coins powers the mirror.'],
-              [Flame, 'Capped coin contribution', 'Allowlisted coins count, but a meme pump cannot instantly summon a Tier 4 NFT.'],
+               [Flame, 'Capped coin contribution', 'Allowlisted coins count, but one meme pump cannot move the NFT through the entire ladder.'],
               [RotateCcw, 'Transfer means reset', 'When the NFT moves, its snapshot moves with it. The new owner starts fresh. The NFT can drop tiers.'],
             ].map(([Icon, title, copy], index) => {
               const IconComponent = Icon as typeof Shield;
@@ -544,14 +578,17 @@ function App() {
                </h2>
             </div>
              <div className="min-w-0">
-             <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Link your X profile to claim your public performance identity, then let your coin bag write the record.</p>
-              <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityState === 'success'} data-testid="button-join-signal" className="button-cut mt-7 bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityState === 'success' ? 'identity verified' : identityBusy ? 'checking proof…' : 'verify your X identity'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
+              <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Prove wallet control to claim; linking X is optional if you want a public performance identity. Then let your coin bag write the record.</p>
+               <div className="mt-7 flex flex-wrap gap-3">
+                 <button type="button" onClick={() => { void startWalletVerification(); }} disabled={identityBusy || identityKind !== null} data-testid="button-verify-wallet" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityKind === 'wallet' ? 'wallet verified' : identityBusy && identityKind === null ? 'checking wallet…' : 'verify wallet'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
+                 <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityKind === 'x'} data-testid="button-join-signal" className="button-cut border-2 border-[#202534] px-6 py-4 font-bold text-[#202534] transition-transform hover:-translate-y-1 hover:bg-[#202534] hover:text-[#eee9dd] disabled:cursor-wait disabled:opacity-60">{identityKind === 'x' ? 'X linked' : 'link X (optional)'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#202534]" /></button>
+               </div>
               <div className="mt-5 border-l-2 border-[#202534] pl-4 text-sm leading-relaxed text-[#4c4b51]" aria-live="polite" data-testid="identity-status">
-                {identityState === 'idle' && <span>First: prove you control a wallet with a plain signature. Then X confirms the profile. No approval, seed phrase, or custody.</span>}
+                 {identityState === 'idle' && <span>Prove you control a wallet with a plain signature. X linking is optional and only adds a public social identity. No approval, seed phrase, or custody.</span>}
                 {identityState === 'signing' && <span>Check your wallet. The message proves control only; it cannot move coins.</span>}
                 {identityState === 'oauth' && <span>Redirecting to X for permission to verify your account. Stonkalicious never sees your X password.</span>}
-                {identityState === 'success' && <span className="font-bold">X identity verified. Mint authorization is kept separate and remains closed until the official launch.</span>}
-                {identityState === 'unavailable' && <span>Verification is not configured for this preview yet. No wallet connection was opened.</span>}
+                 {identityState === 'success' && <span className="font-bold">{identityKind === 'x' ? 'Wallet verified and optional X identity linked.' : 'Wallet verified. X linking is optional.'} Mint authorization is kept separate and remains closed until the official launch.</span>}
+                 {identityState === 'unavailable' && <span>Wallet verification is not configured for this preview yet. No wallet connection was opened.</span>}
                 {identityState === 'error' && <span><strong>{identityError === 'wallet_missing' ? 'A compatible wallet is needed.' : identityErrorCopy(identityError)}</strong> <button type="button" onClick={() => { void resetIdentityVerification(); }} className="ml-1 underline underline-offset-4" data-testid="button-retry-identity">try again</button></span>}
               </div>
             </div>

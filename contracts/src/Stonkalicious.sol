@@ -149,8 +149,8 @@ contract Stonkalicious {
     ) external payable whenNotPaused {
         if (block.timestamp > deadline) revert SignatureExpired();
         if (usedMintNonces[nonce]) revert MintNonceUsed();
-        if (profileHash == bytes32(0) || challengeId == bytes32(0)) revert InvalidXProfile();
-        if (warriorByXProfile[profileHash] != 0) revert XProfileAlreadyBound();
+        if (challengeId == bytes32(0)) revert InvalidXProfile();
+        if (profileHash != bytes32(0) && warriorByXProfile[profileHash] != 0) revert XProfileAlreadyBound();
         if (quantity == 0 || quantity > maxPerWallet - mintedByWallet[msg.sender]) {
             revert InvalidQuantity();
         }
@@ -165,9 +165,11 @@ contract Stonkalicious {
         mintedByWallet[msg.sender] += quantity;
         uint256 tokenId = _nextTokenId;
         _mintWarriors(msg.sender, quantity);
-        warriorByXProfile[profileHash] = tokenId;
-        xProfileOf[tokenId] = profileHash;
-        emit XProfileBound(tokenId, profileHash, msg.sender);
+        if (profileHash != bytes32(0)) {
+            warriorByXProfile[profileHash] = tokenId;
+            xProfileOf[tokenId] = profileHash;
+            emit XProfileBound(tokenId, profileHash, msg.sender);
+        }
     }
 
     function adminMint(address to, uint256 quantity) external onlyOwner whenNotPaused {

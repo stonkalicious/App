@@ -27,7 +27,7 @@ async function fixture() {
 }
 
 async function signedMint(contract, signer, wallet, nonce, profile = `x-account-${nonce}`) {
-  const profileHash = ethers.keccak256(ethers.toUtf8Bytes(profile));
+  const profileHash = profile === null ? ethers.ZeroHash : ethers.keccak256(ethers.toUtf8Bytes(profile));
   const challengeId = ethers.keccak256(ethers.toUtf8Bytes("challenge-1"));
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600);
   const value = { wallet: await wallet.getAddress(), quantity: 1, profileHash, challengeId, nonce, deadline };
@@ -140,7 +140,7 @@ test("transfer starts a new epoch and resets snapshot-write eligibility", async 
   }
 });
 
-test("enforces one lifetime NFT per wallet and binds each X profile once", async () => {
+test("enforces one lifetime NFT per wallet and binds each optional X profile once", async () => {
   const { server, provider, contract, oracle, mintSigner, alice, bob } = await fixture();
   try {
     await (await mintOne(contract, mintSigner, alice, 3, "x-account-123")).wait();
@@ -156,6 +156,18 @@ test("enforces one lifetime NFT per wallet and binds each X profile once", async
     await server.provider.request({ method: "evm_mine", params: [] });
     await (await contract.connect(alice).transferFrom(await alice.getAddress(), await bob.getAddress(), 1)).wait();
     assert.equal(await contract.warriorByXProfile(profileHash), 0n);
+    assert.equal(await contract.xProfileOf(1), ethers.ZeroHash);
+  } finally {
+    await server.close();
+  }
+});
+
+test("allows a wallet-only mint without an X profile", async () => {
+  const { server, contract, mintSigner, alice } = await fixture();
+  try {
+    await (await mintOne(contract, mintSigner, alice, 30, null)).wait();
+    assert.equal(await contract.totalSupply(), 1n);
+    assert.equal(await contract.mintedByWallet(await alice.getAddress()), 1n);
     assert.equal(await contract.xProfileOf(1), ethers.ZeroHash);
   } finally {
     await server.close();

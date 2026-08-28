@@ -14,9 +14,9 @@ or private key.
   transfer lifecycle.
 - The launch policy is one lifetime NFT per wallet. Public minting requires
   an EIP-712 authorization from the configured `mintSigner`, bound to the
-  wallet, X profile hash, challenge, nonce, and expiry. `maxPerWallet` must be
-  configured as `1`, and admin/free allocations count against the same wallet
-  ledger.
+  wallet, optional X profile hash, challenge, nonce, and expiry. A zero profile
+  hash is valid for wallet-only claims. `maxPerWallet` must be configured as
+  `1`, and admin/free allocations count against the same wallet ledger.
 - An authorized identity verifier can bind one hashed X account identifier to
   one active NFT. The raw X handle and OAuth credentials stay off-chain.
 - `recordStartingBagValue(tokenId, expectedEpoch, startingBagValue)` is called
@@ -104,22 +104,22 @@ only the official site origin when the metadata is released.
 
 ## Identity verification configuration
 
-The API identity routes require `X_CLIENT_ID`, `X_CLIENT_SECRET`,
-`X_REDIRECT_URI`, `IDENTITY_APP_BASE_URL`, `MINT_SIGNER_PRIVATE_KEY`, and
-`MINT_PRICE_WEI`, plus the existing contract and RPC settings. Keep the X
-client secret and mint signer key in the deployment secret manager; they are
-never returned to the browser or written to logs. The OAuth flow requests
-`users.read` only, uses state plus S256 PKCE, and retains only the stable X
-account identifier's hash in the short-lived process store.
+Wallet-only claim authorization requires `IDENTITY_APP_BASE_URL`,
+`MINT_SIGNER_PRIVATE_KEY`, and `MINT_PRICE_WEI`, plus the existing contract and
+RPC settings. X linking is optional; configure `X_CLIENT_ID`,
+`X_CLIENT_SECRET`, and `X_REDIRECT_URI` only when the optional social identity
+feature is enabled. Keep all secrets in the deployment secret manager; they
+are never returned to the browser or written to logs. The optional OAuth flow
+requests `users.read` only, uses state plus S256 PKCE, and retains only the
+stable X account identifier's hash in the short-lived process store.
 
-The user first signs a plain wallet-control message. The message explicitly
-does not approve, move, or custody assets. After X verification, the API
-issues one short-lived EIP-712 mint authorization tied to the wallet, profile
-hash, challenge, nonce, chain, and contract. The user submits any future mint
-transaction from their own wallet; the API never asks for a seed phrase or
-private key. Identity sessions and reservations are intentionally short-lived
-and should be backed by a shared expiring store before running multiple API
-instances.
+The user signs a plain wallet-control message. The message explicitly does not
+approve, move, or custody assets. The API can issue one short-lived EIP-712
+mint authorization tied to the wallet, optional profile hash, challenge, nonce,
+chain, and contract. The user submits any future mint transaction from their
+own wallet; the API never asks for a seed phrase or private key. Identity
+sessions and reservations are intentionally short-lived and should be backed
+by a shared expiring store before running multiple API instances.
 
 The deployment script is intentionally not hardcoded to an RPC endpoint or
 private key. Supply those values through the deployment environment's secret

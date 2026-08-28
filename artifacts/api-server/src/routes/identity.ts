@@ -76,6 +76,28 @@ function safeErrorCode(error: unknown): string {
   return "verification_unavailable";
 }
 
+async function issueAuthorization(identityConfig: IdentityConfig, session: ReturnType<typeof getOrCreateSession>, verifiedProfileHash?: string) {
+  if (!session.wallet || !session.challengeId) throw new Error("wallet_challenge_required");
+  const contract = new ContractSnapshotProvider(
+    process.env.ROBINHOOD_RPC_URL ?? "",
+    identityConfig.contractAddress,
+  );
+  const authorization = await createMintAuthorization(
+    identityConfig,
+    contract,
+    session.wallet,
+    verifiedProfileHash,
+    session.challengeId,
+    session.id,
+  );
+  saveAuthorization(authorization);
+  session.profileHash = verifiedProfileHash;
+  session.authorizationId = authorization.id;
+  session.status = "ready";
+  session.errorCode = undefined;
+  return authorization;
+}
+
 router.post("/identity/challenge", (req, res) => {
   if (!allowRequest(clientKey(req, "challenge"), RATE_LIMIT, RATE_WINDOW_MS)) {
     return res.status(429).json({ error: "too_many_attempts", retryAfterSeconds: 600 });
@@ -93,7 +115,20 @@ router.post("/identity/challenge", (req, res) => {
     return res.status(400).json({ error: "invalid_wallet" });
   }
   const previous = sessionFromRequest(req, identityConfig);
-  if (previous?.status === "ready") return res.status(409).json({ error: "identity_already_verified" });
+  if (previous?.status === "ready" && previous.profileHash) {
+    return res.status(409).json({ error: "identity_already_verified" });
+  }
+  if (previous?.status === "ready" && previous.challengeId) {
+    const existingChallenge = getChallenge(previous.challengeId);
+    if (existingChallenge) {
+      setSessionCookie(res, previous.id, identityConfig.sessionSecret, identityConfig.sessionTtlMs);
+      return res.json({
+        challengeId: existingChallenge.id,
+        message: existingChallenge.message,
+        expiresAt: new Date(existingChallenge.expiresAt).toISOString(),
+      });
+    }
+  }
   const session = getOrCreateSession(previous?.id, identityConfig.sessionTtlMs);
   setSessionCookie(res, session.id, identityConfig.sessionSecret, identityConfig.sessionTtlMs);
   const challengeId = `0x${randomBytes(32).toString("hex")}`;
@@ -109,6 +144,39 @@ router.post("/identity/challenge", (req, res) => {
   return res.json({ challengeId, message: walletMessage(wallet, challengeId, expiresAt), expiresAt: new Date(expiresAt).toISOString() });
 });
 
+router.post("/identity/wallet/authorize", async (req, res) => {
+  if (!allowRequest(clientKey(req, "wallet-authorization"), RATE_LIMIT, RATE_WINDOW_MS)) {
+    return res.status(429).json({ error: "too_many_attempts", retryAfterSeconds: 600 });
+  }
+  let identityConfig: IdentityConfig;
+  try {
+    identityConfig = config();
+  } catch {
+    return res.status(503).json({ error: "identity_verification_not_configured" });
+  }
+  const session = sessionFromRequest(req, identityConfig);
+  if (!session || !session.wallet || !session.challengeId) {
+    return res.status(401).json({ error: "wallet_challenge_required" });
+  }
+  if (session.status === "ready") return res.status(409).json({ error: "identity_already_verified" });
+  const challenge = getChallenge(session.challengeId);
+  if (!challenge || challenge.sessionId !== session.id || challenge.wallet !== session.wallet) {
+    return res.status(400).json({ error: "wallet_challenge_expired" });
+  }
+  if (!verifyWalletSignature(challenge.message, req.body?.signature, session.wallet)) {
+    return res.status(400).json({ error: "wallet_signature_invalid" });
+  }
+  challenge.verifiedAt = Date.now();
+  try {
+    await issueAuthorization(identityConfig, session);
+    return res.json({ status: "ready", xVerified: false });
+  } catch (error) {
+    const errorCode = safeErrorCode(error);
+    failSession(session, errorCode);
+    return res.status(409).json({ error: errorCode });
+  }
+});
+
 router.post("/identity/x/start", (req, res) => {
   if (!allowRequest(clientKey(req, "oauth-start"), RATE_LIMIT, RATE_WINDOW_MS)) {
     return res.status(429).json({ error: "too_many_attempts", retryAfterSeconds: 600 });
@@ -119,9 +187,12 @@ router.post("/identity/x/start", (req, res) => {
   } catch {
     return res.status(503).json({ error: "identity_verification_not_configured" });
   }
+  if (!identityConfig.xConfigured) {
+    return res.status(503).json({ error: "x_verification_unavailable" });
+  }
   const session = sessionFromRequest(req, identityConfig);
   if (!session || !session.wallet || !session.challengeId) return res.status(401).json({ error: "wallet_challenge_required" });
-  if (session.status === "ready") return res.status(409).json({ error: "identity_already_verified" });
+  if (session.status === "ready" && session.profileHash) return res.status(409).json({ error: "identity_already_verified" });
   if (session.status === "oauth_pending" && session.oauth) return res.status(409).json({ error: "oauth_already_started" });
   const challenge = getChallenge(session.challengeId);
   if (!challenge || challenge.sessionId !== session.id || challenge.wallet !== session.wallet) {
@@ -154,9 +225,12 @@ router.get("/identity/x/callback", async (req, res) => {
   } catch {
     return res.status(503).json({ error: "identity_verification_not_configured" });
   }
+  if (!identityConfig.xConfigured) {
+    return res.status(503).json({ error: "x_verification_unavailable" });
+  }
   const session = sessionFromRequest(req, identityConfig);
   if (!session) return res.status(400).json({ error: "verification_session_missing" });
-  if (session.status === "ready") return res.redirect(303, redirectToUi(identityConfig, "success"));
+  if (session.status === "ready" && session.profileHash) return res.redirect(303, redirectToUi(identityConfig, "success"));
   if (!session.oauth) return res.redirect(303, redirectToUi(identityConfig, "error", "oauth_session_missing"));
   if (session.oauth.usedAt) return res.redirect(303, redirectToUi(identityConfig, "error", session.errorCode ?? "oauth_replay"));
   session.oauth.usedAt = Date.now();
@@ -177,23 +251,7 @@ router.get("/identity/x/callback", async (req, res) => {
   try {
     const stableAccountId = await getStableAccountId(identityConfig, await exchangeCode(identityConfig, code, session.oauth.codeVerifier));
     const verifiedProfileHash = profileHash(stableAccountId);
-    const contract = new ContractSnapshotProvider(
-      process.env.ROBINHOOD_RPC_URL ?? "",
-      identityConfig.contractAddress,
-    );
-    const authorization = await createMintAuthorization(
-      identityConfig,
-      contract,
-      session.wallet!,
-      verifiedProfileHash,
-      session.challengeId!,
-      session.id,
-    );
-    saveAuthorization(authorization);
-    session.profileHash = verifiedProfileHash;
-    session.authorizationId = authorization.id;
-    session.status = "ready";
-    session.errorCode = undefined;
+    await issueAuthorization(identityConfig, session, verifiedProfileHash);
     return res.redirect(303, redirectToUi(identityConfig, "success"));
   } catch (error) {
     failSession(session, safeErrorCode(error));
@@ -214,7 +272,7 @@ router.get("/identity/status", (req, res) => {
   return res.json({
     status: session.status,
     walletVerified: Boolean(session.wallet && session.challengeId && getChallenge(session.challengeId)?.verifiedAt),
-    xVerified: session.status === "ready",
+    xVerified: Boolean(session.profileHash),
     mintAuthorizationAvailable: Boolean(authorization && !authorization.consumedAt),
     expiresAt: new Date(session.expiresAt).toISOString(),
     errorCode: session.status === "failed" ? session.errorCode : undefined,

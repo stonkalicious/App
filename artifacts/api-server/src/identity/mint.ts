@@ -5,6 +5,8 @@ import { ContractSnapshotProvider } from "../oracle/provider";
 import type { MintAuthorization } from "./store";
 import { randomId, reserveClaim } from "./store";
 
+export const ZERO_PROFILE_HASH = `0x${"00".repeat(32)}`;
+
 const mintTypes = {
   Mint: [
     { name: "wallet", type: "address" },
@@ -20,18 +22,23 @@ export async function createMintAuthorization(
   config: IdentityConfig,
   contract: ContractSnapshotProvider,
   wallet: string,
-  profileHash: string,
+  profileHash: string | undefined,
   challengeId: string,
   sessionId: string,
 ): Promise<MintAuthorization> {
+  const effectiveProfileHash = profileHash ?? ZERO_PROFILE_HASH;
   if ((await contract.getMintedByWallet(wallet)) > 0n) throw new Error("wallet_already_claimed");
-  if ((await contract.getWarriorByXProfile(profileHash)) > 0n) throw new Error("identity_already_bound");
+  if (effectiveProfileHash !== ZERO_PROFILE_HASH && (await contract.getWarriorByXProfile(effectiveProfileHash)) > 0n) {
+    throw new Error("identity_already_bound");
+  }
 
   const signer = new Wallet(config.mintSignerPrivateKey);
   const onChainSigner = await contract.getMintSigner();
   if (signer.address.toLowerCase() !== onChainSigner.toLowerCase()) throw new Error("mint_signer_mismatch");
   const expiresAt = Date.now() + config.authorizationTtlMs;
-  if (!reserveClaim(profileHash, wallet, sessionId, expiresAt)) throw new Error("claim_in_progress");
+  if (!reserveClaim(effectiveProfileHash === ZERO_PROFILE_HASH ? undefined : effectiveProfileHash, wallet, sessionId, expiresAt)) {
+    throw new Error("claim_in_progress");
+  }
 
   const now = Math.floor(Date.now() / 1000);
   const deadline = now + Math.floor(config.authorizationTtlMs / 1000);
@@ -40,7 +47,7 @@ export async function createMintAuthorization(
   const value = {
     wallet,
     quantity: 1,
-    profileHash,
+    profileHash: effectiveProfileHash,
     challengeId,
     nonce,
     deadline,
@@ -58,7 +65,7 @@ export async function createMintAuthorization(
     payload: {
       wallet,
       quantity: 1,
-      profileHash,
+      profileHash: effectiveProfileHash,
       challengeId,
       nonce,
       deadline: String(deadline),

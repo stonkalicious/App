@@ -88,8 +88,9 @@ accept each of these:
       failure behavior in place.
 - [ ] Put admin minting behind the selected multisig/manifest process and audit
       every emergency allocation.
-- [ ] Document and test X-profile recovery/rebinding for a compromised account
-      without permitting arbitrary rebinding.
+- [ ] If optional X identity linking is enabled, document and test
+      X-profile recovery/rebinding for a compromised account without
+      permitting arbitrary rebinding.
 - [ ] Define pause authority, transfer behavior while paused, and recovery
       procedures under the selected governance control.
 - [ ] Review the global mint-nonce namespace and replay policy as part of the

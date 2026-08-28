@@ -534,16 +534,16 @@ function App() {
         <div className="relative overflow-hidden border-2 border-[#202534] bg-[#f5bf58] p-7 md:p-14">
           <div className="absolute -right-10 -top-20 h-72 w-72 rounded-full border-[30px] border-[#ec642f]/20" />
           <div className="absolute -bottom-28 right-24 h-72 w-72 rounded-full border border-[#202534]/15" />
-          <div className="relative grid gap-10 md:grid-cols-[1.1fr_.9fr] md:items-end">
-            <div>
+           <div className="relative grid min-w-0 gap-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] md:items-end">
+             <div className="min-w-0">
               <div className="mono-face mb-5 text-[10px] text-[#ec642f]">05 / claim your mirror</div>
-               <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-8xl">
+               <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl lg:text-8xl">
                  <span className="block">Make your</span>
                  <span className="block">performance</span>
                  <span className="block text-[#ec642f]">visible.</span>
                </h2>
             </div>
-            <div>
+             <div className="min-w-0">
              <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Link your X profile to claim your public performance identity, then let your coin bag write the record.</p>
               <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityState === 'success'} data-testid="button-join-signal" className="button-cut mt-7 bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityState === 'success' ? 'identity verified' : identityBusy ? 'checking proof…' : 'verify your X identity'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
               <div className="mt-5 border-l-2 border-[#202534] pl-4 text-sm leading-relaxed text-[#4c4b51]" aria-live="polite" data-testid="identity-status">

@@ -42,6 +42,7 @@ type Warrior = {
   stage: StageKey;
   strength: number;
   pnl: number;
+  growthPct: number;
   bag: string;
   holderRank: number;
   holderCount: number;
@@ -88,12 +89,12 @@ const stages: Stage[] = [
 }));
 
 const warriors: Warrior[] = [
-  { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, pnl: 218400, bag: '$482,190', holderRank: 1, holderCount: 247 },
-  { rank: 2, name: 'marauder.eth', wallet: '0xD2…4F10', stage: 'elite', strength: 88, pnl: 167900, bag: '$301,842', holderRank: 2, holderCount: 247 },
-  { rank: 3, name: 'cold_storage', wallet: '0xA8…BC33', stage: 'hardened', strength: 73, pnl: 112600, bag: '$188,460', holderRank: 3, holderCount: 247 },
-  { rank: 4, name: 'redline_rider', wallet: '0x3C…008E', stage: 'hardened', strength: 68, pnl: 92300, bag: '$124,707', holderRank: 4, holderCount: 247 },
-  { rank: 5, name: 'smallcap_samurai', wallet: '0x11…E2A9', stage: 'wrecked', strength: 46, pnl: 71800, bag: '$76,340', holderRank: 5, holderCount: 247 },
-  { rank: 6, name: 'index_apprentice', wallet: '0xBE…771C', stage: 'back', strength: 38, pnl: 48700, bag: '$44,920', holderRank: 6, holderCount: 247 },
+  { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, pnl: 218400, growthPct: 184, bag: '$482,190', holderRank: 1, holderCount: 247 },
+  { rank: 2, name: 'marauder.eth', wallet: '0xD2…4F10', stage: 'elite', strength: 88, pnl: 167900, growthPct: 142, bag: '$301,842', holderRank: 2, holderCount: 247 },
+  { rank: 3, name: 'cold_storage', wallet: '0xA8…BC33', stage: 'hardened', strength: 73, pnl: 112600, growthPct: 118, bag: '$188,460', holderRank: 3, holderCount: 247 },
+  { rank: 4, name: 'redline_rider', wallet: '0x3C…008E', stage: 'hardened', strength: 68, pnl: 92300, growthPct: 93, bag: '$124,707', holderRank: 4, holderCount: 247 },
+  { rank: 5, name: 'smallcap_samurai', wallet: '0x11…E2A9', stage: 'wrecked', strength: 46, pnl: 71800, growthPct: 71, bag: '$76,340', holderRank: 5, holderCount: 247 },
+  { rank: 6, name: 'index_apprentice', wallet: '0xBE…771C', stage: 'back', strength: 38, pnl: 48700, growthPct: 48, bag: '$44,920', holderRank: 6, holderCount: 247 },
 ];
 
 function setMeta(name: string, content: string, property?: string) {
@@ -118,8 +119,8 @@ function WarriorIllustration({ stage }: { stage: StageKey }) {
   );
 }
 
-function formatPnl(value: number) {
-  return `${value >= 0 ? '+' : '-'}$${Math.abs(value).toLocaleString('en-US')}`;
+function formatGrowth(value: number) {
+  return `${value >= 0 ? '+' : '-'}${Math.abs(value)}%`;
 }
 
 function BrandMark() {
@@ -138,17 +139,24 @@ function BrandMark() {
 }
 
 function App() {
-  const [activeStage, setActiveStage] = useState<StageKey>('plumber');
+  const [activeStage, setActiveStage] = useState<StageKey>('hardened');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [leaderboardFilter, setLeaderboardFilter] = useState<'all' | StageKey>('all');
-  const [sortMode, setSortMode] = useState<'rank' | 'pnl'>('rank');
+  const [sortMode, setSortMode] = useState<'rank' | 'growth'>('growth');
   const [notice, setNotice] = useState('');
   const [copied, setCopied] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+  const [previewWallet, setPreviewWallet] = useState('');
+  const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [identityState, setIdentityState] = useState<'idle' | 'signing' | 'oauth' | 'success' | 'error' | 'unavailable'>('idle');
   const [identityKind, setIdentityKind] = useState<IdentityKind | null>(null);
   const [identityError, setIdentityError] = useState('');
   const [identityBusy, setIdentityBusy] = useState(false);
   const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[7];
+  const startStage = stages[0];
+  const previewStage = stages.find((stage) => stage.key === 'hardened') ?? stages[4];
+  const previewRank = 12;
+  const previewHolderCount = 247;
 
   useEffect(() => {
     document.title = 'Stonkalicious — Your wallet, turned NFT';
@@ -201,7 +209,7 @@ function App() {
     const filtered = leaderboardFilter === 'all'
       ? warriors
       : warriors.filter((warrior) => warrior.stage === leaderboardFilter);
-    return [...filtered].sort((a, b) => sortMode === 'rank' ? a.holderRank - b.holderRank : b.pnl - a.pnl);
+    return [...filtered].sort((a, b) => sortMode === 'rank' ? a.holderRank - b.holderRank : b.growthPct - a.growthPct);
   }, [leaderboardFilter, sortMode]);
 
   const handleAction = (message: string, target?: string) => {
@@ -218,6 +226,38 @@ function App() {
       window.setTimeout(() => setCopied(false), 2400);
     } catch {
       setNotice('Contract details will be published with the mint announcement.');
+    }
+  };
+
+  const copyShareCaption = async () => {
+    const caption = `I minted 9 days ago. This is the same token. ${selectedStage.name} · #12 of 247 · +71% since I minted.`;
+    try {
+      await navigator.clipboard.writeText(caption);
+      setShareCopied(true);
+      setNotice('Share caption copied.');
+      window.setTimeout(() => setShareCopied(false), 2400);
+    } catch {
+      setNotice(`Share caption: “${caption}”`);
+    }
+  };
+
+  const previewWalletPerformance = async () => {
+    if (!window.ethereum) {
+      setPreviewState('error');
+      setNotice('A compatible wallet is needed for the read-only preview.');
+      return;
+    }
+    setPreviewState('loading');
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const wallet = Array.isArray(accounts) && typeof accounts[0] === 'string' ? accounts[0] : '';
+      if (!wallet) throw new Error('invalid_wallet');
+      setPreviewWallet(wallet);
+      setPreviewState('ready');
+      setNotice('Read-only preview loaded. This warrior is not minted.');
+    } catch {
+      setPreviewState('error');
+      setNotice('Wallet preview did not load. No approval or transaction was requested.');
     }
   };
 
@@ -334,6 +374,7 @@ function App() {
         <div className="hidden items-center gap-8 md:flex">
           {[
             ['the mirror', '#mirror'],
+            ['watch my warrior', '#watch'],
             ['evolution', '#evolution'],
             ['leaderboard', '#leaderboard'],
             ['rules', '#rules'],
@@ -356,6 +397,7 @@ function App() {
           <div className="grid gap-4">
             {[
               ['the mirror', '#mirror'],
+              ['watch my warrior', '#watch'],
               ['evolution', '#evolution'],
               ['leaderboard', '#leaderboard'],
               ['rules', '#rules'],
@@ -375,8 +417,8 @@ function App() {
            <h1 className="max-w-[760px] font-sans text-[clamp(3.75rem,7vw,6.8rem)] font-black leading-[.9] tracking-[-.07em]">
              who’s <span className="text-[#ec642f]">king</span><br />of the<br />Hood?
           </h1>
-          <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
-               NFTs that track your bag from Beginning to God.
+           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
+                Your bag turned into this. Mint the snapshot. Come back when the form changes.
           </p>
            <div className="mt-9 flex flex-wrap items-center gap-4">
               <button type="button" onClick={() => handleAction('Mint details are being locked. Join the signal to get the first drop notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#ec642f] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
@@ -390,20 +432,40 @@ function App() {
           </div>
         </div>
 
-        <div className="reveal-up delay-2 relative flex min-h-[520px] items-center justify-center overflow-hidden border-2 border-[#202534] bg-[#272b3a] px-5 py-10 scanline">
-           <div className="absolute left-5 top-5 mono-face text-[9px] text-[#aaa7a0]">preview specimen / 0001</div>
-           <div className="absolute right-5 top-5 flex items-center gap-2 mono-face text-[9px] text-[#f5bf58]"><span className="h-1.5 w-1.5 rounded-full bg-[#f5bf58]" /> preview mode</div>
-          <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between border-t border-[#eee9dd]/20 pt-3">
-            <div>
-              <div className="mono-face text-[9px] text-[#aaa7a0]">current stage</div>
-              <div className="display-face mt-1 text-3xl text-[#eee9dd]">{selectedStage.name}</div>
-            </div>
-            <div className="text-right">
-              <div className="mono-face text-[9px] text-[#aaa7a0]">orb status</div>
-               <div className="mt-1 font-mono text-sm text-[#f5bf58]">visual preview / 08</div>
-            </div>
+        <div className="reveal-up delay-2 relative overflow-hidden border-2 border-[#202534] bg-[#272b3a] px-4 py-5 scanline sm:px-5 sm:py-6">
+          <div className="flex items-center justify-between">
+            <div className="mono-face text-[9px] text-[#aaa7a0]">share card / sample 0001</div>
+            <div className="flex items-center gap-2 mono-face text-[9px] text-[#f5bf58]"><span className="h-1.5 w-1.5 rounded-full bg-[#f5bf58]" /> preview mode</div>
           </div>
-          <WarriorIllustration stage={activeStage} />
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {[
+              { label: 'start / day 0', stage: startStage, value: '$34,820' },
+              { label: 'now / day 9', stage: selectedStage, value: '+71% since mint' },
+            ].map((frame) => (
+              <div key={frame.label} className="border border-[#eee9dd]/20 bg-[#202534]/45 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="mono-face text-[9px] text-[#aaa7a0]">{frame.label}</div>
+                  <div className="mono-face text-[9px]" style={{ color: frame.stage.color }}>{frame.stage.number}</div>
+                </div>
+                <div className="mt-3 flex justify-center">
+                  <div className="w-full max-w-[190px]"><WarriorIllustration stage={frame.stage.key} /></div>
+                </div>
+                <div className="mt-3 border-t border-[#eee9dd]/20 pt-3">
+                  <div className="display-face text-2xl text-[#eee9dd]">{frame.stage.name}</div>
+                  <div className="mt-1 font-mono text-xs" style={{ color: frame.stage.color }}>{frame.value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#eee9dd]/20 pt-4">
+            <div>
+              <div className="mono-face text-[9px] text-[#aaa7a0]">the same token / still climbing</div>
+              <div className="mt-1 text-sm font-bold text-[#eee9dd]">{selectedStage.name} · #12 of 247</div>
+            </div>
+            <button type="button" onClick={() => { void copyShareCaption(); }} data-testid="button-copy-share-caption" className="mono-face flex items-center gap-2 border border-[#f5bf58] px-3 py-2 text-[9px] text-[#f5bf58] transition-colors hover:bg-[#f5bf58] hover:text-[#202534]">
+              {shareCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {shareCopied ? 'copied' : 'copy the story'}
+            </button>
+          </div>
         </div>
       </section>
 
@@ -476,14 +538,73 @@ function App() {
               </div>
             ))}
           </div>
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-[#202534]/15 pt-5">
-            <div className="flex items-center gap-2 text-sm text-[#5c5b62]"><Activity className="h-4 w-4 text-[#4a8b68]" /> No live wallet connection here — this is the product promise.</div>
+           <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-[#202534]/15 pt-5">
+             <div className="flex items-center gap-2 text-sm text-[#5c5b62]"><Activity className="h-4 w-4 text-[#4a8b68]" /> Connect below for a read-only warrior preview.</div>
             <button type="button" onClick={copyContract} data-testid="button-copy-contract" className="mono-face flex items-center gap-2 text-[9px] text-[#6e6b72] hover:text-[#ec642f]">{copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied ? 'copied' : 'copy launch label'}</button>
           </div>
         </div>
       </section>
 
-      <section id="evolution" className="scroll-mt-10 bg-[#ded7c8] py-24 md:py-36" data-testid="section-evolution">
+       <section id="watch" className="scroll-mt-10 border-y-2 border-[#202534] bg-[#f5bf58] py-24 md:py-32" data-testid="section-watch">
+         <div className="mx-auto max-w-[1320px] px-5 md:px-10">
+           <div className="grid gap-12 md:grid-cols-[.8fr_1.2fr] md:items-end">
+             <div>
+               <div className="mono-face mb-5 text-[10px] text-[#ec642f]">02 / watch my warrior</div>
+               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">See what your<br /><span className="text-[#ec642f]">bag becomes.</span></h2>
+             </div>
+             <p className="max-w-[500px] text-lg leading-relaxed text-[#4c4b51]">Connect a wallet to preview the current form before you mint. This is a read-only preview: no approval, transaction, or custody.</p>
+           </div>
+           <div className="mt-12 grid gap-4 lg:grid-cols-[.78fr_1.22fr]">
+             <div className="border-2 border-[#202534] bg-[#eee9dd] p-6 md:p-8">
+               <div className="flex items-center justify-between gap-4">
+                 <div className="mono-face text-[10px] text-[#ec642f]">wallet check / read-only</div>
+                 <LockKeyhole className="h-4 w-4 text-[#4a8b68]" />
+               </div>
+               <h3 className="display-face mt-8 text-4xl font-bold leading-none">Watch my<br />warrior</h3>
+               <p className="mt-5 text-base leading-relaxed text-[#5c5b62]">Your wallet can preview a form before it owns an NFT. Mint later to lock the snapshot and start the clock.</p>
+               <button type="button" onClick={() => { void previewWalletPerformance(); }} disabled={previewState === 'loading'} data-testid="button-preview-wallet" className="button-cut mt-8 bg-[#202534] px-5 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">
+                 {previewState === 'loading' ? 'checking wallet…' : previewState === 'ready' ? 'refresh preview' : 'connect wallet to preview'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
+               </button>
+               <div className="mt-5 border-l-2 border-[#ec642f] pl-4 text-sm leading-relaxed text-[#6e6b72]" aria-live="polite" data-testid="preview-wallet-status">
+                 {previewState === 'idle' && <span>Sample form for now. Live bag scoring arrives with the metadata layer.</span>}
+                 {previewState === 'loading' && <span>Wallet access is read-only. No signature or approval is requested.</span>}
+                 {previewState === 'ready' && <span>Connected {previewWallet.slice(0, 6)}…{previewWallet.slice(-4)}. Preview only — this warrior is not minted.</span>}
+                 {previewState === 'error' && <span>A compatible wallet is needed. No transaction was requested.</span>}
+               </div>
+             </div>
+             <div className="border-2 border-[#202534] bg-[#272b3a] p-5 text-[#eee9dd] md:p-8">
+               <div className="flex flex-wrap items-start justify-between gap-5">
+                 <div>
+                   <div className="mono-face text-[9px] text-[#aaa7a0]">current form / preview</div>
+                   <div className="display-face mt-2 text-4xl text-[#f5bf58]">{previewStage.name}</div>
+                 </div>
+                 <div className="text-right">
+                   <div className="mono-face text-[9px] text-[#aaa7a0]">status</div>
+                   <div className="mt-2 font-mono text-xs text-[#f5bf58]">not minted</div>
+                 </div>
+               </div>
+               <div className="mt-6 grid gap-6 sm:grid-cols-[180px_1fr] sm:items-center">
+                 <div className="mx-auto w-full max-w-[180px]"><WarriorIllustration stage={previewStage.key} /></div>
+                 <div>
+                   <div className="border-b border-[#eee9dd]/20 pb-4">
+                     <div className="mono-face text-[9px] text-[#aaa7a0]">sample rank</div>
+                     <div className="mt-2 font-mono text-2xl text-[#eee9dd]">#{previewRank} <span className="text-sm text-[#aaa7a0]">of {previewHolderCount}</span></div>
+                   </div>
+                   <div className="border-b border-[#eee9dd]/20 py-4">
+                     <div className="mono-face text-[9px] text-[#aaa7a0]">sample growth</div>
+                     <div className="mt-2 font-mono text-2xl text-[#4a8b68]">+71%</div>
+                     <div className="mt-1 text-xs text-[#aaa7a0]">since the snapshot</div>
+                   </div>
+                   <div className="pt-4 text-sm leading-relaxed text-[#aaa7a0]"><RotateCcw className="mr-2 inline h-4 w-4 text-[#ec642f]" /> Minted 9 days ago? This is the same token.</div>
+                 </div>
+               </div>
+               <div className="mt-6 border border-[#ec642f]/50 bg-[#ec642f]/10 px-4 py-3 text-sm font-bold text-[#f5bf58]">Transfer resets the run. Buying the look does not buy the history.</div>
+             </div>
+           </div>
+         </div>
+       </section>
+
+       <section id="evolution" className="scroll-mt-10 bg-[#ded7c8] py-24 md:py-36" data-testid="section-evolution">
         <div className="mx-auto max-w-[1320px] px-5 md:px-10">
           <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
@@ -538,9 +659,9 @@ function App() {
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <div>
               <div className="mono-face mb-5 text-[10px] text-[#f5bf58]">04 / public signal</div>
-              <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Who is<br /><span className="text-[#ec642f]">still climbing?</span></h2>
+               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Holders<br /><span className="text-[#ec642f]">this week.</span></h2>
             </div>
-             <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">Every NFT competes in the global holder ranking once its seven-day run is eligible.</p>
+              <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">A challenge board for the wallets climbing fastest. Every row has a face, a level, and a run worth defending.</p>
           </div>
           <div className="mt-12 flex flex-col justify-between gap-4 border-y border-[#eee9dd]/15 py-4 md:flex-row md:items-center">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter leaderboard by stage">
@@ -548,19 +669,39 @@ function App() {
                 <button type="button" key={filter} onClick={() => setLeaderboardFilter(filter)} data-testid={`button-filter-${filter}`} className={`mono-face border px-3 py-2 text-[9px] transition-colors ${leaderboardFilter === filter ? 'border-[#f5bf58] bg-[#f5bf58] text-[#202534]' : 'border-[#eee9dd]/20 text-[#aaa7a0] hover:border-[#f5bf58] hover:text-[#f5bf58]'}`}>{filter === 'all' ? 'all NFTs' : stages.find((stage) => stage.key === filter)?.name}</button>
               ))}
             </div>
-             <button type="button" onClick={() => setSortMode(sortMode === 'rank' ? 'pnl' : 'rank')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'rank' ? 'global rank' : 'P&L'} <ChevronDown className="h-3.5 w-3.5" /></button>
+             <button type="button" onClick={() => setSortMode(sortMode === 'rank' ? 'growth' : 'rank')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'rank' ? 'global rank' : 'growth'} <ChevronDown className="h-3.5 w-3.5" /></button>
           </div>
-          <div className="mt-4 overflow-x-auto">
-            <div className="min-w-[700px]">
-              <div className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] gap-4 px-4 py-3 mono-face text-[9px] text-[#777985]"><span>rank / holders</span><span>NFT / wallet</span><span>level</span><span>current value</span><span>P&L since snapshot</span></div>
-              {visibleWarriors.map((warrior, index) => {
-                const stage = stages.find((item) => item.key === warrior.stage) ?? stages[0];
-                 return <div key={warrior.name} data-testid={`row-leaderboard-${warrior.name}`} className="grid grid-cols-[90px_1.6fr_1fr_1fr_1fr] items-center gap-4 border-t border-[#eee9dd]/15 px-4 py-5 transition-colors hover:bg-[#2b3042]"><span className={`font-mono text-sm ${index === 0 ? 'text-[#f5bf58]' : 'text-[#777985]'}`}>{String(warrior.holderRank).padStart(2, '0')}<span className="text-[10px] text-[#777985]"> / {warrior.holderCount}</span></span><div><div className="font-bold">{warrior.name}</div><div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div></div><span className="flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</span><span className="font-mono text-[#f5bf58]">{warrior.bag}</span><span className="font-mono text-[#4a8b68]">{formatPnl(warrior.pnl)}</span></div>;
-              })}
-              {visibleWarriors.length === 0 && <div className="border-t border-[#eee9dd]/15 py-14 text-center text-[#aaa7a0]" data-testid="empty-leaderboard">No NFTs at this stage yet. The arena is still open.</div>}
-            </div>
+           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+             {visibleWarriors.map((warrior, index) => {
+               const stage = stages.find((item) => item.key === warrior.stage) ?? stages[0];
+               return (
+                 <article key={warrior.name} data-testid={`row-leaderboard-${warrior.name}`} className="group border-2 border-[#eee9dd]/15 bg-[#272b3a] p-4 transition-colors hover:border-[#f5bf58] hover:bg-[#2b3042]">
+                   <div className="flex items-start justify-between gap-3">
+                     <div className={`font-mono text-sm ${index === 0 ? 'text-[#f5bf58]' : 'text-[#777985]'}`}>#{warrior.holderRank} <span className="text-[10px] text-[#777985]">/ {warrior.holderCount}</span></div>
+                     <div className="mono-face border border-[#ec642f]/60 px-2 py-1 text-[8px] text-[#ec642f]">sample data</div>
+                   </div>
+                   <div className="mt-4 grid grid-cols-[112px_1fr] gap-4">
+                     <div className="w-full"><WarriorIllustration stage={warrior.stage} /></div>
+                     <div className="min-w-0">
+                       <div className="truncate font-bold">{warrior.name}</div>
+                       <div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div>
+                       <div className="mt-5 flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</div>
+                       <div className="mt-4 border-t border-[#eee9dd]/15 pt-3">
+                         <div className="mono-face text-[8px] text-[#777985]">growth this week</div>
+                         <div className="mt-1 font-mono text-xl text-[#4a8b68]">{formatGrowth(warrior.growthPct)}</div>
+                       </div>
+                     </div>
+                   </div>
+                   <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#eee9dd]/15 pt-3 text-xs">
+                     <span className="font-mono text-[#f5bf58]">{warrior.bag}</span>
+                     <span className="text-[#aaa7a0]">transfer resets run</span>
+                   </div>
+                 </article>
+               );
+             })}
+             {visibleWarriors.length === 0 && <div className="border-t border-[#eee9dd]/15 py-14 text-center text-[#aaa7a0]" data-testid="empty-leaderboard">No NFTs at this stage yet. The arena is still open.</div>}
           </div>
-           <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Preview global ranking: 247 eligible holders. Live holder rankings arrive with the metadata layer.</div>
+            <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Sample challenge board: 247 preview holders. Live holder rankings arrive with the metadata layer.</div>
         </div>
       </section>
 

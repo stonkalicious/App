@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { ethers } from "ethers";
 
-const required = ["RPC_URL", "DEPLOYER_PRIVATE_KEY", "SNAPSHOT_ORACLE", "MINT_SIGNER"];
+const required = ["RPC_URL", "DEPLOYER_PRIVATE_KEY", "SNAPSHOT_ORACLE", "MINT_SIGNER", "ROYALTY_RECEIVER"];
 for (const key of required) {
   if (!process.env[key]) {
     throw new Error(`${key} is required; provide it through the deployment environment's secret manager`);
@@ -28,6 +28,9 @@ for (const [role, address] of Object.entries(roleAddresses)) {
     throw new Error(`${role} must be a non-zero EVM address`);
   }
 }
+if (!ethers.isAddress(process.env.ROYALTY_RECEIVER) || process.env.ROYALTY_RECEIVER === ethers.ZeroAddress) {
+  throw new Error("royaltyReceiver must be a non-zero EVM address");
+}
 const uniqueRoles = new Set(Object.values(roleAddresses).map((address) => address.toLowerCase()));
 if (uniqueRoles.size !== Object.keys(roleAddresses).length) {
   throw new Error("deployer, snapshotOracle, and mintSigner must be separate addresses");
@@ -49,6 +52,7 @@ const contract = await factory.deploy(
   baseTokenURI,
   process.env.SNAPSHOT_ORACLE,
   process.env.MINT_SIGNER,
+  process.env.ROYALTY_RECEIVER,
 );
 await contract.waitForDeployment();
 await (await contract.setContractURI(contractURI)).wait();
@@ -65,5 +69,7 @@ console.log(JSON.stringify({
   contractURI,
   snapshotOracle: process.env.SNAPSHOT_ORACLE,
   mintSigner: process.env.MINT_SIGNER,
+  royaltyReceiver: process.env.ROYALTY_RECEIVER,
+  royaltyBasisPoints: "500",
   snapshotWriteInterface: "recordStartingBagValue(tokenId, expectedEpoch, startingBagValue)",
 }, null, 2));

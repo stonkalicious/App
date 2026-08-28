@@ -116,8 +116,8 @@ router.get("/collection", (req, res) => {
     description: "A live performance identity that reflects its owner's qualifying Robinhood Chain coin bag.",
     image: `${oracle.config.metadataBaseUrl}/images/plumber.png`,
     external_link: oracle.config.metadataBaseUrl,
-    seller_fee_basis_points: 0,
-    fee_recipient: oracle.config.feeRecipient,
+    seller_fee_basis_points: 500,
+    fee_recipient: oracle.config.royaltyReceiver,
   });
 });
 

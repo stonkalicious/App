@@ -26,6 +26,7 @@ released, and no public mint or announcement is authorized.
 | Deployer role | **Not configured** |
 | Snapshot-oracle role | **Not configured** |
 | Mint-signer role | **Not configured** |
+| Royalty receiver | **Not configured** |
 | Explorer source verification | Not applicable — no deployment |
 
 The three operational roles must use separate non-zero addresses:
@@ -57,6 +58,8 @@ explorer verification, or production metadata availability.
 - [ ] Configure and validate the official testnet RPC and chain ID.
 - [ ] Choose and review final contract parameters.
 - [ ] Configure separate deployer, snapshot-oracle, and mint-signer addresses.
+- [ ] Configure and review the explicit royalty receiver and fixed 5% ERC-2981
+      policy.
 - [ ] Configure the explicit Robinhood Chain coin-only allowlist.
 - [ ] Deploy with a dedicated testnet wallet.
 - [ ] Verify deployed source and constructor values on the testnet explorer.
@@ -74,6 +77,8 @@ explorer verification, or production metadata availability.
        configured oracle can write once per epoch and the owner cannot. Confirm
        `snapshotWriteEpoch(tokenId) == snapshotOf(tokenId).epoch` after a write,
        including a zero-valued write, and keep metadata unavailable until then.
+- [ ] Confirm `supportsInterface(0x2a55205a)` and `royaltyInfo` return the
+      configured receiver and 500 basis points on the deployed contract.
 - [ ] Confirm no mainnet transaction, public mint, funding request, or
       announcement is included in the testnet rehearsal.
 
@@ -115,3 +120,5 @@ Do not proceed if any of the following is true:
    design decision, test, and operational control.
 9. Source verification, transfer reset, identity uniqueness, or pause recovery
    fails on testnet.
+10. The deployed royalty receiver or ERC-2981 rate differs from the reviewed
+    5% policy.

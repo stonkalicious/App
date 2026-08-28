@@ -17,6 +17,10 @@ or private key.
   wallet, optional X profile hash, challenge, nonce, and expiry. A zero profile
   hash is valid for wallet-only claims. `maxPerWallet` must be configured as
   `1`, and admin/free allocations count against the same wallet ledger.
+- Secondary-sale royalty signaling uses ERC-2981 with a fixed 5% rate
+  (`500` basis points) and an explicit immutable receiver configured at
+  deployment. ERC-2981 is a marketplace signal; it does not force a marketplace
+  to pay royalties.
 - An authorized identity verifier can bind one hashed X account identifier to
   one active NFT. The raw X handle and OAuth credentials stay off-chain.
 - `recordStartingBagValue(tokenId, expectedEpoch, startingBagValue)` is called
@@ -55,7 +59,7 @@ pnpm --dir contracts run check
 
 The tests use a disposable local EVM and verify minting, exact payment,
 per-wallet limits, ownership, snapshot recording, transfer resets, metadata,
-and owner/oracle permissions.
+royalty signaling, and owner/oracle permissions.
 
 ## Robinhood Chain testnet checklist
 
@@ -89,6 +93,7 @@ CONTRACT_URI=https://metadata.example/collection \
 MAX_SUPPLY=10000 \
 MINT_PRICE_ETH=0.01 \
 MAX_PER_WALLET=1 \
+ROYALTY_RECEIVER=0x... \
 pnpm --dir contracts run deploy:testnet
 ```
 

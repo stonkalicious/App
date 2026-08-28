@@ -8,6 +8,7 @@ const wallet = "0x1111111111111111111111111111111111111111";
 const otherWallet = "0x2222222222222222222222222222222222222222";
 const assetContract = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const contractAddress = `0x${"b".repeat(40)}`;
+const royaltyReceiver = "0x3333333333333333333333333333333333333333";
 
 let assetMode = "fresh";
 let snapshotEpoch = 1;
@@ -110,6 +111,7 @@ async function startApi(metadataPublic) {
       ORACLE_CACHE_TTL_MS: "50",
       ORACLE_STALE_TTL_MS: "150",
       METADATA_PUBLIC: metadataPublic ? "true" : "false",
+      ROYALTY_RECEIVER: royaltyReceiver,
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -144,6 +146,11 @@ try {
 
   const api = await startApi(true);
   const metadataUrl = (tokenId) => `http://127.0.0.1:${api.port}/api/token/${tokenId}`;
+   const collectionResponse = await fetch(`http://127.0.0.1:${api.port}/api/collection`);
+   assert.equal(collectionResponse.status, 200, "collection metadata is served");
+   const collection = await collectionResponse.json();
+   assert.equal(collection.seller_fee_basis_points, 500);
+   assert.equal(collection.fee_recipient, royaltyReceiver);
 
   snapshotWriteEpoch = 0;
   const pendingResponse = await fetch(metadataUrl(1));

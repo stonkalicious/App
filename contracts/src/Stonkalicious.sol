@@ -11,6 +11,7 @@ contract Stonkalicious {
     uint256 public immutable maxSupply;
     uint256 public immutable mintPrice;
     uint256 public immutable maxPerWallet;
+    address public immutable royaltyReceiver;
 
     address public owner;
     address public pendingOwner;
@@ -22,6 +23,9 @@ contract Stonkalicious {
     uint256 private _nextTokenId = 1;
     uint256 public totalSupply;
     uint256 public constant TRANSFER_LOCK = 7 days;
+    uint256 public constant ROYALTY_BASIS_POINTS = 500;
+    uint256 private constant _BASIS_POINTS_DENOMINATOR = 10_000;
+    bytes4 private constant _ERC2981_INTERFACE_ID = 0x2a55205a;
     bytes32 private constant _DOMAIN_TYPEHASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
     bytes32 private constant _MINT_TYPEHASH =
@@ -120,13 +124,15 @@ contract Stonkalicious {
         uint256 maxPerWallet_,
         string memory baseTokenURI_,
         address snapshotOracle_,
-        address mintSigner_
+        address mintSigner_,
+        address royaltyReceiver_
     ) {
         if (maxSupply_ == 0 || maxPerWallet_ != 1 || maxPerWallet_ > maxSupply_) {
             revert InvalidQuantity();
         }
         if (snapshotOracle_ == address(0)) revert InvalidAddress();
         if (mintSigner_ == address(0)) revert InvalidAddress();
+        if (royaltyReceiver_ == address(0)) revert InvalidAddress();
         owner = msg.sender;
         maxSupply = maxSupply_;
         mintPrice = mintPrice_;
@@ -134,6 +140,7 @@ contract Stonkalicious {
         _baseTokenURI = baseTokenURI_;
         snapshotOracle = snapshotOracle_;
         mintSigner = mintSigner_;
+        royaltyReceiver = royaltyReceiver_;
         emit OwnershipTransferred(address(0), msg.sender);
         emit SnapshotOracleUpdated(address(0), snapshotOracle_);
         emit MintSignerUpdated(address(0), mintSigner_);
@@ -338,6 +345,10 @@ contract Stonkalicious {
         return _contractURI;
     }
 
+    function royaltyInfo(uint256, uint256 salePrice) external view returns (address receiver, uint256 royaltyAmount) {
+        return (royaltyReceiver, salePrice * ROYALTY_BASIS_POINTS / _BASIS_POINTS_DENOMINATOR);
+    }
+
     function baseTokenURI() external view returns (string memory) {
         return _baseTokenURI;
     }
@@ -373,7 +384,7 @@ contract Stonkalicious {
     }
 
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
-        return interfaceId == 0x01ffc9a7 || interfaceId == 0x80ac58cd || interfaceId == 0x5b5e139f || interfaceId == 0x49064906;
+        return interfaceId == 0x01ffc9a7 || interfaceId == 0x80ac58cd || interfaceId == 0x5b5e139f || interfaceId == 0x49064906 || interfaceId == _ERC2981_INTERFACE_ID;
     }
 
     function _transfer(address from, address to, uint256 tokenId) internal {

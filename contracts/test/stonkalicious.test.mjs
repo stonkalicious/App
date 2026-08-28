@@ -21,6 +21,7 @@ async function fixture() {
     "https://metadata.stonkalicious.xyz/token/",
     await oracle.getAddress(),
     await mintSigner.getAddress(),
+    await bob.getAddress(),
   );
   await contract.waitForDeployment();
   return { server, provider, contract, owner, oracle, mintSigner, alice, bob, stranger };
@@ -52,7 +53,7 @@ async function mintOne(contract, signer, wallet, nonce, profile) {
 }
 
 test("mints with configured price and exposes metadata and snapshot state", async () => {
-  const { server, contract, mintSigner, alice } = await fixture();
+  const { server, contract, mintSigner, alice, bob } = await fixture();
   try {
     await (await mintOne(contract, mintSigner, alice, 1)).wait();
     assert.equal(await contract.totalSupply(), 1n);
@@ -60,12 +61,36 @@ test("mints with configured price and exposes metadata and snapshot state", asyn
     assert.equal(await contract.tokenURI(1), "https://metadata.stonkalicious.xyz/token/1");
     await (await contract.setContractURI("https://metadata.stonkalicious.xyz/collection")).wait();
     assert.equal(await contract.contractURI(), "https://metadata.stonkalicious.xyz/collection");
+    assert.equal(await contract.supportsInterface("0x2a55205a"), true);
+    assert.equal(await contract.royaltyReceiver(), await bob.getAddress());
+    assert.equal(await contract.ROYALTY_BASIS_POINTS(), 500n);
+    const royalty = await contract.royaltyInfo(1, 12345n);
+    assert.equal(royalty[0], await bob.getAddress());
+    assert.equal(royalty[1], 12345n * 500n / 10000n);
     assert.equal(await contract.supportsInterface("0x49064906"), true);
     const snapshot = await contract.snapshotOf(1);
     assert.equal(snapshot.wallet, await alice.getAddress());
     assert.equal(snapshot.startingBagValue, 0n);
     assert.equal(snapshot.epoch, 1n);
     assert.equal(await contract.snapshotWriteEpoch(1), 0n);
+  } finally {
+    await server.close();
+  }
+});
+
+test("rejects a zero royalty receiver during deployment", async () => {
+  const { server, owner, oracle, mintSigner } = await fixture();
+  try {
+    const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode, owner);
+    await assert.rejects(factory.deploy(
+      10,
+      ethers.parseEther("0.01"),
+      1,
+      "https://metadata.stonkalicious.xyz/token/",
+      await oracle.getAddress(),
+      await mintSigner.getAddress(),
+      ethers.ZeroAddress,
+    ));
   } finally {
     await server.close();
   }

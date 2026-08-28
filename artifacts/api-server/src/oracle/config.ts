@@ -49,7 +49,7 @@ export type OracleConfig = {
   cacheTtlMs: number;
   staleTtlMs: number;
   metadataPublic: boolean;
-  feeRecipient: string;
+  royaltyReceiver: string;
 };
 
 export function getOracleConfig(): OracleConfig {
@@ -58,8 +58,10 @@ export function getOracleConfig(): OracleConfig {
   if (!Number.isFinite(cacheTtlMs) || cacheTtlMs <= 0 || !Number.isFinite(staleTtlMs) || staleTtlMs < cacheTtlMs) {
     throw new Error("Oracle cache TTL values are invalid");
   }
-  const feeRecipient = process.env.METADATA_FEE_RECIPIENT ?? "0x0000000000000000000000000000000000000000";
-  if (!addressPattern.test(feeRecipient)) throw new Error("METADATA_FEE_RECIPIENT must be a valid EVM address");
+  const royaltyReceiver = process.env.ROYALTY_RECEIVER ?? process.env.METADATA_FEE_RECIPIENT;
+  if (!royaltyReceiver || !addressPattern.test(royaltyReceiver) || royaltyReceiver === "0x0000000000000000000000000000000000000000") {
+    throw new Error("ROYALTY_RECEIVER must be a non-zero EVM address");
+  }
   return {
     metadataBaseUrl: required("METADATA_BASE_URL").replace(/\/$/, ""),
     rpcUrl: required("ROBINHOOD_RPC_URL"),
@@ -69,6 +71,6 @@ export function getOracleConfig(): OracleConfig {
     cacheTtlMs,
     staleTtlMs,
     metadataPublic: process.env.METADATA_PUBLIC === "true",
-    feeRecipient,
+    royaltyReceiver,
   };
 }

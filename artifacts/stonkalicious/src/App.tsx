@@ -480,9 +480,6 @@ function App() {
            <h1 className="max-w-[760px] font-sans text-[clamp(3.75rem,7vw,6.8rem)] font-black leading-[.9] tracking-[-.07em]">
              who’s <span className="text-[#ec642f]">king</span><br />of the<br />Hood?
           </h1>
-           <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
-                An illustrative wallet snapshot. If enabled, the form can change with new data.
-          </p>
            <div className="mt-9 flex flex-wrap items-center gap-4">
               <button type="button" onClick={() => handleAction('Mint details are being locked. Join the signal to get the first drop notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#ec642f] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
                 get launch access <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />

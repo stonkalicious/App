@@ -81,7 +81,7 @@ const stageDefinitions: Array<[StageKey, string, string, string, string]> = [
   ['liquidated', '13–24 strength', 'The first real momentum shows. The orb catches heat and the run has room to grow.', 'first momentum / warm glow', '#8d4654'],
   ['back', '25–36 strength', 'The comeback becomes a contest. The NFT has a plan, a pulse, and something to defend.', 'patched kit / contender spark', '#bd7653'],
   ['wrecked', '37–48 strength', 'The bag is taking shape. Layer by layer, the orb carries more weight and the signal gets louder.', 'layered kit / stacked glow', '#a75a48'],
-  ['hardened', '49–60 strength', 'The coin bag has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c'],
+  ['hardened', '49–60 strength', '', 'battle helmet / real fire', '#df7e3c'],
   ['profitable', '61–72 strength', 'The numbers have become a discipline. Every move sharpens the shape of the run.', 'war paint / master glow', '#d99a48'],
   ['elite', '73–88 strength', 'A battle-worn status symbol. Bright flames, a hard gaze, and nothing left to prove.', 'worn armor / bright aura', '#f5bf58'],
   ['plumber', '89+ strength', 'The Final Form', 'mythic kit / maxed-out aura', '#e8d8ac'],
@@ -655,7 +655,7 @@ function App() {
                <div className="flex flex-wrap items-start justify-between gap-5">
                  <div>
                     <div className="mono-face text-[9px] text-[#aaa7a0]">illustrative form / preview</div>
-                   <div className="display-face mt-2 text-4xl text-[#f5bf58]">{previewStage.name}</div>
+                    <div className="display-face mt-2 text-4xl text-[#f5bf58]">Elite</div>
                  </div>
                  <div className="text-right">
                    <div className="mono-face text-[9px] text-[#aaa7a0]">status</div>
@@ -707,7 +707,7 @@ function App() {
                 <div className="absolute left-0 top-0 mono-face text-[9px] text-[#aaa7a0]">{selectedStage.threshold}</div>
                 <div className="absolute right-0 top-0 text-right"><div className="mono-face text-[9px] text-[#aaa7a0]">trait</div><div className="mt-1 text-sm text-[#eee9dd]">{selectedStage.trait}</div></div>
                 <div className="flex justify-center pt-10"><WarriorIllustration stage={activeStage} /></div>
-                <div className="mt-[-20px] border-t border-[#eee9dd]/20 pt-4"><p className="max-w-[500px] text-sm leading-relaxed text-[#aaa7a0]">{selectedStage.description}</p></div>
+                 {selectedStage.description && <div className="mt-[-20px] border-t border-[#eee9dd]/20 pt-4"><p className="max-w-[500px] text-sm leading-relaxed text-[#aaa7a0]">{selectedStage.description}</p></div>}
               </div>
             </div>
           </div>

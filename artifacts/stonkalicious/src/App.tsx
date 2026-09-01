@@ -161,7 +161,6 @@ function BrandMark() {
       </div>
       <div>
         <div className="display-face text-[18px] font-extrabold leading-none tracking-[-.08em]">stonkalicious</div>
-        <div className="mono-face mt-1 text-[9px] text-[#6e6b72]">coin status</div>
       </div>
     </div>
   );
@@ -474,7 +473,7 @@ function App() {
 
       <section id="top" className="mx-auto grid max-w-[1320px] gap-12 px-5 pb-24 pt-10 md:grid-cols-[1.04fr_.96fr] md:items-center md:px-10 md:pb-36 md:pt-16">
         <div className="reveal-up">
-          <div className="mono-face mb-7 flex items-center gap-3 text-[10px] text-[#ec642f]">
+          <div className="mono-face mb-7 flex items-center gap-3 text-[12px] text-[#ec642f]">
             <span className="h-px w-10 bg-[#ec642f]" /> dynamic nft / robinhood chain
           </div>
            <h1 className="max-w-[760px] font-sans text-[clamp(3.75rem,7vw,6.8rem)] font-black leading-[.9] tracking-[-.07em]">
@@ -499,8 +498,8 @@ function App() {
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {[
-              { label: 'start / example', stage: startStage, value: '$34,820 example' },
-              { label: 'now / example', stage: selectedStage, value: '+71% example change' },
+               { label: 'start / example', stage: startStage, title: '', value: '' },
+                { label: 'now / example', stage: selectedStage, title: 'Elite', value: '' },
             ].map((frame) => (
               <div key={frame.label} className="border border-[#eee9dd]/20 bg-[#202534]/45 p-3">
                 <div className="flex items-start justify-between gap-2">
@@ -510,17 +509,17 @@ function App() {
                 <div className="mt-3 flex justify-center">
                   <div className="w-full max-w-[190px]"><WarriorIllustration stage={frame.stage.key} /></div>
                 </div>
-                <div className="mt-3 border-t border-[#eee9dd]/20 pt-3">
-                  <div className="display-face text-2xl text-[#eee9dd]">{frame.stage.name}</div>
-                  <div className="mt-1 font-mono text-xs" style={{ color: frame.stage.color }}>{frame.value}</div>
-                </div>
+                 {(frame.title || frame.value) && <div className="mt-3 border-t border-[#eee9dd]/20 pt-3">
+                    {frame.title && <div className="display-face text-2xl text-[#eee9dd]">{frame.title}</div>}
+                    {frame.value && <div className="mt-1 font-mono text-xs" style={{ color: frame.stage.color }}>{frame.value}</div>}
+                 </div>}
               </div>
             ))}
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#eee9dd]/20 pt-4">
             <div>
               <div className="mono-face text-[9px] text-[#aaa7a0]">illustrative card / no live result</div>
-              <div className="mt-1 text-sm font-bold text-[#eee9dd]">{selectedStage.name} · example rank #12</div>
+               <div className="mt-1 text-sm font-bold text-[#eee9dd]">Elite · example rank #12</div>
             </div>
             <button type="button" onClick={() => { void copyShareCaption(); }} data-testid="button-copy-share-caption" className="mono-face flex items-center gap-2 border border-[#f5bf58] px-3 py-2 text-[9px] text-[#f5bf58] transition-colors hover:bg-[#f5bf58] hover:text-[#202534]">
               {shareCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {shareCopied ? 'copied' : 'copy the story'}

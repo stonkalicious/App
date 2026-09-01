@@ -552,7 +552,7 @@ function App() {
             <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">An NFT that mirrors<br /><span className="text-[#7666c9]">your bag.</span></h2>
           </div>
           <div className="max-w-[490px]">
-             <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one NFT, show off your level. When enabled, the metadata service can read public data for qualifying Robinhood Chain coins to calculate an illustrative state. It cannot move, trade, approve, or withdraw your coins. This site will never ask for a seed phrase, private key, or coin approval.</p>
+              <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one NFT, show off your level. When enabled, stonkalicious can read public data for qualifying Robinhood Chain coins to calculate you're dollar ROI. It cannot move, trade, approve, or withdraw your coins. This site will never ask for a seed phrase, private key, or coin approval.</p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                  [WalletCards, 'read-only by design', 'It observes the wallet. It never controls the wallet.'],

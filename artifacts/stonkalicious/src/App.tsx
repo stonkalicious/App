@@ -498,7 +498,7 @@ function App() {
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {[
-               { label: 'start / example', stage: startStage, title: '', value: '' },
+               { label: 'start / example', stage: startStage, title: 'Beginning', value: '' },
                 { label: 'now / example', stage: selectedStage, title: 'Elite', value: '' },
             ].map((frame) => (
               <div key={frame.label} className="border border-[#eee9dd]/20 bg-[#202534]/45 p-3">

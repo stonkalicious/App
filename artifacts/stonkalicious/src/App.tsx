@@ -740,7 +740,7 @@ function App() {
               <div className="mono-face mb-5 text-[10px] text-[#f5bf58]">04 / public signal</div>
                <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Preview<br /><span className="text-[#ec642f]">board only.</span></h2>
             </div>
-               <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">An illustrative challenge-board layout for when live, verified data is available. These preview rows are not holder results.</p>
+               <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">Preview leaderboard</p>
           </div>
           <div className="mt-12 flex flex-col justify-between gap-4 border-y border-[#eee9dd]/15 py-4 md:flex-row md:items-center">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter leaderboard by stage">

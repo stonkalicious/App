@@ -32,13 +32,13 @@ function metadataFor(tokenId: string, score: ScoredWarrior & { wallet: string; e
   const imageLevel = score.stage;
   return {
     name: `Stonkalicious #${tokenId} — ${score.level}`,
-    description: "A live performance identity that reflects its owner's qualifying Robinhood Chain coin bag.",
+    description: "An experimental digital collectible whose level may be calculated from its owner's qualifying Robinhood Chain coin data when metadata is enabled. Data may be delayed, unavailable, or change.",
     image: `${config.metadataBaseUrl}/images/${imageLevel}.png`,
     external_url: `${config.metadataBaseUrl}/warriors/${tokenId}`,
     attributes: [
       { trait_type: "Level", value: score.level },
-      { trait_type: "Current value (USD)", value: score.currentValueUsd },
-      { trait_type: "ROI (%)", value: score.roiPct ?? "pending" },
+      { trait_type: "Eligible coin value (USD)", value: score.currentValueUsd },
+      { trait_type: "Snapshot change (%)", value: score.roiPct ?? "pending" },
       { trait_type: "Drawdown (%)", value: score.drawdownPct ?? "pending" },
       { trait_type: "Wallet", value: score.wallet },
       { trait_type: "Snapshot epoch", value: score.epoch },
@@ -113,7 +113,7 @@ router.get("/collection", (req, res) => {
   if (!oracle.config.metadataPublic) return lockedResponse(res);
   return res.json({
     name: "Stonkalicious",
-    description: "A live performance identity that reflects its owner's qualifying Robinhood Chain coin bag.",
+    description: "An experimental digital collectible whose level may be calculated from its owner's qualifying Robinhood Chain coin data when metadata is enabled. Data may be delayed, unavailable, or change.",
     image: `${oracle.config.metadataBaseUrl}/images/plumber.png`,
     external_link: oracle.config.metadataBaseUrl,
     seller_fee_basis_points: 500,

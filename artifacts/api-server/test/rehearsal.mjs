@@ -161,7 +161,7 @@ try {
   assert.equal(freshResponse.status, 200, "fresh metadata is served");
   const fresh = await freshResponse.json();
   assert.equal(fresh.properties.stale, false);
-  assert.equal(fresh.attributes.find((attribute) => attribute.trait_type === "Current value (USD)").value, 150);
+   assert.equal(fresh.attributes.find((attribute) => attribute.trait_type === "Eligible coin value (USD)").value, 150);
   assert.equal(fresh.attributes.find((attribute) => attribute.trait_type === "Data status").value, "fresh");
 
   snapshotEpoch = 2;

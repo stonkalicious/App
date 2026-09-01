@@ -262,7 +262,7 @@ function App() {
     try {
       await navigator.clipboard.writeText(referralLink);
       setReferralCopied(true);
-      setNotice('Referral link copied. Send it to the next warrior.');
+      setNotice('Share URL copied. It carries no reward or purchase credit.');
       window.setTimeout(() => setReferralCopied(false), 2400);
     } catch {
       setNotice(`Referral link: ${referralLink}`);
@@ -446,7 +446,7 @@ function App() {
              who’s <span className="text-[#ec642f]">king</span><br />of the<br />Hood?
           </h1>
            <p className="mt-9 max-w-[510px] text-lg leading-relaxed text-[#5c5b62] md:text-xl">
-                Your bag turned into this. Mint the snapshot. Come back when the form changes.
+                An illustrative wallet snapshot. If enabled, the form can change with new data.
           </p>
            <div className="mt-9 flex flex-wrap items-center gap-4">
               <button type="button" onClick={() => handleAction('Mint details are being locked. Join the signal to get the first drop notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#ec642f] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
@@ -503,7 +503,7 @@ function App() {
              ['8', 'coin-tested levels'],
              ['1', 'NFT per wallet'],
              ['1:1', 'wallet / optional X'],
-            ['∞', 'reasons to keep building'],
+             ['∞', 'reasons to keep watching'],
           ].map(([value, label], index) => (
             <div key={label} className={`px-5 py-7 md:px-10 ${index < 3 ? 'border-b border-[#eee9dd]/15 md:border-b-0 md:border-r' : ''}`}>
               <div className="display-face text-4xl text-[#f5bf58]">{value}</div>
@@ -533,31 +533,32 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="mt-20 grid-paper border-2 border-[#202534] p-5 md:p-10">
+         <div className="mt-20 grid-paper border-2 border-[#202534] p-5 md:p-10">
+           <div className="mb-7 flex items-center gap-2 mono-face text-[9px] text-[#ec642f]"><Sparkles className="h-3.5 w-3.5" /> illustrative example / not a live wallet result</div>
           <div className="grid gap-8 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">
             <div className="bg-[#eee9dd] p-5">
-              <div className="mono-face text-[9px] text-[#6e6b72]">snapshot / day zero</div>
+               <div className="mono-face text-[9px] text-[#6e6b72]">example snapshot / day zero</div>
               <div className="mt-3 font-mono text-2xl">$34,820</div>
-              <div className="mt-2 text-sm text-[#6e6b72]">your bag when the NFT became yours</div>
+               <div className="mt-2 text-sm text-[#6e6b72]">illustrative starting value</div>
             </div>
             <ArrowDownUp className="hidden h-7 w-7 text-[#ec642f] md:block" />
             <div className="bg-[#eee9dd] p-5">
-              <div className="mono-face text-[9px] text-[#6e6b72]">wallet mirror / now</div>
+               <div className="mono-face text-[9px] text-[#6e6b72]">example wallet mirror / now</div>
               <div className="mt-3 font-mono text-2xl text-[#4a8b68]">$76,340</div>
-              <div className="mt-2 text-sm text-[#6e6b72]">the current owner’s eligible coin value</div>
+               <div className="mt-2 text-sm text-[#6e6b72]">illustrative eligible value</div>
             </div>
             <ArrowDownUp className="hidden h-7 w-7 text-[#ec642f] md:block" />
             <div className="bg-[#202534] p-5 text-[#eee9dd]">
-              <div className="mono-face text-[9px] text-[#aaa7a0]">visual output / now</div>
+               <div className="mono-face text-[9px] text-[#aaa7a0]">example visual output / now</div>
                <div className="mt-3 display-face text-3xl text-[#f5bf58]">Forged</div>
-              <div className="mt-2 text-sm text-[#aaa7a0]">a stronger bag gets a stronger body</div>
+               <div className="mt-2 text-sm text-[#aaa7a0]">an illustrative state, not an outcome</div>
             </div>
           </div>
           <div className="mt-8 grid gap-4 border-t border-[#202534]/15 pt-5 sm:grid-cols-3">
             {[
-              ['ROI', '+120%', 'how hard the bag climbed'],
-              ['TIME', '184 days', 'how long you stayed in'],
-              ['TOTAL', '$76,340', 'current eligible value'],
+               ['CHANGE', '+120% example', 'illustrative snapshot delta'],
+               ['TIME', '184 days example', 'illustrative mint age'],
+               ['VALUE', '$76,340 example', 'illustrative eligible value'],
             ].map(([label, value, copy]) => (
               <div key={label} className="border-l-2 border-[#ec642f] pl-4">
                 <div className="mono-face text-[9px] text-[#6e6b72]">{label}</div>
@@ -580,7 +581,7 @@ function App() {
                <div className="mono-face mb-5 text-[10px] text-[#ec642f]">02 / watch my warrior</div>
                <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">See what your<br /><span className="text-[#ec642f]">bag becomes.</span></h2>
              </div>
-             <p className="max-w-[500px] text-lg leading-relaxed text-[#4c4b51]">Connect a wallet to preview the current form before you mint. This is a read-only preview: no approval, transaction, or custody.</p>
+              <p className="max-w-[500px] text-lg leading-relaxed text-[#4c4b51]">Connect a wallet to view the preview flow before any future mint. This demo does not calculate a live wallet score. No approval, transaction, or custody.</p>
            </div>
            <div className="mt-12 grid gap-4 lg:grid-cols-[.78fr_1.22fr]">
              <div className="border-2 border-[#202534] bg-[#eee9dd] p-6 md:p-8">
@@ -589,14 +590,14 @@ function App() {
                  <LockKeyhole className="h-4 w-4 text-[#4a8b68]" />
                </div>
                <h3 className="display-face mt-8 text-4xl font-bold leading-none">Watch my<br />warrior</h3>
-               <p className="mt-5 text-base leading-relaxed text-[#5c5b62]">Your wallet can preview a form before it owns an NFT. Mint later to lock the snapshot and start the clock.</p>
+                <p className="mt-5 text-base leading-relaxed text-[#5c5b62]">A wallet can preview the interface before it owns an NFT. If minting opens later, the recorded snapshot would start a new performance run.</p>
                <button type="button" onClick={() => { void previewWalletPerformance(); }} disabled={previewState === 'loading'} data-testid="button-preview-wallet" className="button-cut mt-8 bg-[#202534] px-5 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">
                  {previewState === 'loading' ? 'checking wallet…' : previewState === 'ready' ? 'refresh preview' : 'connect wallet to preview'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
                </button>
                <div className="mt-5 border-l-2 border-[#ec642f] pl-4 text-sm leading-relaxed text-[#6e6b72]" aria-live="polite" data-testid="preview-wallet-status">
-                 {previewState === 'idle' && <span>Sample form for now. Live bag scoring arrives with the metadata layer.</span>}
+                  {previewState === 'idle' && <span>Illustrative form only. Live bag scoring is not enabled in this preview.</span>}
                  {previewState === 'loading' && <span>Wallet access is read-only. No signature or approval is requested.</span>}
-                 {previewState === 'ready' && <span>Connected {previewWallet.slice(0, 6)}…{previewWallet.slice(-4)}. Preview only — this warrior is not minted.</span>}
+                  {previewState === 'ready' && <span>Connected {previewWallet.slice(0, 6)}…{previewWallet.slice(-4)}. Illustrative preview only — this warrior is not minted or live-scored.</span>}
                  {previewState === 'error' && <span>A compatible wallet is needed. No transaction was requested.</span>}
                </div>
                 {referrer && (
@@ -614,14 +615,14 @@ function App() {
                       </button>
                     </>
                   ) : (
-                    <div className="mt-2 text-sm text-[#6e6b72]">Connect your wallet to generate a link that carries your ref code.</div>
+                    <div className="mt-2 text-sm text-[#6e6b72]">Connect your wallet to generate a share URL carrying a ref code. No rewards or attribution credit are promised.</div>
                   )}
                 </div>
              </div>
              <div className="border-2 border-[#202534] bg-[#272b3a] p-5 text-[#eee9dd] md:p-8">
                <div className="flex flex-wrap items-start justify-between gap-5">
                  <div>
-                   <div className="mono-face text-[9px] text-[#aaa7a0]">current form / preview</div>
+                    <div className="mono-face text-[9px] text-[#aaa7a0]">illustrative form / preview</div>
                    <div className="display-face mt-2 text-4xl text-[#f5bf58]">{previewStage.name}</div>
                  </div>
                  <div className="text-right">
@@ -633,15 +634,15 @@ function App() {
                  <div className="mx-auto w-full max-w-[180px]"><WarriorIllustration stage={previewStage.key} /></div>
                  <div>
                    <div className="border-b border-[#eee9dd]/20 pb-4">
-                     <div className="mono-face text-[9px] text-[#aaa7a0]">sample rank</div>
+                      <div className="mono-face text-[9px] text-[#aaa7a0]">illustrative rank</div>
                      <div className="mt-2 font-mono text-2xl text-[#eee9dd]">#{previewRank} <span className="text-sm text-[#aaa7a0]">of {previewHolderCount}</span></div>
                    </div>
                    <div className="border-b border-[#eee9dd]/20 py-4">
-                     <div className="mono-face text-[9px] text-[#aaa7a0]">sample growth</div>
+                      <div className="mono-face text-[9px] text-[#aaa7a0]">illustrative growth</div>
                      <div className="mt-2 font-mono text-2xl text-[#4a8b68]">+71%</div>
                      <div className="mt-1 text-xs text-[#aaa7a0]">since the snapshot</div>
                    </div>
-                   <div className="pt-4 text-sm leading-relaxed text-[#aaa7a0]"><RotateCcw className="mr-2 inline h-4 w-4 text-[#ec642f]" /> Minted 9 days ago? This is the same token.</div>
+                    <div className="pt-4 text-sm leading-relaxed text-[#aaa7a0]"><RotateCcw className="mr-2 inline h-4 w-4 text-[#ec642f]" /> Example only — a live card would show its recorded snapshot and current level.</div>
                  </div>
                </div>
                <div className="mt-6 border border-[#ec642f]/50 bg-[#ec642f]/10 px-4 py-3 text-sm font-bold text-[#f5bf58]">Transfer resets the run. Buying the look does not buy the history.</div>
@@ -657,7 +658,7 @@ function App() {
               <div className="mono-face mb-5 text-[10px] text-[#ec642f]">02 / the evolution</div>
               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Eight levels.<br /><span className="text-[#ec642f]">No shortcuts.</span></h2>
             </div>
-            <p className="max-w-[340px] text-base leading-relaxed text-[#5c5b62]">Choose a level. Watch the same character mutate as the numbers behind him do.</p>
+             <p className="max-w-[340px] text-base leading-relaxed text-[#5c5b62]">Explore an illustrative level. In a live release, configured public data would determine the displayed state.</p>
           </div>
           <div className="grid gap-10 md:grid-cols-[.72fr_1.28fr] md:items-center">
             <div className="order-2 grid gap-2 md:order-1">
@@ -705,9 +706,9 @@ function App() {
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <div>
               <div className="mono-face mb-5 text-[10px] text-[#f5bf58]">04 / public signal</div>
-               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Holders<br /><span className="text-[#ec642f]">this week.</span></h2>
+               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Preview<br /><span className="text-[#ec642f]">board only.</span></h2>
             </div>
-              <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">A challenge board for the wallets climbing fastest. Every row has a face, a level, and a run worth defending.</p>
+               <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">An illustrative challenge-board layout for when live, verified data is available. These preview rows are not holder results.</p>
           </div>
           <div className="mt-12 flex flex-col justify-between gap-4 border-y border-[#eee9dd]/15 py-4 md:flex-row md:items-center">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter leaderboard by stage">
@@ -733,7 +734,7 @@ function App() {
                        <div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div>
                        <div className="mt-5 flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</div>
                        <div className="mt-4 border-t border-[#eee9dd]/15 pt-3">
-                         <div className="mono-face text-[8px] text-[#777985]">growth this week</div>
+                         <div className="mono-face text-[8px] text-[#777985]">example growth window</div>
                          <div className="mt-1 font-mono text-xl text-[#4a8b68]">{formatGrowth(warrior.growthPct)}</div>
                        </div>
                      </div>
@@ -747,7 +748,7 @@ function App() {
              })}
              {visibleWarriors.length === 0 && <div className="border-t border-[#eee9dd]/15 py-14 text-center text-[#aaa7a0]" data-testid="empty-leaderboard">No NFTs at this stage yet. The arena is still open.</div>}
           </div>
-            <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Sample challenge board: 247 preview holders. Live holder rankings arrive with the metadata layer.</div>
+             <div className="mt-8 flex items-center gap-3 text-sm text-[#777985]"><Swords className="h-4 w-4 text-[#ec642f]" /> Illustrative challenge board: 247 preview rows. Live holder rankings are not enabled in this preview.</div>
         </div>
       </section>
 
@@ -758,14 +759,14 @@ function App() {
            <div className="relative grid min-w-0 gap-10 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] xl:items-end">
              <div className="min-w-0">
               <div className="mono-face mb-5 text-[10px] text-[#ec642f]">05 / claim your mirror</div>
-               <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl xl:text-8xl">
+                <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl xl:text-8xl">
                  <span className="block">Make your</span>
-                 <span className="block">performance</span>
+                 <span className="block">snapshot</span>
                  <span className="block text-[#ec642f]">visible.</span>
                </h2>
             </div>
              <div className="min-w-0">
-              <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Prove wallet control to claim; linking X is optional if you want a public performance identity. Then let your coin bag write the record.</p>
+               <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Prove wallet control to request a future claim; linking X is optional if you want a public performance identity. If enabled, configured public coin data can update the visual record. No public mint is open in this preview.</p>
                <div className="mt-7 flex flex-wrap gap-3">
                  <button type="button" onClick={() => { void startWalletVerification(); }} disabled={identityBusy || identityKind !== null} data-testid="button-verify-wallet" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityKind === 'wallet' ? 'wallet verified' : identityBusy && identityKind === null ? 'checking wallet…' : 'verify wallet'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
                  <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityKind === 'x'} data-testid="button-join-signal" className="button-cut border-2 border-[#202534] px-6 py-4 font-bold text-[#202534] transition-transform hover:-translate-y-1 hover:bg-[#202534] hover:text-[#eee9dd] disabled:cursor-wait disabled:opacity-60">{identityKind === 'x' ? 'X linked' : 'link X (optional)'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#202534]" /></button>

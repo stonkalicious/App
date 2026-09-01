@@ -35,9 +35,10 @@ or private key.
   instead of treating a zero `startingBagValue` as proof that no write occurred.
 - On every transfer, the contract resets `startingBagValue` to zero, updates the
   wallet and timestamp, and increments the snapshot epoch.
-- The off-chain metadata service reads `ownerOf`, `snapshotOf`, and its own
-  allowlisted Robinhood Chain coin data to choose the current NFT level and
-  social performance card.
+  - The off-chain metadata service reads `ownerOf`, `snapshotOf`, and its own
+   allowlisted Robinhood Chain coin data to calculate the current NFT level and
+   metadata card when explicitly enabled. Website examples and preview rankings
+   are illustrative and are not live holder or wallet results.
   `tokenURI` points marketplaces at that service.
 - Metadata stays mutable by design. Base URI changes emit ERC-4906-compatible
   `BatchMetadataUpdate`; snapshot and identity changes emit `MetadataUpdate`.

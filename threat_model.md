@@ -239,6 +239,9 @@ Do not fund or announce the deployment until all of these are true:
 - EIP-712 claims and anti-bot launch flow tested under load.
 - OAuth flow has state/PKCE, consent, privacy policy, and token handling review.
 - Challenge cohort/ranking rules are published before entries open.
+- Public claims, risk language, sample-data labels, referral wording, metadata
+  descriptions, and testnet disclosures receive a final human/legal review
+  before any public announcement or mint.
 - Risk disclaimer, terms, privacy policy, and jurisdiction-specific legal review are complete.
 - Contract source and deployment parameters are reproducibly verified.
 

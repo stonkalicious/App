@@ -27,6 +27,7 @@ released, and no public mint or announcement is authorized.
 | Snapshot-oracle role | **Not configured** |
 | Mint-signer role | **Not configured** |
 | Royalty receiver | **Not configured** |
+| Public claims and preview labels | Reviewed for the current preview; final human/legal review still required |
 | Explorer source verification | Not applicable — no deployment |
 
 The three operational roles must use separate non-zero addresses:
@@ -66,6 +67,8 @@ explorer verification, or production metadata availability.
 - [ ] Complete qualified human contract review; AI-assisted review is informational
       only and is not independent audit assurance.
 - [ ] Set and validate the metadata base URL and collection URL.
+- [ ] Complete final human/legal review of public claims, risk language, sample
+      labels, referral wording, metadata descriptions, and testnet disclosures.
 - [ ] Keep metadata locked until the endpoint, cache, stale fallback, and
       wallet-data privacy checks pass against the deployed contract.
 - [ ] Exercise mint authorization, one-wallet lifetime enforcement, identity
@@ -122,3 +125,6 @@ Do not proceed if any of the following is true:
    fails on testnet.
 10. The deployed royalty receiver or ERC-2981 rate differs from the reviewed
     5% policy.
+11. Any illustrative wallet value, rank, growth figure, share card, referral
+    statement, or metadata description can reasonably be mistaken for a live
+    result, guaranteed outcome, reward, or available mint.

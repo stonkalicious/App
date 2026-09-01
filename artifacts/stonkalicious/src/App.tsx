@@ -181,6 +181,7 @@ function App() {
   const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [identityState, setIdentityState] = useState<'idle' | 'signing' | 'oauth' | 'success' | 'error' | 'unavailable'>('idle');
   const [identityKind, setIdentityKind] = useState<IdentityKind | null>(null);
+  const [verificationIntent, setVerificationIntent] = useState<IdentityKind | null>(null);
   const [identityError, setIdentityError] = useState('');
   const [identityBusy, setIdentityBusy] = useState(false);
   const selectedStage = stages.find((stage) => stage.key === activeStage) ?? stages[7];
@@ -313,7 +314,13 @@ function App() {
     }
   };
 
-  const identityErrorCopy = (code: string) => ({
+  const identityErrorCopy = (code: string) => {
+    if (code === 'verification_unavailable') {
+      return verificationIntent === 'x'
+        ? 'Optional X linking is temporarily unavailable. No wallet permission was requested.'
+        : 'Wallet verification is temporarily unavailable. No wallet permission was requested.';
+    }
+    return ({
     invalid_wallet: 'Your wallet address was not accepted. Try again with a compatible EVM wallet.',
     wallet_signature_invalid: 'The wallet proof did not match this wallet. Nothing was submitted or approved.',
     wallet_challenge_expired: 'That wallet proof expired. Start again to receive a fresh challenge.',
@@ -327,7 +334,8 @@ function App() {
     x_verification_unavailable: 'Optional X linking is not configured for this preview.',
     wallet_challenge_required: 'Start with wallet verification before requesting an optional identity link.',
     verification_unavailable: 'Verification is temporarily unavailable. No wallet permission was requested.',
-  } as Record<string, string>)[code] ?? 'Verification did not complete. Try again from this page.';
+    } as Record<string, string>)[code] ?? 'Verification did not complete. Try again from this page.';
+  };
 
   const proveWallet = async () => {
     if (!window.ethereum) {
@@ -353,6 +361,7 @@ function App() {
 
   const startWalletVerification = async () => {
     setIdentityBusy(true);
+    setVerificationIntent('wallet');
     setIdentityError('');
     try {
       const signature = await proveWallet();
@@ -376,6 +385,7 @@ function App() {
 
   const startIdentityVerification = async () => {
     setIdentityBusy(true);
+    setVerificationIntent('x');
     setIdentityError('');
     try {
       const signature = await proveWallet();
@@ -404,6 +414,7 @@ function App() {
     } finally {
       setIdentityState('idle');
       setIdentityKind(null);
+      setVerificationIntent(null);
       setIdentityError('');
       setIdentityBusy(false);
     }
@@ -541,7 +552,7 @@ function App() {
         <div className="grid gap-14 md:grid-cols-[.8fr_1.2fr] md:items-end">
           <div>
             <div className="mono-face mb-5 text-[10px] text-[#ec642f]">01 / the mirror</div>
-            <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">Your NFT can mirror<br /><span className="text-[#7666c9]">the bag.</span></h2>
+           <h2 className="display-face max-w-[520px] text-5xl font-bold leading-[.9] md:text-7xl">When enabled, your NFT can mirror<br /><span className="text-[#7666c9]">the bag.</span></h2>
           </div>
           <div className="max-w-[490px]">
              <p className="text-lg leading-relaxed text-[#5c5b62]">One wallet, one NFT, show off your level. When enabled, the metadata service can read public data for qualifying Robinhood Chain coins to calculate an illustrative state. It cannot move, trade, approve, or withdraw your coins. This site will never ask for a seed phrase, private key, or coin approval.</p>
@@ -603,7 +614,7 @@ function App() {
            <div className="grid gap-12 md:grid-cols-[.8fr_1.2fr] md:items-end">
              <div>
                <div className="mono-face mb-5 text-[10px] text-[#ec642f]">02 / watch my warrior</div>
-               <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">See what your<br /><span className="text-[#ec642f]">bag becomes.</span></h2>
+                <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Preview what your<br /><span className="text-[#ec642f]">bag could become.</span></h2>
              </div>
               <p className="max-w-[500px] text-lg leading-relaxed text-[#4c4b51]">Connect a wallet to view the preview flow before any future mint. This demo does not calculate a live wallet score. No approval, transaction, or custody.</p>
            </div>
@@ -658,11 +669,11 @@ function App() {
                  <div className="mx-auto w-full max-w-[180px]"><WarriorIllustration stage={previewStage.key} /></div>
                  <div>
                    <div className="border-b border-[#eee9dd]/20 pb-4">
-                      <div className="mono-face text-[9px] text-[#aaa7a0]">illustrative rank</div>
-                     <div className="mt-2 font-mono text-2xl text-[#eee9dd]">#{previewRank} <span className="text-sm text-[#aaa7a0]">of {previewHolderCount}</span></div>
+                       <div className="mono-face text-[9px] text-[#aaa7a0]">sample rank / sample holders</div>
+                      <div className="mt-2 font-mono text-2xl text-[#eee9dd]">#{previewRank} <span className="text-sm text-[#aaa7a0]">of {previewHolderCount} sample holders</span></div>
                    </div>
                    <div className="border-b border-[#eee9dd]/20 py-4">
-                      <div className="mono-face text-[9px] text-[#aaa7a0]">illustrative growth</div>
+                       <div className="mono-face text-[9px] text-[#aaa7a0]">sample growth</div>
                      <div className="mt-2 font-mono text-2xl text-[#4a8b68]">+71%</div>
                      <div className="mt-1 text-xs text-[#aaa7a0]">since the snapshot</div>
                    </div>
@@ -713,10 +724,10 @@ function App() {
           </div>
           <div className="grid gap-3">
             {[
-               [Shield, 'One wallet per NFT', 'Every wallet can claim one NFT. Optional X linking adds a public performance identity.'],
+               [Shield, 'One lifetime NFT per wallet', 'The contract is designed to enforce one lifetime NFT per wallet. Optional X linking is a separate public social identity step. Mint availability is not live in this preview.'],
               [WalletCards, 'Robinhood Chain coins only', 'A fixed allowlist of eligible Robinhood Chain coins powers the mirror.'],
                [Flame, 'Capped coin contribution', 'Allowlisted coins count, but one meme pump cannot move the NFT through the entire ladder.'],
-              [RotateCcw, 'Transfer means reset', 'When the NFT moves, its snapshot moves with it. The new owner starts fresh. The NFT can drop tiers.'],
+               [RotateCcw, 'Transfer means reset', 'Transfers are locked for seven days after mint or transfer. When the NFT moves, its snapshot and optional X link reset; the new owner starts fresh.'],
             ].map(([Icon, title, copy], index) => {
               const IconComponent = Icon as typeof Shield;
               return <article key={title as string} className="group border-2 border-[#202534] p-6 transition-colors hover:bg-[#202534] hover:text-[#eee9dd] md:p-8"><div className="flex gap-6"><div className="grid h-11 w-11 shrink-0 place-items-center bg-[#f5bf58] text-[#202534]"><IconComponent className="h-5 w-5" /></div><div><div className="mono-face mb-2 text-[9px] text-[#ec642f]">0{index + 1}</div><h3 className="display-face text-3xl font-bold">{title as string}</h3><p className="mt-3 max-w-[530px] text-base leading-relaxed text-[#6e6b72] group-hover:text-[#aaa7a0]">{copy as string}</p></div></div></article>;
@@ -756,9 +767,9 @@ function App() {
                      <div className="min-w-0">
                        <div className="truncate font-bold">{warrior.name}</div>
                        <div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div>
-                       <div className="mt-5 flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />{stage.name}</div>
+                       <div className="mt-5 flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />sample level: {stage.name}</div>
                        <div className="mt-4 border-t border-[#eee9dd]/15 pt-3">
-                         <div className="mono-face text-[8px] text-[#777985]">example growth window</div>
+                         <div className="mono-face text-[8px] text-[#777985]">sample growth window</div>
                          <div className="mt-1 font-mono text-xl text-[#4a8b68]">{formatGrowth(warrior.growthPct)}</div>
                        </div>
                      </div>
@@ -792,15 +803,15 @@ function App() {
              <div className="min-w-0">
                <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Prove wallet control to request a future claim; linking X is optional if you want a public performance identity. If enabled, configured public coin data can update the visual record. No public mint is open in this preview.</p>
                <div className="mt-7 flex flex-wrap gap-3">
-                 <button type="button" onClick={() => { void startWalletVerification(); }} disabled={identityBusy || identityKind !== null} data-testid="button-verify-wallet" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityKind === 'wallet' ? 'wallet verified' : identityBusy && identityKind === null ? 'checking wallet…' : 'verify wallet'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
-                 <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityKind === 'x'} data-testid="button-join-signal" className="button-cut border-2 border-[#202534] px-6 py-4 font-bold text-[#202534] transition-transform hover:-translate-y-1 hover:bg-[#202534] hover:text-[#eee9dd] disabled:cursor-wait disabled:opacity-60">{identityKind === 'x' ? 'X linked' : 'link X (optional)'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#202534]" /></button>
+                  <button type="button" onClick={() => { void startWalletVerification(); }} disabled={identityBusy || identityKind !== null} data-testid="button-verify-wallet" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityKind === 'wallet' ? 'wallet control verified' : identityBusy && verificationIntent === 'wallet' ? 'checking wallet control…' : 'verify wallet control'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
+                  <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityKind === 'x'} data-testid="button-join-signal" className="button-cut border-2 border-[#202534] px-6 py-4 font-bold text-[#202534] transition-transform hover:-translate-y-1 hover:bg-[#202534] hover:text-[#eee9dd] disabled:cursor-wait disabled:opacity-60">{identityKind === 'x' ? 'X linked' : identityBusy && verificationIntent === 'x' ? 'checking wallet for X link…' : 'link X (optional)'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#202534]" /></button>
                </div>
               <div className="mt-5 border-l-2 border-[#202534] pl-4 text-sm leading-relaxed text-[#4c4b51]" aria-live="polite" data-testid="identity-status">
                  {identityState === 'idle' && <span>Prove you control a wallet with a plain signature. X linking is optional and only adds a public social identity. No approval, seed phrase, or custody.</span>}
-                {identityState === 'signing' && <span>Check your wallet. The message proves control only; it cannot move coins.</span>}
-                {identityState === 'oauth' && <span>Redirecting to X for permission to verify your account. Stonkalicious never sees your X password.</span>}
+                 {identityState === 'signing' && <span>Check your wallet. This plain signature proves wallet control only; it does not link X, grant permissions, or move coins.</span>}
+                 {identityState === 'oauth' && <span>Wallet control was verified separately. Redirecting to X for optional account linking; X OAuth consent is a separate step.</span>}
                  {identityState === 'success' && <span className="font-bold">{identityKind === 'x' ? 'Wallet verified and optional X identity linked.' : 'Wallet verified. X linking is optional.'} Mint authorization is kept separate and remains closed until the official launch.</span>}
-                 {identityState === 'unavailable' && <span>Wallet verification is not configured for this preview yet. No wallet connection was opened.</span>}
+                 {identityState === 'unavailable' && <span>Wallet verification is not configured for this preview yet. No wallet or X verification flow was opened.</span>}
                 {identityState === 'error' && <span><strong>{identityError === 'wallet_missing' ? 'A compatible wallet is needed.' : identityErrorCopy(identityError)}</strong> <button type="button" onClick={() => { void resetIdentityVerification(); }} className="ml-1 underline underline-offset-4" data-testid="button-retry-identity">try again</button></span>}
               </div>
             </div>
@@ -824,8 +835,8 @@ function App() {
            <div className="max-w-[900px]">
               <h2 className="display-face text-3xl font-bold leading-none md:text-5xl">Know the risks.</h2>
               <p className="mt-5 text-base leading-relaxed md:text-lg">Stonkalicious is an experimental digital collectible and performance mirror, not financial advice, an investment, a security, or a promise of profit. Robinhood Chain coins are highly volatile. You may lose some or all of the money you spend, including 100% of your purchase.</p>
-              <p className="mt-4 text-sm leading-relaxed opacity-80">This project has received an AI-assisted review for informational purposes only. It is not a formal independent smart-contract audit, does not guarantee contract or service safety, and does not replace qualified human security review. The collection is testnet-only while these checks are unfinished, and the contract, metadata, and service may change or be unavailable.</p>
-              <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, coin price moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring an NFT. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: trust only the contract address published on the official Stonkalicious domain and official X account.</p>
+               <p className="mt-4 text-sm leading-relaxed opacity-80">This project has received an AI-assisted review for informational purposes only. It is not a formal independent smart-contract audit, does not guarantee contract or service safety, and does not replace qualified human security review. The collection is testnet-only while these checks are unfinished. Minting is not open in this preview; the contract, mutable metadata, and service may change or be unavailable.</p>
+               <p className="mt-4 text-sm leading-relaxed opacity-80">To the fullest extent permitted by applicable law, Stonkalicious and its creators are not liable for losses, coin price moves, smart-contract bugs, wallet errors, outages, metadata delays, launch issues, or other damage connected with using or acquiring an NFT. Do your own research and only participate with money you can afford to lose. There is no surprise claim, airdrop, or DM: verify any future contract address or launch announcement on the official Stonkalicious domain.</p>
            </div>
          </div>
        </section>

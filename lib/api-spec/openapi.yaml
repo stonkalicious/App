@@ -185,7 +185,7 @@ paths:
       operationId: consumeMintAuthorization
       tags: [identity]
       summary: Consume a one-use mint authorization
-      description: Returns an EIP-712 authorization only after wallet proof and X verification. The response is single-use and short-lived.
+      description: Returns an EIP-712 authorization after wallet-control proof; optional X verification may be included. The response is single-use and short-lived.
       responses:
         "200":
           description: Signed mint authorization

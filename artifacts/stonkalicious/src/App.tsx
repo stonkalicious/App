@@ -22,8 +22,13 @@ import {
   WalletCards,
   X,
 } from 'lucide-react';
+import {
+  WARRIOR_ARTWORK_MAP,
+  type WarriorArtworkStatus,
+  type WarriorStageKey,
+} from '@workspace/warrior-config';
 
-type StageKey = 'newb' | 'liquidated' | 'back' | 'wrecked' | 'hardened' | 'profitable' | 'elite' | 'plumber';
+type StageKey = WarriorStageKey;
 
 type Stage = {
   key: StageKey;
@@ -34,6 +39,8 @@ type Stage = {
   trait: string;
   color: string;
   image: string;
+  artworkStatus: WarriorArtworkStatus;
+  artworkBlocker?: string;
 };
 
 type Warrior = {
@@ -69,25 +76,32 @@ declare global {
   }
 }
 
-const stages: Stage[] = [
-  ['newb', 'Beginning', '0–12 strength', 'Everyone starts here. The orb is warm, the bag is small, and the first signal is still ahead.', 'open face / soft purple energy', '#7666c9', 'newb'],
-  ['liquidated', 'Climbing', '13–24 strength', 'The first real momentum shows. The orb catches heat and the run has room to grow.', 'first momentum / warm glow', '#8d4654', 'liquidated'],
-  ['back', 'Contender', '25–36 strength', 'The comeback becomes a contest. The NFT has a plan, a pulse, and something to defend.', 'patched kit / contender spark', '#bd7653', 'back'],
-  ['wrecked', 'Stacked', '37–48 strength', 'The bag is taking shape. Layer by layer, the orb carries more weight and the signal gets louder.', 'layered kit / stacked glow', '#a75a48', 'wrecked'],
-  ['hardened', 'Forged', '49–60 strength', 'The coin bag has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c', 'hardened'],
-  ['profitable', 'Master', '61–72 strength', 'The numbers have become a discipline. Every move sharpens the shape of the run.', 'war paint / master glow', '#d99a48', 'profitable'],
-  ['elite', 'Elite', '73–88 strength', 'A battle-worn status symbol. Bright flames, a hard gaze, and nothing left to prove.', 'worn armor / bright aura', '#f5bf58', 'elite'],
-  ['plumber', 'God', '89+ strength', 'The Final Form', 'mythic kit / maxed-out aura', '#e8d8ac', 'plumber'],
-].map(([key, name, threshold, description, trait, color, image], index) => ({
-  key: key as StageKey,
-  number: String(index + 1).padStart(2, '0'),
-  name,
-  threshold,
-  description,
-  trait,
-  color,
-  image: `/warriors/${image}.png`,
-}));
+const stageDefinitions: Array<[StageKey, string, string, string, string]> = [
+  ['newb', '0–12 strength', 'Everyone starts here. The orb is warm, the bag is small, and the first signal is still ahead.', 'open face / soft purple energy', '#7666c9'],
+  ['liquidated', '13–24 strength', 'The first real momentum shows. The orb catches heat and the run has room to grow.', 'first momentum / warm glow', '#8d4654'],
+  ['back', '25–36 strength', 'The comeback becomes a contest. The NFT has a plan, a pulse, and something to defend.', 'patched kit / contender spark', '#bd7653'],
+  ['wrecked', '37–48 strength', 'The bag is taking shape. Layer by layer, the orb carries more weight and the signal gets louder.', 'layered kit / stacked glow', '#a75a48'],
+  ['hardened', '49–60 strength', 'The coin bag has taken hits and kept going. Practical steel replaces the soft edges.', 'battle helmet / real fire', '#df7e3c'],
+  ['profitable', '61–72 strength', 'The numbers have become a discipline. Every move sharpens the shape of the run.', 'war paint / master glow', '#d99a48'],
+  ['elite', '73–88 strength', 'A battle-worn status symbol. Bright flames, a hard gaze, and nothing left to prove.', 'worn armor / bright aura', '#f5bf58'],
+  ['plumber', '89+ strength', 'The Final Form', 'mythic kit / maxed-out aura', '#e8d8ac'],
+ ];
+
+const stages: Stage[] = stageDefinitions.map(([key, threshold, description, trait, color], index) => {
+  const artwork = WARRIOR_ARTWORK_MAP[key];
+  return {
+    key,
+    number: String(index + 1).padStart(2, '0'),
+    name: artwork.level,
+    threshold,
+    description,
+    trait,
+    color,
+    image: `/warriors/${artwork.filename}`,
+    artworkStatus: artwork.status,
+    artworkBlocker: artwork.blocker,
+  };
+});
 
 const warriors: Warrior[] = [
   { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, pnl: 218400, growthPct: 184, bag: '$482,190', holderRank: 1, holderCount: 247 },
@@ -113,8 +127,18 @@ function setMeta(name: string, content: string, property?: string) {
 function WarriorIllustration({ stage }: { stage: StageKey }) {
   const stageDetails = stages.find((item) => item.key === stage) ?? stages[0];
   return (
-    <div className={`warrior-art warrior-float level-${stage}`} aria-label={`${stageDetails.name} NFT visual`} data-testid={`illustration-warrior-${stage}`}>
-      <img src={stageDetails.image} alt={`${stageDetails.name} Stonkalicious NFT`} />
+    <div className={`warrior-art warrior-float level-${stage}`} aria-label={`${stageDetails.name} NFT visual`} data-artwork-status={stageDetails.artworkStatus} data-testid={`illustration-warrior-${stage}`}>
+      {stageDetails.artworkStatus === 'blocked' ? (
+        <div className="absolute inset-0 z-[1] grid place-items-center bg-[#202534] p-6 text-center text-[#eee9dd]">
+          <div>
+            <div className="mono-face text-[9px] text-[#ec642f]">artwork blocked</div>
+            <div className="display-face mt-3 text-3xl text-[#f5bf58]">{stageDetails.name}</div>
+            <div className="mt-3 text-xs leading-relaxed text-[#aaa7a0]">Approved {stageDetails.name} artwork is pending. No other tier is shown in its place.</div>
+          </div>
+        </div>
+      ) : (
+        <img src={stageDetails.image} alt={`${stageDetails.name} Stonkalicious NFT`} />
+      )}
       <div className="artwork-glow" />
     </div>
   );
@@ -169,14 +193,14 @@ function App() {
     : '';
 
   useEffect(() => {
-    document.title = 'Stonkalicious — Your wallet, turned NFT';
+     document.title = 'King of the Hood';
      setMeta('description', 'Stonkalicious is an experimental Robinhood Chain collectible with illustrative performance previews.');
-    setMeta('', 'Stonkalicious — Your wallet, turned NFT', 'og:title');
+     setMeta('', 'King of the Hood', 'og:title');
      setMeta('', 'An experimental Robinhood Chain collectible with illustrative previews. No custody. No wallet approvals.', 'og:description');
     setMeta('', 'website', 'og:type');
     setMeta('', window.location.href, 'og:url');
     setMeta('twitter:card', 'summary_large_image');
-    setMeta('twitter:title', 'Stonkalicious — Your wallet, turned NFT');
+     setMeta('twitter:title', 'King of the Hood');
      setMeta('twitter:description', 'An experimental Robinhood Chain collectible with illustrative previews. No custody. No wallet approvals.');
   }, []);
 

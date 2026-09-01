@@ -4,6 +4,7 @@ import { StaleCache } from "../oracle/cache";
 import { ContractSnapshotProvider, PublicAssetProvider } from "../oracle/provider";
 import { scoreObservation } from "../oracle/scoring";
 import type { MetadataResponse, ScoredWarrior } from "../oracle/types";
+import { WARRIOR_ARTWORK_MAP } from "@workspace/warrior-config";
 
 const router: IRouter = Router();
 type OracleContext = {
@@ -29,11 +30,14 @@ function getContext(): OracleContext {
 }
 
 function metadataFor(tokenId: string, score: ScoredWarrior & { wallet: string; epoch: string }, stale: boolean, config: ReturnType<typeof getOracleConfig>): MetadataResponse {
-  const imageLevel = score.stage;
+  const artwork = WARRIOR_ARTWORK_MAP[score.stage];
+  if (artwork.status === "blocked") {
+    throw new Error(artwork.blocker ?? `Artwork is unavailable for ${artwork.level}`);
+  }
   return {
     name: `Stonkalicious #${tokenId} — ${score.level}`,
     description: "An experimental digital collectible whose level may be calculated from its owner's qualifying Robinhood Chain coin data when metadata is enabled. Data may be delayed, unavailable, or change.",
-    image: `${config.metadataBaseUrl}/images/${imageLevel}.png`,
+    image: `${config.metadataBaseUrl}/images/${artwork.filename}`,
     external_url: `${config.metadataBaseUrl}/warriors/${tokenId}`,
     attributes: [
       { trait_type: "Level", value: score.level },
@@ -46,6 +50,15 @@ function metadataFor(tokenId: string, score: ScoredWarrior & { wallet: string; e
     ],
     properties: { wallet: score.wallet, epoch: score.epoch, observedAt: score.observedAt, stale },
   };
+}
+
+function blockedArtworkResponse(res: Response, stage: ScoredWarrior["stage"]) {
+  const artwork = WARRIOR_ARTWORK_MAP[stage];
+  return res.status(503).json({
+    error: "warrior artwork is not available",
+    level: artwork.level,
+    blocker: artwork.blocker ?? "Artwork is unavailable",
+  });
 }
 
 function lockedResponse(res: Response) {
@@ -79,16 +92,25 @@ async function resolveMetadata(req: Request, res: Response, tokenId: string) {
     snapshot = await oracle.contract.getSnapshot(tokenId);
     const cached = oracle.cache.get(key);
     if (cached && matchesSnapshot(cached.value, snapshot)) {
+      if (WARRIOR_ARTWORK_MAP[cached.value.stage].status === "blocked") {
+        return blockedArtworkResponse(res, cached.value.stage);
+      }
       return res.json(metadataFor(tokenId, cached.value, cached.stale, oracle.config));
     }
     const observation = await oracle.provider.getObservation(snapshot.wallet, snapshot);
     const score = { ...scoreObservation(observation), wallet: snapshot.wallet, epoch: snapshot.epoch };
     oracle.cache.set(key, score);
+    if (WARRIOR_ARTWORK_MAP[score.stage].status === "blocked") {
+      return blockedArtworkResponse(res, score.stage);
+    }
     return res.json(metadataFor(tokenId, score, false, oracle.config));
   } catch (error) {
     req.log.warn({ route: "nft-metadata" }, "NFT metadata resolution failed");
     const stale = oracle.cache.get(key);
     if (stale && (!snapshot || matchesSnapshot(stale.value, snapshot))) {
+      if (WARRIOR_ARTWORK_MAP[stale.value.stage].status === "blocked") {
+        return blockedArtworkResponse(res, stale.value.stage);
+      }
       return res.json(metadataFor(tokenId, stale.value, true, oracle.config));
     }
     return res.status(503).json({ error: "NFT data is temporarily unavailable" });
@@ -111,10 +133,14 @@ router.get("/collection", (req, res) => {
     return res.status(503).json({ error: "metadata is not configured" });
   }
   if (!oracle.config.metadataPublic) return lockedResponse(res);
+  if (WARRIOR_ARTWORK_MAP.plumber.status === "blocked") {
+    return blockedArtworkResponse(res, "plumber");
+  }
+  const collectionArtwork = WARRIOR_ARTWORK_MAP.plumber;
   return res.json({
     name: "Stonkalicious",
     description: "An experimental digital collectible whose level may be calculated from its owner's qualifying Robinhood Chain coin data when metadata is enabled. Data may be delayed, unavailable, or change.",
-    image: `${oracle.config.metadataBaseUrl}/images/plumber.png`,
+    image: `${oracle.config.metadataBaseUrl}/images/${collectionArtwork.filename}`,
     external_link: oracle.config.metadataBaseUrl,
     seller_fee_basis_points: 500,
     fee_recipient: oracle.config.royaltyReceiver,

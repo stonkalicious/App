@@ -1,0 +1,43 @@
+{
+  "newb": {
+    "level": "Beginning",
+    "filename": "newb.png",
+    "status": "available"
+  },
+  "liquidated": {
+    "level": "Climbing",
+    "filename": "liquidated.png",
+    "status": "available"
+  },
+  "back": {
+    "level": "Contender",
+    "filename": "back.png",
+    "status": "available"
+  },
+  "wrecked": {
+    "level": "Stacked",
+    "filename": "wrecked.png",
+    "status": "available"
+  },
+  "hardened": {
+    "level": "Forged",
+    "filename": "hardened.png",
+    "status": "available"
+  },
+  "profitable": {
+    "level": "Master",
+    "filename": "profitable.png",
+    "status": "available"
+  },
+  "elite": {
+    "level": "Elite",
+    "filename": "elite.png",
+    "status": "available"
+  },
+  "plumber": {
+    "level": "God",
+    "filename": "plumber.png",
+    "status": "blocked",
+    "blocker": "Approved distinct God artwork is missing; plumber.png is byte-identical to elite.png and must not be presented as God artwork."
+  }
+}

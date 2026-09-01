@@ -8,11 +8,13 @@
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:rehearsal": "pnpm run build && node test/rehearsal.mjs"
+    "test:rehearsal": "pnpm run build && node test/rehearsal.mjs",
+    "test:artwork-map": "node test/artwork-map.mjs"
   },
   "dependencies": {
     "@workspace/api-zod": "workspace:*",
     "@workspace/db": "workspace:*",
+    "@workspace/warrior-config": "workspace:*",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "drizzle-orm": "catalog:",

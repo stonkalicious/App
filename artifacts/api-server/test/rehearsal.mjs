@@ -147,10 +147,10 @@ try {
   const api = await startApi(true);
   const metadataUrl = (tokenId) => `http://127.0.0.1:${api.port}/api/token/${tokenId}`;
    const collectionResponse = await fetch(`http://127.0.0.1:${api.port}/api/collection`);
-   assert.equal(collectionResponse.status, 200, "collection metadata is served");
-   const collection = await collectionResponse.json();
-   assert.equal(collection.seller_fee_basis_points, 500);
-   assert.equal(collection.fee_recipient, royaltyReceiver);
+   assert.equal(collectionResponse.status, 503, "collection metadata stays blocked while God artwork is unavailable");
+   const blockedCollection = await collectionResponse.json();
+   assert.equal(blockedCollection.level, "God");
+   assert.match(blockedCollection.blocker, /distinct God artwork is missing/);
 
   snapshotWriteEpoch = 0;
   const pendingResponse = await fetch(metadataUrl(1));

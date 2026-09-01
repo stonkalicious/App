@@ -1,33 +1,6 @@
-export type WarriorStageKey =
-  | "newb"
-  | "liquidated"
-  | "back"
-  | "wrecked"
-  | "hardened"
-  | "profitable"
-  | "elite"
-  | "plumber";
+import { WARRIOR_LEVEL_LABELS, type WarriorLevel, type WarriorStageKey } from "@workspace/warrior-config";
 
-export type WarriorLevel =
-  | "Beginning"
-  | "Climbing"
-  | "Contender"
-  | "Stacked"
-  | "Forged"
-  | "Master"
-  | "Elite"
-  | "God";
-
-export const WARRIOR_LEVEL_LABELS: Record<WarriorStageKey, WarriorLevel> = {
-  newb: "Beginning",
-  liquidated: "Climbing",
-  back: "Contender",
-  wrecked: "Stacked",
-  hardened: "Forged",
-  profitable: "Master",
-  elite: "Elite",
-  plumber: "God",
-};
+export { WARRIOR_LEVEL_LABELS, type WarriorLevel, type WarriorStageKey };
 
 export type AssetKind = "coin";
 

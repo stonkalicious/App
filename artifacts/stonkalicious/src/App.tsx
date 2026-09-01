@@ -504,7 +504,7 @@ function App() {
               <div key={frame.label} className="border border-[#eee9dd]/20 bg-[#202534]/45 p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="mono-face text-[9px] text-[#aaa7a0]">{frame.label}</div>
-                  <div className="mono-face text-[9px]" style={{ color: frame.stage.color }}>{frame.stage.number}</div>
+                   <div className="mono-face text-[9px]" style={{ color: frame.stage.color }}>{frame.label === 'now / example' ? '07' : frame.stage.number}</div>
                 </div>
                 <div className="mt-3 flex justify-center">
                   <div className="w-full max-w-[190px]"><WarriorIllustration stage={frame.stage.key} /></div>

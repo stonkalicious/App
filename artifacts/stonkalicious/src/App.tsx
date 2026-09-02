@@ -23,6 +23,7 @@ import {
   X,
 } from 'lucide-react';
 import {
+  rankDollarPnl,
   WARRIOR_ARTWORK_MAP,
   type WarriorArtworkStatus,
   type WarriorStageKey,
@@ -49,7 +50,7 @@ type Warrior = {
   wallet: string;
   stage: StageKey;
   strength: number;
-  pnl: number;
+  dollarPnlUsd: number;
   growthPct: number;
   bag: string;
   holderRank: number;
@@ -104,13 +105,21 @@ const stages: Stage[] = stageDefinitions.map(([key, threshold, description, trai
 });
 
 const warriors: Warrior[] = [
-  { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, pnl: 218400, growthPct: 184, bag: '$482,190', holderRank: 1, holderCount: 247 },
-  { rank: 2, name: 'marauder.eth', wallet: '0xD2…4F10', stage: 'elite', strength: 88, pnl: 167900, growthPct: 142, bag: '$301,842', holderRank: 2, holderCount: 247 },
-  { rank: 3, name: 'cold_storage', wallet: '0xA8…BC33', stage: 'hardened', strength: 73, pnl: 112600, growthPct: 118, bag: '$188,460', holderRank: 3, holderCount: 247 },
-  { rank: 4, name: 'redline_rider', wallet: '0x3C…008E', stage: 'hardened', strength: 68, pnl: 92300, growthPct: 93, bag: '$124,707', holderRank: 4, holderCount: 247 },
-  { rank: 5, name: 'smallcap_samurai', wallet: '0x11…E2A9', stage: 'wrecked', strength: 46, pnl: 71800, growthPct: 71, bag: '$76,340', holderRank: 5, holderCount: 247 },
-  { rank: 6, name: 'index_apprentice', wallet: '0xBE…771C', stage: 'back', strength: 38, pnl: 48700, growthPct: 48, bag: '$44,920', holderRank: 6, holderCount: 247 },
+  { rank: 1, name: 'orbital_ronin', wallet: '0x7F…91A2', stage: 'plumber', strength: 94, dollarPnlUsd: 218400, growthPct: 184, bag: '$482,190', holderRank: 1, holderCount: 247 },
+  { rank: 2, name: 'marauder.eth', wallet: '0xD2…4F10', stage: 'elite', strength: 88, dollarPnlUsd: 167900, growthPct: 142, bag: '$301,842', holderRank: 2, holderCount: 247 },
+  { rank: 3, name: 'cold_storage', wallet: '0xA8…BC33', stage: 'hardened', strength: 73, dollarPnlUsd: 112600, growthPct: 118, bag: '$188,460', holderRank: 3, holderCount: 247 },
+  { rank: 4, name: 'redline_rider', wallet: '0x3C…008E', stage: 'hardened', strength: 68, dollarPnlUsd: 92300, growthPct: 93, bag: '$124,707', holderRank: 4, holderCount: 247 },
+  { rank: 5, name: 'smallcap_samurai', wallet: '0x11…E2A9', stage: 'wrecked', strength: 46, dollarPnlUsd: 71800, growthPct: 71, bag: '$76,340', holderRank: 5, holderCount: 247 },
+  { rank: 6, name: 'index_apprentice', wallet: '0xBE…771C', stage: 'back', strength: 38, dollarPnlUsd: 48700, growthPct: 48, bag: '$44,920', holderRank: 6, holderCount: 247 },
 ];
+
+const PREVIEW_COHORT_SIZE = 247;
+const PREVIEW_PNL_MOVES = [
+  [0, 0, 0, 0, 0, 0],
+  [-92000, 52000, 72000, 18000, -12000, -8000],
+  [68000, -38000, -72000, 51000, 28000, 14000],
+  [-36000, -62000, 44000, -52000, 76000, 32000],
+] as const;
 
 function setMeta(name: string, content: string, property?: string) {
   const selector = property ? `meta[property="${property}"]` : `meta[name="${name}"]`;
@@ -148,6 +157,10 @@ function formatGrowth(value: number) {
   return `${value >= 0 ? '+' : '-'}${Math.abs(value)}%`;
 }
 
+function formatDollarPnl(value: number) {
+  return `${value >= 0 ? '+' : '-'}$${Math.abs(value).toLocaleString('en-US')}`;
+}
+
 function formatReferralCode(value: string) {
   return value.length > 14 ? `${value.slice(0, 8)}…${value.slice(-4)}` : value;
 }
@@ -170,7 +183,8 @@ function App() {
   const [activeStage, setActiveStage] = useState<StageKey>('hardened');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [leaderboardFilter, setLeaderboardFilter] = useState<'all' | StageKey>('all');
-  const [sortMode, setSortMode] = useState<'rank' | 'growth'>('growth');
+  const [sortMode, setSortMode] = useState<'rank' | 'pnl'>('pnl');
+  const [previewPnlStep, setPreviewPnlStep] = useState(0);
   const [notice, setNotice] = useState('');
   const [copied, setCopied] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
@@ -242,12 +256,35 @@ function App() {
     return () => window.clearTimeout(timeout);
   }, [notice]);
 
+  const rankedPreviewWarriors = useMemo(() => {
+    const moves = PREVIEW_PNL_MOVES[previewPnlStep];
+    const ranked = rankDollarPnl(
+      warriors.map((warrior, index) => ({
+        id: warrior.name,
+        dollarPnlUsd: warrior.dollarPnlUsd + moves[index],
+      })),
+      PREVIEW_COHORT_SIZE,
+    );
+    const rankedById = new Map(ranked.map((warrior) => [warrior.id, warrior]));
+    return warriors.map((warrior) => {
+      const current = rankedById.get(warrior.name);
+      if (!current) return warrior;
+      return {
+        ...warrior,
+        dollarPnlUsd: current.dollarPnlUsd,
+        stage: current.stage,
+        holderRank: current.rank,
+        holderCount: PREVIEW_COHORT_SIZE,
+      };
+    });
+  }, [previewPnlStep]);
+
   const visibleWarriors = useMemo(() => {
     const filtered = leaderboardFilter === 'all'
-      ? warriors
-      : warriors.filter((warrior) => warrior.stage === leaderboardFilter);
-    return [...filtered].sort((a, b) => sortMode === 'rank' ? a.holderRank - b.holderRank : b.growthPct - a.growthPct);
-  }, [leaderboardFilter, sortMode]);
+      ? rankedPreviewWarriors
+      : rankedPreviewWarriors.filter((warrior) => warrior.stage === leaderboardFilter);
+    return [...filtered].sort((a, b) => sortMode === 'rank' ? a.holderRank - b.holderRank : b.dollarPnlUsd - a.dollarPnlUsd);
+  }, [leaderboardFilter, rankedPreviewWarriors, sortMode]);
 
   const handleAction = (message: string, target?: string) => {
     setNotice(message);
@@ -741,13 +778,16 @@ function App() {
             </div>
                <p className="max-w-[330px] leading-relaxed text-[#aaa7a0]">Preview leaderboard</p>
           </div>
-          <div className="mt-12 flex flex-col justify-between gap-4 border-y border-[#eee9dd]/15 py-4 md:flex-row md:items-center">
+           <div className="mt-12 flex flex-col justify-between gap-4 border-y border-[#eee9dd]/15 py-4 md:flex-row md:items-center">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter leaderboard by stage">
               {(['all', ...stages.map((stage) => stage.key)] as const).map((filter) => (
                 <button type="button" key={filter} onClick={() => setLeaderboardFilter(filter)} data-testid={`button-filter-${filter}`} className={`mono-face border px-3 py-2 text-[9px] transition-colors ${leaderboardFilter === filter ? 'border-[#f5bf58] bg-[#f5bf58] text-[#202534]' : 'border-[#eee9dd]/20 text-[#aaa7a0] hover:border-[#f5bf58] hover:text-[#f5bf58]'}`}>{filter === 'all' ? 'all NFTs' : stages.find((stage) => stage.key === filter)?.name}</button>
               ))}
             </div>
-             <button type="button" onClick={() => setSortMode(sortMode === 'rank' ? 'growth' : 'rank')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'rank' ? 'global rank' : 'growth'} <ChevronDown className="h-3.5 w-3.5" /></button>
+              <div className="flex flex-wrap items-center gap-4">
+                <button type="button" onClick={() => { setPreviewPnlStep((step) => (step + 1) % PREVIEW_PNL_MOVES.length); setNotice('Preview levels re-ranked by dollar P&L.'); }} data-testid="button-rerank-preview" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><RotateCcw className="h-3.5 w-3.5" /> re-rank preview</button>
+                <button type="button" onClick={() => setSortMode(sortMode === 'rank' ? 'pnl' : 'rank')} data-testid="button-sort-leaderboard" className="mono-face flex items-center gap-2 text-[9px] text-[#f5bf58] hover:text-[#eee9dd]"><SlidersHorizontal className="h-3.5 w-3.5" /> sort: {sortMode === 'rank' ? 'global rank' : 'dollar P&L'} <ChevronDown className="h-3.5 w-3.5" /></button>
+              </div>
           </div>
            <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
              {visibleWarriors.map((warrior, index) => {
@@ -765,6 +805,10 @@ function App() {
                        <div className="mt-1 font-mono text-[10px] text-[#777985]">{warrior.wallet}</div>
                        <div className="mt-5 flex items-center gap-2 text-sm"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />sample level: {stage.name}</div>
                        <div className="mt-4 border-t border-[#eee9dd]/15 pt-3">
+                          <div className="mono-face text-[8px] text-[#777985]">all-time dollar P&L</div>
+                          <div className={`mt-1 font-mono text-xl ${warrior.dollarPnlUsd >= 0 ? 'text-[#4a8b68]' : 'text-[#ec642f]'}`}>{formatDollarPnl(warrior.dollarPnlUsd)}</div>
+                        </div>
+                        <div className="mt-4 border-t border-[#eee9dd]/15 pt-3">
                          <div className="mono-face text-[8px] text-[#777985]">sample growth window</div>
                          <div className="mt-1 font-mono text-xl text-[#4a8b68]">{formatGrowth(warrior.growthPct)}</div>
                        </div>

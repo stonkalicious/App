@@ -20,3 +20,16 @@ as if it were verified.
 **How to apply:** Read the public snapshot-write marker alongside the snapshot,
 require epoch equality before fetching/scoring public wallet data, and return an
 explicit unavailable response while the baseline is pending.
+
+Relative tier assignment also requires an explicit eligible snapshot cohort and
+ranking epoch. A visible sample or collection max supply is not a substitute
+for that cohort; preview re-ranking must remain labeled as illustrative until
+the oracle has a configured cohort feed.
+
+**Why:** Percentile boundaries are only meaningful when every eligible NFT is
+compared in the same data window. Inferring the cohort from a partial preview
+could present a sample movement as a live holder-level claim.
+
+**How to apply:** Keep the shared percentile model deterministic, provide the
+oracle with a versioned cohort/ranking input before enabling live relative
+metadata, and keep sample controls out of live scoring paths.

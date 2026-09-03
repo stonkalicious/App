@@ -191,7 +191,6 @@ function App() {
   const [referralCopied, setReferralCopied] = useState(false);
   const [previewWallet, setPreviewWallet] = useState('');
   const [referrer, setReferrer] = useState('');
-  const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [identityState, setIdentityState] = useState<'idle' | 'signing' | 'oauth' | 'success' | 'error' | 'unavailable'>('idle');
   const [identityKind, setIdentityKind] = useState<IdentityKind | null>(null);
   const [verificationIntent, setVerificationIntent] = useState<IdentityKind | null>(null);
@@ -203,7 +202,7 @@ function App() {
   const previewRank = 12;
   const previewHolderCount = 247;
   const referralLink = previewWallet
-    ? `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(previewWallet.toLowerCase())}#watch`
+    ? `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(previewWallet.toLowerCase())}#register`
     : '';
 
   useEffect(() => {
@@ -330,26 +329,6 @@ function App() {
     }
   };
 
-  const previewWalletPerformance = async () => {
-    if (!window.ethereum) {
-      setPreviewState('error');
-      setNotice('A compatible wallet is needed for the read-only preview.');
-      return;
-    }
-    setPreviewState('loading');
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const wallet = Array.isArray(accounts) && typeof accounts[0] === 'string' ? accounts[0] : '';
-      if (!wallet) throw new Error('invalid_wallet');
-      setPreviewWallet(wallet);
-      setPreviewState('ready');
-      setNotice('Read-only preview loaded. This warrior is not minted.');
-    } catch {
-      setPreviewState('error');
-      setNotice('Wallet preview did not load. No approval or transaction was requested.');
-    }
-  };
-
   const identityErrorCopy = (code: string) => {
     if (code === 'verification_unavailable') {
       return verificationIntent === 'x'
@@ -389,10 +368,11 @@ function App() {
     });
     const challenge = await challengeResponse.json() as { message?: string; challengeId?: string; error?: string };
     if (!challengeResponse.ok || !challenge.message || !challenge.challengeId) throw new Error(challenge.error ?? 'verification_unavailable');
-    return window.ethereum.request({
+    const signature = await window.ethereum.request({
       method: 'personal_sign',
       params: [challenge.message, wallet],
     });
+    return { signature, wallet };
   };
 
   const startWalletVerification = async () => {
@@ -400,7 +380,7 @@ function App() {
     setVerificationIntent('wallet');
     setIdentityError('');
     try {
-      const signature = await proveWallet();
+      const { signature, wallet } = await proveWallet();
       const authorizationResponse = await fetch('/api/identity/wallet/authorize', {
         method: 'POST',
         credentials: 'include',
@@ -409,6 +389,7 @@ function App() {
       });
       const authorization = await authorizationResponse.json() as { error?: string };
       if (!authorizationResponse.ok) throw new Error(authorization.error ?? 'verification_unavailable');
+      setPreviewWallet(wallet);
       setIdentityKind('wallet');
       setIdentityState('success');
     } catch (error) {
@@ -424,7 +405,7 @@ function App() {
     setVerificationIntent('x');
     setIdentityError('');
     try {
-      const signature = await proveWallet();
+      const { signature } = await proveWallet();
       const startResponse = await fetch('/api/identity/x/start', {
         method: 'POST',
         credentials: 'include',
@@ -473,7 +454,7 @@ function App() {
         <div className="hidden items-center gap-8 md:flex">
           {[
             ['the mirror', '#mirror'],
-            ['watch my warrior', '#watch'],
+            ['register for mint', '#register'],
             ['evolution', '#evolution'],
             ['leaderboard', '#leaderboard'],
             ['rules', '#rules'],
@@ -483,7 +464,7 @@ function App() {
         </div>
         <div className="hidden items-center gap-3 md:flex">
           <button type="button" onClick={() => handleAction('Mint details are being locked. Join the signal to get the first drop notice.', 'mint')} data-testid="button-nav-mint" className="button-cut border-2 border-[#202534] bg-[#ec642f] px-5 py-3 font-bold text-[#eee9dd] transition-transform hover:-translate-y-0.5">
-            get launch access <ArrowUpRight className="ml-1 inline h-4 w-4" />
+            register for mint <ArrowUpRight className="ml-1 inline h-4 w-4" />
           </button>
         </div>
         <button type="button" aria-label="Open menu" data-testid="button-open-menu" className="md:hidden" onClick={() => setMobileNavOpen((open) => !open)}>
@@ -496,14 +477,14 @@ function App() {
           <div className="grid gap-4">
             {[
               ['the mirror', '#mirror'],
-              ['watch my warrior', '#watch'],
+              ['register for mint', '#register'],
               ['evolution', '#evolution'],
               ['leaderboard', '#leaderboard'],
               ['rules', '#rules'],
             ].map(([label, href]) => (
               <a key={href} href={href} onClick={() => setMobileNavOpen(false)} data-testid={`link-mobile-${label.replace(' ', '-')}`} className="mono-face border-b border-[#202534]/15 pb-3 text-xs">{label}</a>
             ))}
-            <button type="button" onClick={() => handleAction('Mint details are not live yet. Join the signal for the official launch notice.', 'mint')} data-testid="button-mobile-mint" className="button-cut bg-[#ec642f] px-4 py-3 text-left font-bold text-[#eee9dd]">get launch access <ArrowUpRight className="inline h-4 w-4" /></button>
+            <button type="button" onClick={() => handleAction('Register your wallet below for mint access.', 'mint')} data-testid="button-mobile-mint" className="button-cut bg-[#ec642f] px-4 py-3 text-left font-bold text-[#eee9dd]">register for mint <ArrowUpRight className="inline h-4 w-4" /></button>
           </div>
         </div>
       )}
@@ -518,7 +499,7 @@ function App() {
           </h1>
            <div className="mt-9 flex flex-wrap items-center gap-4">
               <button type="button" onClick={() => handleAction('Mint details are being locked. Join the signal to get the first drop notice.', 'mint')} data-testid="button-hero-mint" className="button-cut bg-[#ec642f] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1">
-                get launch access <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
+                register for mint <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
              </button>
           </div>
           <div className="mt-16 flex flex-wrap gap-x-8 gap-y-4 border-t border-[#202534]/15 pt-5 text-[11px] text-[#6e6b72]">
@@ -642,29 +623,30 @@ function App() {
         </div>
       </section>
 
-       <section id="watch" className="scroll-mt-10 border-y-2 border-[#202534] bg-[#f5bf58] py-24 md:py-32" data-testid="section-watch">
+       <section id="register" className="scroll-mt-10 border-y-2 border-[#202534] bg-[#f5bf58] py-24 md:py-32" data-testid="section-register">
          <div className="mx-auto max-w-[1320px] px-5 md:px-10">
            <div className="grid gap-12 md:grid-cols-[.8fr_1.2fr] md:items-end">
              <div>
-               <div className="mono-face mb-5 text-[10px] text-[#ec642f]">02 / watch my warrior</div>
+                <div className="mono-face mb-5 text-[10px] text-[#ec642f]">02 / register for mint</div>
              </div>
            </div>
            <div className="mt-12 grid gap-4 lg:grid-cols-[.78fr_1.22fr]">
              <div className="border-2 border-[#202534] bg-[#eee9dd] p-6 md:p-8">
                <div className="flex items-center justify-between gap-4">
-                 <div className="mono-face text-[10px] text-[#ec642f]">wallet check / read-only</div>
+                  <div className="mono-face text-[10px] text-[#ec642f]">mint registration / wallet check</div>
                  <LockKeyhole className="h-4 w-4 text-[#4a8b68]" />
                </div>
-               <h3 className="display-face mt-8 text-4xl font-bold leading-none">Watch my<br />warrior</h3>
-                <p className="mt-5 text-base leading-relaxed text-[#5c5b62]">A wallet can preview the interface before it owns an NFT. If minting opens later, the recorded snapshot would start a new performance run.</p>
-               <button type="button" onClick={() => { void previewWalletPerformance(); }} disabled={previewState === 'loading'} data-testid="button-preview-wallet" className="button-cut mt-8 bg-[#202534] px-5 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">
-                 {previewState === 'loading' ? 'checking wallet…' : previewState === 'ready' ? 'refresh preview' : 'connect wallet to preview'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
+                <h3 className="display-face mt-8 text-4xl font-bold leading-none">Register for<br />mint</h3>
+                 <p className="mt-5 text-base leading-relaxed text-[#5c5b62]">Register your wallet for the mint. We’re considering 1,000 free mints, followed by a possible 0.03 ETH price per NFT. Final launch details are not set; the plan is to reward early registrants if this structure is approved.</p>
+                <button type="button" onClick={() => { void startWalletVerification(); }} disabled={identityBusy || identityKind !== null} data-testid="button-register-wallet" className="button-cut mt-8 bg-[#202534] px-5 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">
+                  {identityKind !== null ? 'wallet registered' : identityBusy && verificationIntent === 'wallet' ? 'checking wallet control…' : 'register wallet'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" />
                </button>
-               <div className="mt-5 border-l-2 border-[#ec642f] pl-4 text-sm leading-relaxed text-[#6e6b72]" aria-live="polite" data-testid="preview-wallet-status">
-                  {previewState === 'idle' && <span>Illustrative form only. Live bag scoring is not enabled in this preview.</span>}
-                 {previewState === 'loading' && <span>Wallet access is read-only. No signature or approval is requested.</span>}
-                  {previewState === 'ready' && <span>Connected {previewWallet.slice(0, 6)}…{previewWallet.slice(-4)}. Illustrative preview only — this warrior is not minted or live-scored.</span>}
-                 {previewState === 'error' && <span>A compatible wallet is needed. No transaction was requested.</span>}
+                <div className="mt-5 border-l-2 border-[#ec642f] pl-4 text-sm leading-relaxed text-[#6e6b72]" aria-live="polite" data-testid="registration-wallet-status">
+                  {identityState === 'idle' && <span>Wallet registration uses a plain signature to prove control. No mint transaction, approval, or custody is requested.</span>}
+                  {identityState === 'signing' && <span>Check your wallet. This plain signature proves wallet control only; it does not grant permissions or move coins.</span>}
+                  {identityState === 'success' && <span className="font-bold">Wallet registered for the mint. Final allocation, price, and launch timing remain subject to the official announcement.</span>}
+                  {identityState === 'unavailable' && <span>Wallet registration is not configured for this preview yet. No wallet verification flow was opened.</span>}
+                  {identityState === 'error' && <span><strong>{identityError === 'wallet_missing' ? 'A compatible wallet is needed.' : identityErrorCopy(identityError)}</strong> <button type="button" onClick={() => { void resetIdentityVerification(); }} className="ml-1 underline underline-offset-4" data-testid="button-retry-registration">try again</button></span>}
                </div>
                 {referrer && (
                   <div className="mt-5 border border-[#4a8b68]/50 bg-[#4a8b68]/10 px-4 py-3 text-sm leading-relaxed text-[#4c4b51]" data-testid="referral-attribution">
@@ -831,11 +813,11 @@ function App() {
            <div className="relative grid min-w-0 gap-10 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] xl:items-end">
              <div className="min-w-0">
                 <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl xl:text-8xl">
-                 Verify your wallet to claim
+                  Register for mint
                </h2>
             </div>
              <div className="min-w-0">
-               <p className="text-lg leading-relaxed text-[#4c4b51]">One wallet gets one NFT. Sign your wallet to request a future claim; linking X is optional but reduces your chance of being blocked for multiple accounts. No public mint is open in this preview.</p>
+                <p className="text-lg leading-relaxed text-[#4c4b51]">Register your wallet for a future mint. We’re considering 1,000 free mints, followed by a possible 0.03 ETH price per NFT, with early registrants considered for rewards. Final allocation, price, and timing will be announced officially; no public mint is open in this preview.</p>
                <div className="mt-7 flex flex-wrap gap-3">
                   <button type="button" onClick={() => { void startWalletVerification(); }} disabled={identityBusy || identityKind !== null} data-testid="button-verify-wallet" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityKind === 'wallet' ? 'wallet control verified' : identityBusy && verificationIntent === 'wallet' ? 'checking wallet control…' : 'verify wallet control'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
                   <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityKind === 'x'} data-testid="button-join-signal" className="button-cut border-2 border-[#202534] px-6 py-4 font-bold text-[#202534] transition-transform hover:-translate-y-1 hover:bg-[#202534] hover:text-[#eee9dd] disabled:cursor-wait disabled:opacity-60">{identityKind === 'x' ? 'X linked' : identityBusy && verificationIntent === 'x' ? 'checking wallet for X link…' : 'link X (optional)'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#202534]" /></button>

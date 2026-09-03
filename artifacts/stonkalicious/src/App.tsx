@@ -647,9 +647,7 @@ function App() {
            <div className="grid gap-12 md:grid-cols-[.8fr_1.2fr] md:items-end">
              <div>
                <div className="mono-face mb-5 text-[10px] text-[#ec642f]">02 / watch my warrior</div>
-                <h2 className="display-face text-5xl font-bold leading-[.9] md:text-7xl">Preview what your<br /><span className="text-[#ec642f]">bag could become.</span></h2>
              </div>
-              <p className="max-w-[500px] text-lg leading-relaxed text-[#4c4b51]">Connect a wallet to view the preview flow before any future mint. This demo does not calculate a live wallet score. No approval, transaction, or custody.</p>
            </div>
            <div className="mt-12 grid gap-4 lg:grid-cols-[.78fr_1.22fr]">
              <div className="border-2 border-[#202534] bg-[#eee9dd] p-6 md:p-8">
@@ -736,7 +734,6 @@ function App() {
                   <span className="h-2.5 w-2.5 rounded-full transition-transform group-hover:scale-125" style={{ backgroundColor: stage.color, opacity: activeStage === stage.key ? 1 : .45 }} />
                 </button>
               ))}
-              <div className="mt-6 flex items-start gap-3 text-sm leading-relaxed text-[#6e6b72]"><MousePointer2 className="mt-1 h-4 w-4 shrink-0 text-[#ec642f]" /> This is a visual readout, not a promise of a specific live score.</div>
             </div>
             <div className="order-1 flex min-h-[530px] items-center justify-center border-2 border-[#202534] bg-[#272b3a] p-5 md:order-2 md:p-10">
               <div className="relative w-full max-w-[680px]">
@@ -833,11 +830,8 @@ function App() {
           <div className="absolute -bottom-28 right-24 h-72 w-72 rounded-full border border-[#202534]/15" />
            <div className="relative grid min-w-0 gap-10 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] xl:items-end">
              <div className="min-w-0">
-              <div className="mono-face mb-5 text-[10px] text-[#ec642f]">05 / claim your mirror</div>
                 <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl xl:text-8xl">
-                 <span className="block">Make your</span>
-                 <span className="block">snapshot</span>
-                 <span className="block text-[#ec642f]">visible.</span>
+                 Verify your wallet to claim
                </h2>
             </div>
              <div className="min-w-0">

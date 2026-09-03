@@ -9,7 +9,8 @@
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:rehearsal": "pnpm run build && node test/rehearsal.mjs",
-    "test:artwork-map": "node test/artwork-map.mjs"
+    "test:artwork-map": "node test/artwork-map.mjs",
+    "test:registry": "pnpm run build && node test/registry.mjs"
   },
   "dependencies": {
     "@workspace/api-zod": "workspace:*",

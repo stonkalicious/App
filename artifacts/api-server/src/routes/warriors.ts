@@ -5,6 +5,7 @@ import { ContractSnapshotProvider, PublicAssetProvider } from "../oracle/provide
 import { scoreObservation } from "../oracle/scoring";
 import type { MetadataResponse, ScoredWarrior } from "../oracle/types";
 import { WARRIOR_ARTWORK_MAP } from "@workspace/warrior-config";
+import { getAllowlistedAssets } from "../oracle/registry";
 
 const router: IRouter = Router();
 type OracleContext = {
@@ -22,7 +23,7 @@ function getContext(): OracleContext {
     context = {
       config,
       contract: new ContractSnapshotProvider(config.rpcUrl, config.contractAddress),
-      provider: new PublicAssetProvider(config.assetDataUrl, config.allowlist),
+      provider: new PublicAssetProvider(config.assetDataUrl, () => getAllowlistedAssets(config)),
       cache: new StaleCache(config.cacheTtlMs, config.staleTtlMs),
     };
   }

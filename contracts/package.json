@@ -6,6 +6,8 @@
   "scripts": {
     "compile": "node scripts/compile.mjs",
     "deploy:testnet": "pnpm run compile && node scripts/deploy.mjs",
+    "rehearse:testnet": "pnpm run compile && node scripts/rehearse.mjs",
+    "verify:testnet": "node scripts/verify.mjs",
     "test": "node --test test/stonkalicious.test.mjs",
     "check": "pnpm run compile && pnpm run test"
   },

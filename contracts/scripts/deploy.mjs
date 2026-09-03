@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { ethers } from "ethers";
 
-const required = ["RPC_URL", "DEPLOYER_PRIVATE_KEY", "SNAPSHOT_ORACLE", "MINT_SIGNER", "ROYALTY_RECEIVER"];
+const required = ["RPC_URL", "DEPLOYER_PRIVATE_KEY", "ROYALTY_RECEIVER"];
 for (const key of required) {
   if (!process.env[key]) {
     throw new Error(`${key} is required; provide it through the deployment environment's secret manager`);
@@ -18,10 +18,26 @@ if (network.chainId !== 46630n) {
   throw new Error(`Refusing deployment: expected Robinhood Chain testnet chain ID 46630, got ${network.chainId}`);
 }
 
+function addressFromPrivateKey(privateKeyName, addressName) {
+  const privateKey = process.env[privateKeyName];
+  const configuredAddress = process.env[addressName];
+  if (privateKey) {
+    const derivedAddress = new ethers.Wallet(privateKey).address;
+    if (configuredAddress && configuredAddress.toLowerCase() !== derivedAddress.toLowerCase()) {
+      throw new Error(`${addressName} does not match the address derived from ${privateKeyName}`);
+    }
+    return derivedAddress;
+  }
+  if (!configuredAddress) {
+    throw new Error(`${privateKeyName} or ${addressName} is required; provide it through the deployment environment's secret manager`);
+  }
+  return configuredAddress;
+}
+
 const roleAddresses = {
   deployer: deployer.address,
-  snapshotOracle: process.env.SNAPSHOT_ORACLE,
-  mintSigner: process.env.MINT_SIGNER,
+  snapshotOracle: addressFromPrivateKey("SNAPSHOT_ORACLE_PRIVATE_KEY", "SNAPSHOT_ORACLE"),
+  mintSigner: addressFromPrivateKey("MINT_SIGNER_PRIVATE_KEY", "MINT_SIGNER"),
 };
 for (const [role, address] of Object.entries(roleAddresses)) {
   if (!ethers.isAddress(address) || address === ethers.ZeroAddress) {
@@ -50,10 +66,11 @@ const contract = await factory.deploy(
   mintPrice,
   maxPerWallet,
   baseTokenURI,
-  process.env.SNAPSHOT_ORACLE,
-  process.env.MINT_SIGNER,
+  roleAddresses.snapshotOracle,
+  roleAddresses.mintSigner,
   process.env.ROYALTY_RECEIVER,
 );
+const deploymentTransaction = contract.deploymentTransaction();
 await contract.waitForDeployment();
 await (await contract.setContractURI(contractURI)).wait();
 
@@ -62,13 +79,14 @@ console.log(JSON.stringify({
   explorer: "https://explorer.testnet.chain.robinhood.com",
   deployer: deployer.address,
   contract: await contract.getAddress(),
+  deploymentTransaction: deploymentTransaction?.hash,
   maxSupply: maxSupply.toString(),
   mintPriceWei: mintPrice.toString(),
   maxPerWallet: maxPerWallet.toString(),
   baseTokenURI,
   contractURI,
-  snapshotOracle: process.env.SNAPSHOT_ORACLE,
-  mintSigner: process.env.MINT_SIGNER,
+  snapshotOracle: roleAddresses.snapshotOracle,
+  mintSigner: roleAddresses.mintSigner,
   royaltyReceiver: process.env.ROYALTY_RECEIVER,
   royaltyBasisPoints: "500",
   snapshotWriteInterface: "recordStartingBagValue(tokenId, expectedEpoch, startingBagValue)",

@@ -87,8 +87,8 @@ The repeatable deployment command is:
 ```bash
 RPC_URL=... \
 DEPLOYER_PRIVATE_KEY=... \
-SNAPSHOT_ORACLE=0x... \
-MINT_SIGNER=0x... \
+SNAPSHOT_ORACLE_PRIVATE_KEY=... \
+MINT_SIGNER_PRIVATE_KEY=... \
 BASE_TOKEN_URI=https://metadata.example/token/ \
 CONTRACT_URI=https://metadata.example/collection \
 MAX_SUPPLY=10000 \
@@ -98,15 +98,63 @@ ROYALTY_RECEIVER=0x... \
 pnpm --dir contracts run deploy:testnet
 ```
 
+The live contract rehearsal is run only after deployment and requires the same
+three private keys plus the public contract address. The script derives role
+addresses from the keys, checks chain ID `46630`, and never prints secret
+material:
+
+```bash
+RPC_URL=https://rpc.testnet.chain.robinhood.com \
+CONTRACT_ADDRESS=0x... \
+DEPLOYER_PRIVATE_KEY=... \
+SNAPSHOT_ORACLE_PRIVATE_KEY=... \
+MINT_SIGNER_PRIVATE_KEY=... \
+EXPECTED_BASE_TOKEN_URI=https://stonkalicious.com/api/token/ \
+EXPECTED_CONTRACT_URI=https://stonkalicious.com/api/collection \
+pnpm --dir contracts run rehearse:testnet
+```
+
+The seven-day transfer lock is intentionally not time-travelled on a live
+network. The rehearsal verifies the lock immediately and the reset must be
+verified by a second run after the real lock expires.
+
+Submit source verification with the same constructor values and compiler
+settings:
+
+```bash
+RPC_URL=https://rpc.testnet.chain.robinhood.com \
+CONTRACT_ADDRESS=0x... \
+BASE_TOKEN_URI=https://stonkalicious.com/api/token/ \
+CONTRACT_URI=https://stonkalicious.com/api/collection \
+SNAPSHOT_ORACLE_PRIVATE_KEY=... \
+MINT_SIGNER_PRIVATE_KEY=... \
+pnpm --dir contracts run verify:testnet
+```
+
 The metadata API reads the deployed contract with read-only `eth_call`
 requests; it does not submit snapshot or X-binding transactions. Its runtime
 configuration requires `METADATA_BASE_URL`,
 `ROBINHOOD_RPC_URL`, `STONKALICIOUS_CONTRACT_ADDRESS`,
-`PUBLIC_ASSET_DATA_URL`, and `ROBINHOOD_ASSET_ALLOWLIST_JSON`. Metadata remains
-locked unless `METADATA_PUBLIC=true` is explicitly set. Before that release
-flag is enabled, token and collection routes return `404`, set `no-store`, and
-do not expose wallet or portfolio data. `API_ALLOWED_ORIGINS` should contain
-only the official site origin when the metadata is released.
+and `PUBLIC_ASSET_DATA_URL`. In non-production rehearsals,
+`ROBINHOOD_ASSET_ALLOWLIST_JSON` may provide a disposable fixture; production
+loads the asset universe from the official registry and native-crypto discovery
+sources instead. Metadata remains locked unless `METADATA_PUBLIC=true` is
+explicitly set. Before that release flag is enabled, token and collection routes
+return `404`, set `no-store`, and do not expose wallet or portfolio data.
+`API_ALLOWED_ORIGINS` should contain only the official site origin when the
+metadata is released.
+
+The production asset-data endpoint is `https://stonkalicious.com/api/assets`.
+It reads balances from the configured Robinhood Chain RPC. Stock Tokens are
+discovered from `https://api.robinhood.com/rhj/assets` and priced through
+`/rhj/prices/{symbol}` with the registry multiplier applied. Configured crypto
+candidates are discovered from native Robinhood-chain market pairs and included
+only when their verified market cap is at least `$5,000,000`; a non-empty
+contract and native-chain deployment are required. The endpoint is read-only,
+returns `no-store`, rejects stale prices, and fails closed on RPC, registry,
+price, or allowlist errors. The official registry currently exposes mainnet
+deployments only, so metadata remains locked until a chain-matched testnet
+registry or explicitly approved mirror is available.
 
 ## Identity verification configuration
 

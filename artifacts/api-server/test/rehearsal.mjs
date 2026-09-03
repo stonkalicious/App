@@ -97,6 +97,7 @@ async function startApi(metadataPublic) {
     cwd: new URL("..", import.meta.url),
     env: {
       ...process.env,
+      NODE_ENV: "test",
       PORT: String(port),
       METADATA_BASE_URL: "https://metadata.example",
       ROBINHOOD_RPC_URL: rpcUrl,

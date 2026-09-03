@@ -21,3 +21,20 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.production]
+API_ALLOWED_ORIGINS = "https://stonkalicious.com"
+METADATA_BASE_URL = "https://stonkalicious.com/api"
+METADATA_PUBLIC = "false"
+PUBLIC_ASSET_DATA_URL = "https://stonkalicious.com/api/assets"
+ROBINHOOD_RPC_URL = "https://rpc.testnet.chain.robinhood.com"
+STONKALICIOUS_CONTRACT_ADDRESS = "0xB9fF6D9dc5ecea6ADc71a23C37306a40E72782a8"
+ROBINHOOD_ASSET_CHAIN_ID = "46630"
+ROBINHOOD_ASSET_REGISTRY_URL = "https://api.robinhood.com/rhj/assets"
+ROBINHOOD_ASSET_RPC_URL = "https://rpc.testnet.chain.robinhood.com"
+ROBINHOOD_CRYPTO_MARKET_CAP_FLOOR_USD = "5000000"
+ROBINHOOD_CRYPTO_REGISTRY_URL = "https://api.dexscreener.com/latest/dex/search"
+ROBINHOOD_CRYPTO_SYMBOLS = "VIRTUAL,PONS,CASHCAT,STONKBROKER,PIPEDOG,INDEX,DOGO,CHUMP,CHAI,STATICS,HMM,LIAM,GOONER,CASHBIRD,DELTA,AI,PONSTER,MOO,JOHN,HOOKR,QUOTRON,TENDIES,MICRODUCK,GPRO,GOOD,RAM,DTF,RABBIT,TWO"
+ROBINHOOD_PRICE_URL = "https://api.robinhood.com/rhj/prices"

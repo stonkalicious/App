@@ -1,5 +1,6 @@
 import type { AllowlistedAsset, AssetKind, ContractSnapshot, PortfolioObservation } from "./types";
 import { id } from "ethers";
+import type { OracleConfig } from "./config";
 
 type ProviderResponse = {
   wallet?: unknown;
@@ -145,7 +146,7 @@ export class ContractSnapshotProvider {
 export class PublicAssetProvider {
   constructor(
     private readonly assetDataUrl: string,
-    private readonly allowlist: AllowlistedAsset[],
+    private readonly allowlist: AllowlistedAsset[] | (() => Promise<AllowlistedAsset[]>),
   ) {}
 
   async getObservation(wallet: string, snapshot: ContractSnapshot): Promise<PortfolioObservation> {
@@ -158,22 +159,26 @@ export class PublicAssetProvider {
     const candidate = value as ProviderResponse;
     if (!isWallet(candidate.wallet) || candidate.wallet.toLowerCase() !== wallet.toLowerCase()) throw new Error("Public asset provider wallet mismatch");
 
+    const allowlist = Array.isArray(this.allowlist) ? this.allowlist : await this.allowlist();
     const assets = Array.isArray(candidate.assets) ? candidate.assets : [];
     const normalizedAssets = assets.map((asset) => {
       if (!asset || typeof asset !== "object") throw new Error("Public asset provider returned an invalid asset");
       const item = asset as Record<string, unknown>;
       const symbol = typeof item.symbol === "string" ? item.symbol.toUpperCase() : "";
       const valueUsd = numberValue(item.valueUsd, `${symbol || "asset"}.valueUsd`);
-      const kind = item.kind;
+       const kind = item.kind;
       const contractAddress = typeof item.contractAddress === "string" ? item.contractAddress.toLowerCase() : "";
-      const configured = this.allowlist.find((entry) =>
+       const configured = allowlist.find((entry) =>
         entry.symbol === symbol &&
         entry.contractAddress.toLowerCase() === contractAddress &&
         entry.kind === kind,
       );
-      const capped = configured?.maxContributionUsd !== undefined && valueUsd > configured.maxContributionUsd;
-      const included = Boolean(configured) && !capped;
-       const normalizedKind: AssetKind = "coin";
+       const capped = configured?.maxContributionUsd !== undefined && valueUsd > configured.maxContributionUsd;
+       const included = Boolean(configured) && !capped;
+       if (kind !== "coin" && kind !== "stock" && kind !== "crypto") {
+         throw new Error("Public asset provider returned an unsupported asset kind");
+       }
+       const normalizedKind: AssetKind = kind;
       return {
         symbol: symbol || "UNKNOWN",
         kind: normalizedKind,

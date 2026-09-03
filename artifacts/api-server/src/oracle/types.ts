@@ -2,7 +2,7 @@ import { WARRIOR_LEVEL_LABELS, type WarriorLevel, type WarriorStageKey } from "@
 
 export { WARRIOR_LEVEL_LABELS, type WarriorLevel, type WarriorStageKey };
 
-export type AssetKind = "coin";
+export type AssetKind = "coin" | "stock" | "crypto";
 
 export type AllowlistedAsset = {
   symbol: string;
@@ -10,6 +10,9 @@ export type AllowlistedAsset = {
   kind: AssetKind;
   decimals: number;
   maxContributionUsd?: number;
+  priceMultiplier?: number;
+  currentPriceUsd?: number;
+  marketCapUsd?: number;
 };
 
 export type PortfolioObservation = {

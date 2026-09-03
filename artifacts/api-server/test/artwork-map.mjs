@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 
 const mapUrl = new URL("../../../lib/warrior-config/src/artwork-map.json", import.meta.url);
@@ -35,11 +34,11 @@ for (const [stage, [level, filename]] of Object.entries(expected)) {
 
 assert.equal(new Set(availableFiles).size, availableFiles.length, "available tiers must not share artwork files");
 
-const fileHash = async (filename) => {
-  const bytes = await readFile(new URL(filename, assetRoot));
-  return createHash("sha256").update(bytes).digest("hex");
-};
-assert.equal(await fileHash("elite.png"), await fileHash("plumber.png"), "current Elite/God duplicate must remain detected");
 assert.equal(artworkMap.plumber.status, "blocked", "God must stay blocked until a distinct approved asset is supplied");
+await assert.rejects(
+  () => stat(new URL(artworkMap.plumber.filename, assetRoot)),
+  { code: "ENOENT" },
+  "blocked God artwork must not be present as a substitute",
+);
 
-console.log("Artwork map passed: eight stage/level mappings checked; duplicate God artwork remains explicitly blocked.");
+console.log("Artwork map passed: eight stage/level mappings checked; God artwork remains explicitly blocked and unavailable.");

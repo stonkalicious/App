@@ -49,7 +49,7 @@ for (const [label, content, required] of [
     "Signing it never approves a transaction or grants custody",
   ]],
   ["launch gates", checklist, [
-    "final human/legal review of public claims",
+    "final human/legal review still required",
     "Automatic no-go conditions",
     "illustrative wallet value, rank, growth figure",
   ]],

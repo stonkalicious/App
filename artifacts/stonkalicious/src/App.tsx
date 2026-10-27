@@ -812,12 +812,12 @@ function App() {
           <div className="absolute -bottom-28 right-24 h-72 w-72 rounded-full border border-[#202534]/15" />
            <div className="relative grid min-w-0 gap-10 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] xl:items-end">
              <div className="min-w-0">
-                <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl xl:text-8xl">
-                  Register for mint
+                 <h2 className="display-face max-w-[750px] text-4xl font-bold leading-[.88] sm:text-5xl md:text-7xl xl:text-8xl">
+                   Be there from the start
                </h2>
             </div>
              <div className="min-w-0">
-                <p className="text-lg leading-relaxed text-[#4c4b51]">Register your wallet for a future mint. We’re considering 1,000 free mints, followed by a possible 0.03 ETH price per NFT, with early registrants considered for rewards. Final allocation, price, and timing will be announced officially; no public mint is open in this preview.</p>
+                 <p className="text-lg leading-relaxed text-[#4c4b51]">Verify your wallet to prepare for the mint. We’re planning rewards for early supporters; details will be announced before launch.</p>
                <div className="mt-7 flex flex-wrap gap-3">
                   <button type="button" onClick={() => { void startWalletVerification(); }} disabled={identityBusy || identityKind !== null} data-testid="button-verify-wallet" className="button-cut bg-[#202534] px-6 py-4 font-bold text-[#eee9dd] transition-transform hover:-translate-y-1 disabled:cursor-wait disabled:opacity-60">{identityKind === 'wallet' ? 'wallet control verified' : identityBusy && verificationIntent === 'wallet' ? 'checking wallet control…' : 'verify wallet control'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#f5bf58]" /></button>
                   <button type="button" onClick={() => { void startIdentityVerification(); }} disabled={identityBusy || identityKind === 'x'} data-testid="button-join-signal" className="button-cut border-2 border-[#202534] px-6 py-4 font-bold text-[#202534] transition-transform hover:-translate-y-1 hover:bg-[#202534] hover:text-[#eee9dd] disabled:cursor-wait disabled:opacity-60">{identityKind === 'x' ? 'X linked' : identityBusy && verificationIntent === 'x' ? 'checking wallet for X link…' : 'link X (optional)'} <ArrowUpRight className="ml-2 inline h-4 w-4 text-[#202534]" /></button>

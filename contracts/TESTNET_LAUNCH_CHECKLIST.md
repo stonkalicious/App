@@ -136,8 +136,9 @@ does not attempt another mint.
 - [x] Deploy with a dedicated testnet wallet.
 - [x] Verify the recorded deployment source and constructor values on the testnet
       explorer.
-- [ ] Complete qualified human contract review; AI-assisted review is informational
-      only and is not independent audit assurance.
+- [x] Complete qualified human contract review; see
+      `contracts/HUMAN_SECURITY_REVIEW.md`. The review is not a formal audit or
+      a guarantee of contract safety.
 - [x] Set and validate the metadata base URL and collection URL on the deployed
       contract.
 - [ ] Keep metadata locked until the endpoint, cache, stale fallback, and
@@ -159,24 +160,34 @@ does not attempt another mint.
 - [x] Confirm no mainnet transaction, public mint, funding request, or
       announcement is included in the testnet rehearsal.
 
-## Review findings still open outside this task
+## Human-review findings accepted as launch blockers
 
-The snapshot boundary is hardened above, but this task does not silently close
-other review findings. Before a launch go decision, explicitly resolve or
-accept each of these:
+The project owner accepted the qualified human review findings as open launch
+blockers. This records their disposition; it does not resolve the findings,
+accept them as safe residual risks, or authorize a launch. Keep the current
+NO-GO decision until each applicable blocker is resolved and verified.
 
+- [ ] Protect the snapshot-oracle role and define auditable rotation, signed
+      records, approved sources, and freshness rules.
 - [ ] Choose a mutable-versus-pinned metadata strategy and protect URI changes
       with the selected governance control; keep endpoint monitoring and safe
       failure behavior in place.
 - [ ] Put admin minting behind the selected multisig/manifest process and audit
       every emergency allocation.
+- [ ] Define eligibility and external anti-Sybil controls for any free or
+      allowlisted allocation.
+- [ ] Define pause authority, disclose that pause freezes transfers, and
+      document recovery procedures under the selected governance control.
 - [ ] If optional X identity linking is enabled, document and test
       X-profile recovery/rebinding for a compromised account without
       permitting arbitrary rebinding.
-- [ ] Define pause authority, transfer behavior while paused, and recovery
-      procedures under the selected governance control.
 - [ ] Review the global mint-nonce namespace and replay policy as part of the
       final claim-signing design.
+- [ ] Decide whether to add a withdrawal event for on-chain observability.
+
+The recorded deployment predates the current royalty-receiver and
+epoch-bound snapshot-write requirements. Its source match remains unverified;
+deploy and verify the current source before any launch decision.
 
 ## Automatic no-go conditions
 

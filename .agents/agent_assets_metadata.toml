@@ -22,3 +22,17 @@ mtime_ms = 1787836268992
 storage_uri = "gcs://replit-rams-assets-kirk/rams/assets/repl:d02ff542-2bc0-448d-a728-30a17bd1db02/665d45ee-f3d0-485c-96d9-a97656c348c0/384b049f-be6e-45d8-a628-d2c2a1fdd124"
 storage_version_token = "1787836741414623"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "e9PRSHoEG6d76y6ZVfbtq"
+uri = "file://generated-artifacts/security-review/stonkalicious-full-codebase.zip"
+type = "unspecified"
+title = "Stonkalicious full codebase"
+description = "Current tracked application and contract source bundle for the independent security reviewer. Excludes Git history, dependencies, local secrets, agent memory, and the superseded contract-review export."
+logical_id = "6c9a8cb7-2b26-4b5c-8214-de797c119d0a"
+content_hash = "sha256:42bfd8f75f26182fe466e529c43dd213868158ea0d998017dd1aa15b49e2a5a8"
+size = 16988144
+mtime_ms = 1793092524257
+storage_uri = "gcs://replit-rams-assets-kirk/rams/assets/repl:d02ff542-2bc0-448d-a728-30a17bd1db02/6c9a8cb7-2b26-4b5c-8214-de797c119d0a/5062b7ac-82b1-4c41-9a50-a3ceac36d0e0"
+storage_version_token = "1793092529363588"
+content_type = "application/octet-stream"

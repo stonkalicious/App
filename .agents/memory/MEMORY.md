@@ -3,4 +3,5 @@
 - [Identity verification boundary](identity-verification.md) — hash stable X IDs transiently; never persist raw handles, OAuth tokens, or replayable wallet bindings.
 - [Contract test revert errors](contract-test-revert-errors.md) — local Ganache may omit custom-error data during estimateGas failures; avoid matching provider text.
 - [Robinhood testnet asset data](robinhood-testnet-data.md) — official API lacks wallet holdings; derive allowlisted testnet balances read-only and keep metadata locked until live checks pass.
+- [Testnet address casing](testnet-address-casing.md) — normalize documented testnet addresses before ethers calls; a valid deployment address may not have valid checksum casing.
 - [Repeated UI rebase conflicts](rebase-ui-conflicts.md) — later replayed commits can reintroduce the same annotated app conflict; resolve each against the canonical current UI before continuing.

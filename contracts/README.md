@@ -115,8 +115,20 @@ pnpm --dir contracts run rehearse:testnet
 ```
 
 The seven-day transfer lock is intentionally not time-travelled on a live
-network. The rehearsal verifies the lock immediately and the reset must be
-verified by a second run after the real lock expires.
+network. The full rehearsal verifies the immediate lock. After the lock expires,
+run the existing-token phase below; it does not mint another token and transfers
+the configured deployer's token to the snapshot-oracle wallet.
+
+```bash
+REHEARSAL_PHASE=post-unlock \
+RPC_URL=https://rpc.testnet.chain.robinhood.com \
+CONTRACT_ADDRESS=0x... \
+DEPLOYER_PRIVATE_KEY=... \
+EXPECTED_BASE_TOKEN_URI=https://stonkalicious.com/api/token/ \
+EXPECTED_CONTRACT_URI=https://stonkalicious.com/api/collection \
+TOKEN_ID=1 \
+pnpm --dir contracts run rehearse:testnet
+```
 
 Submit source verification with the same constructor values and compiler
 settings:

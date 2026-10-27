@@ -99,16 +99,31 @@ Completed successfully against the deployed contract:
 - Pause blocking oracle writes and pause recovery.
 - Metadata base URI update and restoration.
 
-Final on-chain state after the rehearsal:
+On-chain state after the initial pre-unlock rehearsal:
 
 - `totalSupply=1`; token `1` is owned by the deployer.
 - Token `1` has the oracle snapshot with `startingBagValue=100000`.
 - Contract is unpaused.
 - Base token URI and collection URI are restored to their verified values.
 
-The transfer reset, snapshot reset, and identity unbinding checks remain
-deferred until the real seven-day lock expires. The live rehearsal must be
-rerun for those post-unlock checks; the lock is not time-travelled on testnet.
+### Post-unlock transfer verification — 2026-10-27
+
+Completed against the live testnet deployment after the real lock expired:
+
+- Transfer transaction:
+  `0x326b4d465ad324253ce0ccced93f60045a7fab23976a1822e0d8f538466a057c`
+- Token `1` transferred from the deployer to the configured snapshot oracle.
+- The snapshot wallet changed to the new owner, `startingBagValue` reset from
+  `100000` to `0`, and the epoch incremented from `1` to `2`.
+- The token's X profile hash was cleared and its lookup returned no token.
+  A non-mutating call from the configured verifier confirmed the old hash can
+  be rebound to this token without changing state.
+- The contract remained unpaused, and the token and collection metadata
+  endpoints stayed unavailable (`503`, `Cache-Control: no-store`) before and
+  after the transfer.
+
+The dedicated `post-unlock` rehearsal phase verifies this existing token and
+does not attempt another mint.
 
 ## Blockers before a testnet go decision
 
@@ -131,7 +146,7 @@ rerun for those post-unlock checks; the lock is not time-travelled on testnet.
 - [x] Exercise mint authorization, one-wallet lifetime enforcement, identity
       uniqueness, snapshot-oracle writes, seven-day transfer lock enforcement,
       pause recovery, and metadata update/restore on testnet.
-- [ ] After the real seven-day lock expires, exercise transfer reset, snapshot
+- [x] After the real seven-day lock expires, exercise transfer reset, snapshot
       reset, and identity unbinding on testnet.
 - [ ] Exercise `recordStartingBagValue(tokenId, expectedEpoch,
       startingBagValue)` with the live `snapshotOf(tokenId).epoch`; confirm

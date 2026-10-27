@@ -1,62 +1,0 @@
-I’ll pull FOMO’s actual changelog and postmortems so we only copy lessons that are real.FOMO here means fomo.family — social feed + on-chain balances + leaderboards — not the other “FOMO” copy-trading mini-app. They started simple and then spent a year patching the holes that appear the minute a public PnL board exists.
-You do not want their product. You want their scar list.
-
-What they launched with
-One loop: see someone’s bag → see their PnL → follow → copy the feeling of being on a board.
-That loop is why you pointed at them. Everything after that was defense and scope creep.
-
-What they had to ship later (and why)
-1. Time windows (24h / 7d / 30d / all) All-time boards get captured by one lucky coin or a bot farm. Short windows look like a slot machine. They needed both so “hot today” and “actually good” were not the same list.
-Patch for you on day 1: rank growth since this owner acquired the NFT, plus a 7-day board if you want chatter. Never ship only all-time.
-2. Friends feed vs global feed Global feed became noise. They added following, a friends tab, then chain filters, then clans. Same problem on repeat: too many strangers.
-Patch: one public board + “my warrior.” No feed of every mint in v1.
-3. Illiquid / fake PnL People still roast them for counting unrealized PnL on dead tokens and for wash wallets printing the 30d board. Fresh wallets bundling a scamcoin still hit visibility.
-Patch you already halfway have: allowlist + liquidity floor + cap per token. Also: don’t count a token you cannot sell into. Mark thin bags as unscored, not as God.
-4. Wallet identity split FOMO accounts sit on mapped/custodial-style addresses; real trading often happens on another wallet. Third parties scraped the reverse-lookup, then FOMO killed that API. Leaderboards and “who is this person” drifted apart.
-Patch: one wallet owns the NFT. Snapshot that wallet. Don’t let people “link a different flex wallet” in v1. X is a label, not a second bag.
-5. Multi-chain Base, BNB, Monad, Robinhood… each chain needed its own board or the numbers lied. They shipped multichain leaderboards because a single number mixed apples.
-Patch: Robinhood Chain only. If you ever add another chain, that’s a new product.
-6. Safety warnings + token filters They had to tag dangerous tokens after people got wrecked following a green card.
-Patch: if a listed token dies, it drops off the score in public. Don’t wait for a “safety badge” feature.
-7. Misclick / UX debt They shipped flip-able buy/sell because people fat-fingered size. That’s a trading-app wound.
-Patch: you are not a trading app. No buy button on the warrior page. Preview ≠ swap.
-8. Scope gravity Onramp, taxes, TradingView, web, perps, clans, theses, comments. The social board became a broker. That’s how they make money. It’s also how a solo NFT dies.
-Patch: freeze v1 at warrior + board + mint. Every FOMO-like add is a year of work.
-9. Trust / fee optics Independent writeups said small tickets paid a much higher effective fee than the advertised 0.5%. Whether fair or not, the board felt rigged for whales.
-Patch: publish the scoring formula. If God requires $X listed-token value and Y% growth, write it on /rules. Hidden math = FOMO’s “the board is bots” thread.
-10. Clones and drainers Typosquat sites copied them and asked for wallet approvals.
-Patch: you already say no approvals. Keep that sentence on every mint screen. Official domain only.
-
-Mistakes to skip entirely
-FOMO wound
-Don’t do this
-Board first, filters later
-Ship allowlist + cap + “unscored if illiquid” before public rank
-All-time PnL as the flex
-Rank from acquire snapshot, reset on transfer
-Mapped wallet ≠ trading wallet
-One address, one NFT, one bag
-Follow-the-trade feed
-No copy-trade, no swap, no “ape what #1 bought”
-uPNL on junk
-No thin-pool marks
-Handle without proof
-X is optional label; wallet is source of truth
-More chains = more users
-One chain
-Monetize via taker fees
-You monetize the mint. Don’t become a DEX to fund art
-
-What to steal (tiny)
-FOMO’s share object is a row: name, number, green or red, time window. Yours should be that row plus the warrior image.
-They also learned: celebrate #1 in public (they post 7d leaders on X). That’s free distribution if the number is not a wash.
-
-v1 that avoids their patch treadmill
-	•	RH chain only
-	•	Allowlisted tokens + liquidity rule + per-token cap
-	•	Score = current listed bag vs snapshot at mint/transfer
-	•	Boards: “this owner’s run” and maybe 7-day movers
-	•	One wallet, transfer resets, no second bag
-	•	Formula on the site
-	•	No feed, no swap, no clans, no perps
-That’s FOMO’s core without the product they had to become. If you add a live feed of every trade, you inherit their entire bug list.
